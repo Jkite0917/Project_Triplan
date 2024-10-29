@@ -1,0 +1,169 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background_image">
+
+    <CalendarView
+        android:id="@+id/MainCalendarView"
+        android:layout_width="match_parent"
+        android:layout_height="315dp"
+        android:layout_marginTop="40dp"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/WeatherTextView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="5dp"
+        android:gravity="center_vertical"
+        android:text="   MM DD 날씨"
+        android:textSize="25dp"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="3"
+        app:layout_constraintBottom_toTopOf="@+id/WeatherScrollViewBlock"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/WeatherScrollViewBlock"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        app:cardCornerRadius="16dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomCardView"
+        app:cardBackgroundColor="@null">
+
+        <HorizontalScrollView
+            android:id="@+id/WeatherScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/main_background_image"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" >
+
+            <LinearLayout
+                android:id="@+id/weatherLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <include layout="@layout/item_weather_hour" />
+                <include layout="@layout/item_weather_hour1" />
+                <include layout="@layout/item_weather_hour2" />
+                <include layout="@layout/item_weather_hour3" />
+                <include layout="@layout/item_weather_hour4" />
+                <include layout="@layout/item_weather_hour5" />
+                <include layout="@layout/item_weather_hour6" />
+                <include layout="@layout/item_weather_hour7" />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/bottomCardView"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginBottom="48dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:cardUseCompatPadding="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/menubar_image">
+
+            <!-- 왼쪽 첫 번째 버튼 -->
+            <ImageButton
+                android:id="@+id/button_left1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_calendar_icon"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_left2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <!-- 왼쪽 두 번째 버튼 -->
+            <ImageButton
+                android:id="@+id/button_left2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_weather_icon"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_center"
+                app:layout_constraintStart_toEndOf="@id/button_left1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <!-- 가운데 버튼 -->
+            <ImageButton
+                android:id="@+id/button_center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_plus_icon"
+                android:scaleType="centerCrop"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_right1"
+                app:layout_constraintStart_toEndOf="@id/button_left2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <!-- 오른쪽 첫 번째 버튼 -->
+            <ImageButton
+                android:id="@+id/button_right1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_check_icon"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_right2"
+                app:layout_constraintStart_toEndOf="@id/button_center"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+            <!-- 오른쪽 두 번째 버튼 -->
+            <ImageButton
+                android:id="@+id/button_right2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_setting_icon"
+                android:scaleType="fitCenter"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/button_right1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

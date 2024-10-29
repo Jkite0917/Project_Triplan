@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="450dp"
+    android:padding="16dp"
+    android:id="@+id/MainAddID">
+
+    <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->
+    <TextView
+        android:id="@+id/TitleID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="5dp"
+        android:text="일정 추가"
+        android:textSize="20sp"
+        android:textColor="@color/black"
+        android:gravity="center" />
+
+    <!-- 내용 입력 -->
+    <EditText
+        android:id="@+id/EditID"
+        app:layout_constraintTop_toBottomOf="@id/TitleID"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_marginTop="10dp"
+        android:hint="    내용을 작성하세요"/>
+
+    <!-- 날짜 선택 버튼 -->
+    <Button
+        android:id="@+id/buttonSelectDate"
+        app:layout_constraintTop_toBottomOf="@id/EditID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="날짜 선택"
+        android:layout_marginTop="16dp" />
+
+    <!-- 선택된 날짜 표시 TextView -->
+    <TextView
+        android:id="@+id/selectedDateTextView"
+        app:layout_constraintTop_toBottomOf="@id/buttonSelectDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="선택된 날짜 없음"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="8dp"
+        android:gravity="center"/>
+
+    <!-- 저장 버튼 -->
+    <Button
+        android:id="@+id/buttonSave"
+        app:layout_constraintTop_toBottomOf="@id/selectedDateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="저장"
+        android:layout_marginTop="16dp"
+        android:background="#20b2aa"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
