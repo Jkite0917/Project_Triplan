@@ -62,9 +62,9 @@ class MainActivity : AppCompatActivity() {
 // 두 번째 오른쪽 버튼 클릭 시 설정 화면으로 전환
         buttonRight2.setOnClickListener {
             switchButton(buttonRight2)
-            Log.d("Button Click", "Right 2 button clicked - SettingActivity intent")
-            // val intent = Intent(this, SettingActivity::class.java)
-            // startActivity(intent)
+
+            val intent = Intent(this, SettingActivity::class.java)
+            startActivity(intent)
         }
 
 
