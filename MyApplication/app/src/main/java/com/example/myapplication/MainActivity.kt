@@ -19,9 +19,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        // CalendarView 초기화
-        calendarView = findViewById<CalendarView>(R.id.MainCalendarView)
-        setCalendarToToday()
 
         val buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
         val buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
@@ -79,13 +76,6 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun setCalendarToToday() {
-        // 오늘 날짜 가져오기
-        val calendar = Calendar.getInstance(Locale.KOREA)
-
-        // CalendarView에 오늘 날짜 설정
-        calendarView.date = calendar.timeInMillis
-    }
 
     private fun switchButton(button: ImageButton) {
         // 이전 선택된 버튼의 선택 해제
