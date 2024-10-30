@@ -29,7 +29,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".WeatherActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".SettingActivity" />
+        <activity android:name=".SettingActivity"
+            android:screenOrientation="portrait" />
 
     </application>
 

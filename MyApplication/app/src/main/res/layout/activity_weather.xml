@@ -16,6 +16,7 @@
         android:layout_marginTop="8dp"
         android:text="Weather list"
         android:textSize="24sp"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

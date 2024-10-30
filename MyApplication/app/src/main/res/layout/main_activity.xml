@@ -23,7 +23,7 @@
         android:shadowDx="3"
         android:shadowDy="3"
         android:shadowRadius="3"
-        app:layout_canstraintTop_toBottomOf="@+id/mainActivityIncludeCalender"
+        app:layout_constraintTop_toBottomOf="@+id/mainActivityIncludeCalender"
         app:layout_constraintBottom_toTopOf="@+id/WeatherScrollViewBlock"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
