@@ -5,28 +5,25 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_background_image">
 
-    <CalendarView
-        android:id="@+id/MainCalendarView"
-        android:layout_width="match_parent"
-        android:layout_height="315dp"
-        android:layout_marginTop="40dp"
-        android:textColor="@android:color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <include layout = "@layout/main_calendar"
+        android:id="@+id/mainActivityIncludeCalender"
+        app:layout_constraintBottom_toTopOf="@+id/WeatherTextView"
+        app:layout_constraintTop_toBottomOf="parent"
+        />
 
     <TextView
         android:id="@+id/WeatherTextView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="13dp"
         android:gravity="center_vertical"
         android:text="   MM DD 날씨"
         android:textSize="25dp"
+        android:textColor="@color/black"
         android:shadowDx="3"
         android:shadowDy="3"
         android:shadowRadius="3"
+        app:layout_canstraintTop_toBottomOf="@+id/mainActivityIncludeCalender"
         app:layout_constraintBottom_toTopOf="@+id/WeatherScrollViewBlock"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
