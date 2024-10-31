@@ -1,15 +1,22 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.ImageButton
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingActivity : AppCompatActivity() {
+    private lateinit var buttonLeft1: ImageButton
+    private lateinit var buttonLeft2: ImageButton
+    private lateinit var buttonRight1: ImageButton
+    private lateinit var buttonRight2: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
+        setupButtonListeners()
 
         // Spinner에 사용할 지역 리스트
         val regionList = listOf("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종")
@@ -21,4 +28,33 @@ class SettingActivity : AppCompatActivity() {
         spinner.adapter = adapter
 
     }
+
+    private fun setupButtonListeners() {
+        buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
+        buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
+        buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
+        buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
+
+        buttonLeft1.setOnClickListener {
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+
+        buttonLeft2.setOnClickListener {
+            startActivity(Intent(this, WeatherActivity::class.java))
+        }
+
+        buttonRight1.setOnClickListener {
+            startActivity(Intent(this, CheckActivity::class.java))
+        }
+
+        buttonRight2.setOnClickListener {
+            // 현재 Activity가 MainActivity인지 확인
+            if (this is SettingActivity) {
+                return@setOnClickListener
+            }
+            startActivity(Intent(this, SettingActivity::class.java))
+        }
+
+    }
+
 }

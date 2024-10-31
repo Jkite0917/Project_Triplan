@@ -17,149 +17,74 @@ import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var txtCurrentMonth: TextView
-    private lateinit var layoutDates: LinearLayout
-    private var currentCalendar: Calendar = Calendar.getInstance()
+    private lateinit var buttonLeft1: ImageButton
+    private lateinit var buttonLeft2: ImageButton
+    private lateinit var buttonRight1: ImageButton
+    private lateinit var buttonRight2: ImageButton
+    private lateinit var buttonCenter: ImageButton
 
-    private var selectedButton: ImageButton? = null
+    private lateinit var calendarView: CalendarView
+    private lateinit var selectedDate: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        setupButtonListeners()
 
 
-        val buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
-        val buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
-        val buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
-        val buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
+        calendarView = findViewById(R.id.MainCalendarView)
+        selectedDate = findViewById(R.id.WeatherTextView)
+
+        // 현재 날짜 가져오기
+        val calendar = Calendar.getInstance()
+        calendarView.date = calendar.timeInMillis // 캘린더뷰를 현재 날짜로 설정
+        updateSelectedDate(calendar)
+
+        // 날짜 변경 리스너
+        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
+            val selectedCalendar = Calendar.getInstance()
+            selectedCalendar.set(year, month, dayOfMonth)
+            updateSelectedDate(selectedCalendar)
+        }
+    }
+
+    private fun updateSelectedDate(calendar: Calendar) {
+        val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedDate.text = "  보고 있는 날짜: $month/$day"
+    }
+
+    private fun setupButtonListeners() {
+        buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
+        buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
+        buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
+        buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
+        buttonCenter = findViewById(R.id.button_center)
 
         buttonLeft1.setOnClickListener {
-            switchButton(buttonLeft1)
-
             // 현재 Activity가 MainActivity인지 확인
             if (this is MainActivity) {
-                // 현재 Activity가 MainActivity이면 아무것도 하지 않음
                 return@setOnClickListener
             }
-
-            // 현재 Activity가 MainActivity가 아니면 새 Intent로 시작
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, MainActivity::class.java))
         }
 
-
-// 두 번째 버튼 클릭 시 날씨 화면으로 전환
         buttonLeft2.setOnClickListener {
-            switchButton(buttonLeft2)
-
-            val intent = Intent(this, WeatherActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, WeatherActivity::class.java))
         }
 
-// 첫 번째 오른쪽 버튼 클릭 시 체크리스트 화면으로 전환
         buttonRight1.setOnClickListener {
-            switchButton(buttonRight1)
-
-            val intent = Intent(this, CheckActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, CheckActivity::class.java))
         }
 
-// 두 번째 오른쪽 버튼 클릭 시 설정 화면으로 전환
         buttonRight2.setOnClickListener {
-            switchButton(buttonRight2)
-
-            val intent = Intent(this, SettingActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, SettingActivity::class.java))
         }
 
-
-        val buttonCenter = findViewById<ImageButton>(R.id.button_center)
         buttonCenter.setOnClickListener {
-            // BottomSheetDialogFragment 표시
-            Log.d("Button Click", "center add button clicked - SettingActivity intent")
-            //val bottomSheet = MainAddPage()
-            //bottomSheet.show(supportFragmentManager, bottomSheet.tag)
-        }
-
-        updateCalendarView()
-
-        // 이전 달 버튼 클릭 이벤트
-        findViewById<View>(R.id.btnPrevMonthLeft).setOnClickListener {
-            currentCalendar.add(Calendar.MONTH, -1)
-            updateCalendarView()
-        }
-
-        // 다음 달 버튼 클릭 이벤트
-        findViewById<View>(R.id.btnPrevMonthRight).setOnClickListener {
-            currentCalendar.add(Calendar.MONTH, 1)
-            updateCalendarView()
+            val bottomSheet = MainAddActivity()
+            bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
     }
 
-
-    private fun switchButton(button: ImageButton) {
-        // 이전 선택된 버튼의 선택 해제
-        selectedButton?.isSelected = false
-        // 현재 버튼을 선택 상태로 변경
-        selectedButton = button
-        selectedButton?.isSelected = true
-    }
-
-    private fun updateCalendarView() {
-        // 현재 달과 연도 가져오기
-        val monthFormat = SimpleDateFormat("yyyy년 MM월", Locale.getDefault())
-        txtCurrentMonth.text = monthFormat.format(currentCalendar.time)
-
-        // 날짜 그리드 초기화
-        layoutDates.removeAllViews()
-
-        // 해당 월의 첫 날과 마지막 날 가져오기
-        val firstDayOfMonth = currentCalendar.clone() as Calendar
-        firstDayOfMonth.set(Calendar.DAY_OF_MONTH, 1)
-
-        val lastDayOfMonth = currentCalendar.clone() as Calendar
-        lastDayOfMonth.set(Calendar.DAY_OF_MONTH, lastDayOfMonth.getActualMaximum(Calendar.DAY_OF_MONTH))
-
-        // 요일에 맞춰 시작하는 날 계산
-        val startDayOfWeek = firstDayOfMonth.get(Calendar.DAY_OF_WEEK)
-        val daysInMonth = lastDayOfMonth.get(Calendar.DAY_OF_MONTH)
-
-        // 빈 칸 추가 (1일부터 시작하는 주의 요일까지)
-        for (i in 1 until startDayOfWeek) {
-            val emptyView = TextView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = ""
-            }
-            layoutDates.addView(emptyView)
-        }
-
-        // 날짜 추가
-        for (day in 1..daysInMonth) {
-            val dateView = TextView(this).apply {
-                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
-                text = day.toString()
-                gravity = Gravity.CENTER
-                setPadding(4, 4, 4, 4)
-                setTextColor(
-                    if (day == Calendar.getInstance().get(Calendar.DAY_OF_MONTH) &&
-                        currentCalendar.get(Calendar.MONTH) == Calendar.getInstance().get(Calendar.MONTH)) {
-                        android.graphics.Color.RED // 수정된 부분
-                    } else {
-                        android.graphics.Color.BLACK // 수정된 부분
-                    }
-                )
-            }
-            layoutDates.addView(dateView) // 날짜 뷰를 layoutDates에 추가
-        }
-
-        if (startDayOfWeek == 7) {
-            layoutDates.addView(LinearLayout(this).apply {
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                orientation = LinearLayout.VERTICAL
-            })
-        }
-    }
 }
