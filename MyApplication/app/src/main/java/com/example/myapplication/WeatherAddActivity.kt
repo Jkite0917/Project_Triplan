@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -58,12 +59,15 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
             val contents = etContent.text.toString()
             val selectedTime = selectedTimeButton.text.toString()
 
-            // WeatherListItem을 생성하고 필요한 데이터를 전달
-            val weatherItem = WeatherListItem(contents, selectedWeatherIcon, selectedTime)
-            // 데이터를 어댑터나 데이터베이스로 전달하는 로직 추가 가능
-
-            // BottomSheet 종료
-            dismiss()
+            if (contents.isNotEmpty() && selectedTime != "선택된 날짜 없음") {
+                // Room DB에 데이터 저장
+                // WeatherListItem을 생성하고 필요한 데이터를 전달
+                val weatherItem = WeatherListItem(contents, selectedWeatherIcon, selectedTime)
+                // 데이터를 어댑터나 데이터베이스로 전달하는 로직 추가 가능
+                dismiss() // 다이얼로그 닫기
+            } else {
+                Toast.makeText(requireContext(), "선택과 내용을 전부 입력해주세요.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         return view // 인플레이트한 뷰 반환
@@ -78,7 +82,7 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         }
 
         // 선택된 버튼 강조 표시
-        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.teal_200))
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC))
         button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
         selectedTimeButton = button // 선택된 버튼을 저장
     }
@@ -93,6 +97,6 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         }
 
         // 선택된 날씨 버튼 강조 표시
-        selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.teal_200))
+        selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC))
     }
 }

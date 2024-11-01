@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class CheckAddActivity : BottomSheetDialogFragment() {
@@ -76,11 +77,15 @@ class CheckAddActivity : BottomSheetDialogFragment() {
             val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString() else ""
             val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString() else ""
 
-            // 데이터 처리 로직 (예: 데이터베이스에 저장 등)
-            // 예시: Log 출력
-            println("제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay")
 
-            dismiss() // Bottom Sheet 닫기
+
+            if (title.isNotEmpty() && period != "선택된 날짜 없음") {
+                // Room DB에 데이터 저장
+                println("제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay")
+                dismiss() // 다이얼로그 닫기
+            } else {
+                Toast.makeText(requireContext(), "내용과 주기를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
