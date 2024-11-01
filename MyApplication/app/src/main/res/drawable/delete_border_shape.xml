@@ -1,0 +1,8 @@
+<!-- res/drawable/border_shape.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#FFEBEE " />
+    <stroke
+        android:width="2dp"
+        android:background="@color/black" /> <!-- 테두리 색상 -->
+    <corners android:radius="4dp" /> <!-- 모서리 둥글게 설정 -->
+</shape>

@@ -3,7 +3,8 @@
     android:layout_width="380dp"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/border_shape">
 
     <TextView
         android:id="@+id/weatherlist_item_contents"
@@ -46,7 +47,8 @@
         android:layout_width="0dp"
         android:layout_height="29dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_weight="1"
-        android:background="#808080"
+        android:background="@drawable/delete_border_shape"
         android:text="삭제" />
 </LinearLayout>

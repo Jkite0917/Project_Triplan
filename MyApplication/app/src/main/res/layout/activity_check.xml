@@ -15,6 +15,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:text="Check list"
+        android:textColor="@color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -25,6 +26,7 @@
         android:id="@+id/checklist_recycler_view"
         android:layout_width="382dp"
         android:layout_height="623dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintTop_toBottomOf="@id/CheckListPageText"
         app:layout_constraintVertical_bias="0.742"
         tools:layout_editor_absoluteX="-8dp" />
