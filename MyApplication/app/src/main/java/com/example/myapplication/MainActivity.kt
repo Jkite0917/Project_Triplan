@@ -11,12 +11,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var database: LocalDatabase
+    private lateinit var dateTextDao: DateTextDao
+
     private lateinit var buttonLeft1: ImageButton
     private lateinit var buttonLeft2: ImageButton
     private lateinit var buttonRight1: ImageButton
@@ -30,6 +36,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         setupButtonListeners()
+
+        database = LocalDatabase.getDatabase(this) // DB 생성
+        dateTextDao = database.getDateTextDao() // DAO 생성
+        Log.d("DatabaseCheck", "Database instance created: $database") // DB 연동 확인 로그
+
+        // 데이터베이스에 항목 추가
+        val dateText = DateText("2024-11-04", "Sample memo")
+        CoroutineScope(Dispatchers.IO).launch {
+            dateTextDao.insertDateText(dateText)
+            val allDateTexts = dateTextDao.getAllDateText()
+            Log.d("DatabaseCheck", "All DateTexts: $allDateTexts") // 테스트용 값 입력
+        }
 
 
         calendarView = findViewById(R.id.MainCalendarView)
