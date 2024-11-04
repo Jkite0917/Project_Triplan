@@ -46,21 +46,21 @@ interface WeatherTextDao {
 
 @Dao
 interface CheckTextDao {
-    @Query("SELECT * FROM CheckText")
-    fun getAllCheckText(): List<CheckText>
+    @Query("SELECT * FROM Checklist")
+    fun getAllCheckText(): List<Checklist>
 
-    @Query("SELECT * FROM CheckText WHERE CNo = :cNo")
-    suspend fun getCheckText(cNo: Int): CheckText?
+    @Query("SELECT * FROM Checklist WHERE CNo = :cNo")
+    suspend fun getCheckText(cNo: Int): Checklist?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCheckText(checkText: CheckText)
+    suspend fun insertCheckText(checkText: Checklist)
 
     @Update
-    suspend fun updateCheckText(checkText: CheckText)
+    suspend fun updateCheckText(checkText: Checklist)
 
     @Delete
-    suspend fun deleteCheckText(checkText: CheckText)
+    suspend fun deleteCheckText(checkText: Checklist)
 
-    @Query("DELETE FROM CheckText")
+    @Query("DELETE FROM Checklist")
     suspend fun deleteAllCheckTexts()
 }
