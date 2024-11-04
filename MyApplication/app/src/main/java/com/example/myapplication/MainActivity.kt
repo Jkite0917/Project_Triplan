@@ -1,28 +1,17 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
-import android.view.View
 import android.widget.CalendarView
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-
 class MainActivity : AppCompatActivity() {
-    private lateinit var database: LocalDatabase
-    private lateinit var dateTextDao: DateTextDao
-
     private lateinit var buttonLeft1: ImageButton
     private lateinit var buttonLeft2: ImageButton
     private lateinit var buttonRight1: ImageButton
@@ -32,44 +21,32 @@ class MainActivity : AppCompatActivity() {
     private lateinit var calendarView: CalendarView
     private lateinit var selectedDate: TextView
 
+    // 다년 공휴일 리스트
+    private val holidayMap = mapOf(
+        2024 to listOf("2024-01-01", "2024-12-25"),
+        2025 to listOf("2025-01-01", "2025-12-25"),
+        // 필요한 연도를 추가
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         setupButtonListeners()
 
-        database = LocalDatabase.getDatabase(this) // DB 생성
-        dateTextDao = database.getDateTextDao() // DAO 생성
-        Log.d("DatabaseCheck", "Database instance created: $database") // DB 연동 확인 로그
-
-        // 데이터베이스에 항목 추가
-        val dateText = DateText("2024-11-04", "Sample memo")
-        CoroutineScope(Dispatchers.IO).launch {
-            dateTextDao.insertDateText(dateText)
-            val allDateTexts = dateTextDao.getAllDateText()
-            Log.d("DatabaseCheck", "All DateTexts: $allDateTexts") // 테스트용 값 입력
-        }
-
-
         calendarView = findViewById(R.id.MainCalendarView)
         selectedDate = findViewById(R.id.WeatherTextView)
 
-        // 현재 날짜 가져오기
-        val calendar = Calendar.getInstance()
-        calendarView.date = calendar.timeInMillis // 캘린더뷰를 현재 날짜로 설정
-        updateSelectedDate(calendar)
+        // 현재 날짜를 설정하고 표시
+        setCurrentDate()
 
-        // 날짜 변경 리스너
-        calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            val selectedCalendar = Calendar.getInstance()
-            selectedCalendar.set(year, month, dayOfMonth)
+        // 날짜 선택 리스너 등록
+        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
+            val selectedCalendar = Calendar.getInstance().apply {
+                set(year, month, dayOfMonth)
+            }
             updateSelectedDate(selectedCalendar)
+            updateDateTextColor(selectedCalendar)
         }
-    }
-
-    private fun updateSelectedDate(calendar: Calendar) {
-        val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        selectedDate.text = "  보고 있는 날짜: $month/$day"
     }
 
     private fun setupButtonListeners() {
@@ -105,4 +82,46 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setCurrentDate() {
+        val calendar = Calendar.getInstance()
+        calendarView.date = calendar.timeInMillis
+        updateSelectedDate(calendar)
+        updateDateTextColor(calendar)
+    }
+
+    private fun updateDateTextColor(calendar: Calendar) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate = dateFormat.format(calendar.time)
+        val year = calendar.get(Calendar.YEAR)
+        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // 기본 색상 설정
+        var color = Color.BLACK
+
+        // 요일별 색상 설정
+        when (dayOfWeek) {
+            Calendar.SUNDAY -> color = Color.RED
+            Calendar.SATURDAY -> color = Color.BLUE
+        }
+
+        // 공휴일 색상 적용
+        holidayMap[year]?.let { holidays ->
+            if (holidays.contains(formattedDate)) {
+                color = Color.RED
+            }
+        }
+    }
+
+
+    private fun updateSelectedDate(calendar: Calendar) {
+        val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        selectedDate.text = "  $month/$day  날씨"
+    }
 }
+
+
+
+
+
+

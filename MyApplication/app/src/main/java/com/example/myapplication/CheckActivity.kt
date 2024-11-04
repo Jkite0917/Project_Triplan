@@ -33,6 +33,14 @@ class CheckActivity : AppCompatActivity() {
         checklistRecyclerView = findViewById(R.id.checklist_recycler_view)
         items.add(ChecklistItem("예시 제목 1", "매주", false))
         items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+        items.add(ChecklistItem("예시 제목 2", "매월", true))
+
 
         adapter = CheckListAdapter(items) { position ->
             // 삭제 버튼 클릭 시 아이템 삭제
