@@ -5,11 +5,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 
-@Database(entities = [DateText::class, WeatherText::class, CheckText::class], version = 1)
+@Database(entities = [DateText::class, WeatherText::class, Checklist::class], version = 1)
 abstract class LocalDatabase : RoomDatabase() {
     abstract fun getDateTextDao(): DateTextDao
     abstract fun getWeatherTextDao(): WeatherTextDao
-    abstract fun getCheckTextDao(): CheckTextDao
+    abstract fun getChecklistDao(): ChecklistDao
 
     /*
         싱글턴 인스턴스 생성

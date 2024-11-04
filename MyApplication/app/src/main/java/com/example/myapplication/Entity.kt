@@ -19,10 +19,11 @@ data class WeatherText (
 )
 
 @Entity(tableName = "Checklist")
-data class Checklist (
-    @PrimaryKey(autoGenerate = true) val CNo: Int = 0, // 체크리스트 pk, 자동 생성
-    @ColumnInfo val CTitle: String, // 제목
+data class Checklist(
+    @PrimaryKey(autoGenerate = true) val cNo: Int = 0, // 체크리스트 pk, 자동 생성
+    @ColumnInfo val cTitle: String, // 제목
+    @ColumnInfo var isChecked: Boolean = false, // 체크리스트 선택
     @ColumnInfo val period: String, // 주기
-    val weekDay: String?, // 요일 (선택 사항)
-    val monthDay: String? // 날짜 (선택 사항)
+    @ColumnInfo val weekDay: String? = null, // 요일 (선택 사항)
+    @ColumnInfo val monthDay: String? = null // 날짜 (선택 사항)
 )

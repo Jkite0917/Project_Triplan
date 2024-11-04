@@ -3,16 +3,15 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.widget.AdapterView
 import android.widget.ImageButton
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CheckActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -21,36 +20,50 @@ class CheckActivity : AppCompatActivity() {
     private lateinit var buttonRight2: ImageButton
     private lateinit var buttonCenter: ImageButton
 
-    private lateinit var checklistRecyclerView: RecyclerView
-    private lateinit var adapter: CheckListAdapter
-    private val items = mutableListOf<ChecklistItem>()
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var checklistAdapter: ChecklistAdapter
+    private lateinit var checklistItems: MutableList<Checklist>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check) // 메인 레이아웃 설정
         setupButtonListeners()
+        loadChecklistItems()
+    }
 
-        checklistRecyclerView = findViewById(R.id.checklist_recycler_view)
-        items.add(ChecklistItem("예시 제목 1", "매주", false))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
-        items.add(ChecklistItem("예시 제목 2", "매월", true))
+    private fun loadChecklistItems() {
+        recyclerView = findViewById(R.id.checklist_recyclerview)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        adapter = CheckListAdapter(items) { position ->
-            // 삭제 버튼 클릭 시 아이템 삭제
-            items.removeAt(position)
-            adapter.notifyItemRemoved(position)
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                // 모든 체크리스트 아이템 가져오기
+                checklistItems = LocalDatabase.getDatabase(
+                    this@CheckActivity).getChecklistDao().getAllChecklistItems().toMutableList()
+                withContext(Dispatchers.Main) {
+                    checklistAdapter = ChecklistAdapter(checklistItems) { item ->
+                        // 삭제 버튼 클릭 시 실행되는 로직
+                        deleteChecklistItem(item)  // deleteChecklistItem 함수 호출
+                    }
+                    recyclerView.adapter = checklistAdapter // 어댑터 설정
+                }
+            } catch (e: Exception) {
+                // 예외 처리: 사용자에게 오류 메시지를 표시하거나 로그를 남기는 등의 작업
+                Log.e("CheckActivity", "Failed to load checklist items: ${e.message}")
+            }
         }
+    }
 
-        checklistRecyclerView.adapter = adapter
-        checklistRecyclerView.layoutManager = LinearLayoutManager(this)
-
+    // 삭제 아이템 처리 함수
+    private fun deleteChecklistItem(item: Checklist) {
+        CoroutineScope(Dispatchers.IO).launch {
+            // 데이터베이스에서 삭제
+            LocalDatabase.getDatabase(this@CheckActivity).getChecklistDao().deleteChecklistItemByCNo(item.cNo)
+            checklistItems.remove(item) // 리스트에서 제거
+            withContext(Dispatchers.Main) {
+                checklistAdapter.notifyDataSetChanged() // RecyclerView 업데이트
+            }
+        }
     }
 
     private fun setupButtonListeners() {

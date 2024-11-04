@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,21 +12,26 @@ import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CheckAddActivity : BottomSheetDialogFragment() {
-
     private lateinit var titleEditText: EditText
     private lateinit var periodSpinner: Spinner
     private lateinit var weekDaySpinner: Spinner
     private lateinit var monthDaySpinner: Spinner
     private lateinit var saveButton: Button
 
+    private lateinit var db: LocalDatabase
+
     // 시작 레이아웃 뷰 설정
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+        ): View? {
         return inflater.inflate(R.layout.checklist_add, container, false)
+
     }
 
     // 뷰 생성 시 실행되는 함수
@@ -35,6 +41,7 @@ class CheckAddActivity : BottomSheetDialogFragment() {
         initializeViews(view)
         setupPeriodSpinner()
         setupSaveButton()
+
     }
     
     // 뷰 id 지정
@@ -115,10 +122,23 @@ class CheckAddActivity : BottomSheetDialogFragment() {
     private fun isInputValid(title: String, period: String): Boolean {
         return title.isNotEmpty() && period != "선택하세요"
     }
-    
+
     // 생성한 일정 DB 저장 로직
     private fun saveToDatabase(title: String, period: String, weekDay: String, monthDay: String) {
-        // Room DB에 데이터 저장 (DB 로직)
-        println("제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay")
+        // Room DB에 데이터를 저장하는 함수
+        val ChecklistItemData  = Checklist(
+            cTitle = title,
+            isChecked = false,
+            period = period,
+            weekDay = if (weekDay.isEmpty()) null else weekDay,  // 요일 값이 비어있으면 null, 아니면 해당 요일 값 사용
+            monthDay = if (monthDay.isEmpty()) null else monthDay // 날짜 값이 비어있으면 null, 아니면 해당 날짜 값 사용
+        )
+
+        // IO 스레드에서 비동기로 데이터베이스 작업을 수행하기 위해 CoroutineScope 시작
+        CoroutineScope(Dispatchers.IO).launch {
+            db.getChecklistDao().insertChecklistItem(ChecklistItemData) // ChecklistItemData 객체를 DB에 저장
+            println("데이터 저장 완료: 제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay") // 저장 완료 로그 출력
+        }
     }
+
 }

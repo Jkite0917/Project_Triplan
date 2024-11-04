@@ -11,16 +11,13 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainAddActivity : BottomSheetDialogFragment() {
     private lateinit var editText: EditText
     private lateinit var selectedDateTextView: TextView
     private lateinit var buttonSelectDate: Button
     private lateinit var buttonSave: Button
-
+    
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,6 +41,7 @@ class MainAddActivity : BottomSheetDialogFragment() {
             saveData()
         }
 
+        // --------------------------------------------------------
         return view // 뷰를 반환
     }
 

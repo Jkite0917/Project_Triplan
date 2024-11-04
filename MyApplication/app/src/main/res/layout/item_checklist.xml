@@ -16,7 +16,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <CheckBox
-            android:id="@+id/checkBox"
+            android:id="@+id/checklist_item_checkbox"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"/>
@@ -33,7 +33,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/checklist_item_cycle"
+            android:id="@+id/checklist_item_period"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
