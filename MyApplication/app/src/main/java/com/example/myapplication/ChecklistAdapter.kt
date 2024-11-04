@@ -20,8 +20,15 @@ class ChecklistAdapter(private val items: MutableList<Checklist>,
 
         fun bind(item: Checklist) {
             titleTextView.text = item.cTitle
-            periodTextView.text = item.period
             checkBox.isChecked = item.isChecked
+
+            // period, weekDay, monthDay가 null이 아닌 경우에만 표시
+            val period = item.period ?: ""
+            val weekDay = item.weekDay?.let { " $it" + "요일" } ?: ""
+            val monthDay = item.monthDay?.let { " $it" + "일" } ?: ""
+
+            // 모든 값이 null인 경우 빈 문자열이 되도록 조합
+            periodTextView.text = "$period$weekDay$monthDay".trim() // trim()으로 공백 제거
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
                 item.isChecked = isChecked

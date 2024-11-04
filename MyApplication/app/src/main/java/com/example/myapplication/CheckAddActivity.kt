@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,7 @@ class CheckAddActivity : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        db = LocalDatabase.getDatabase(requireContext())
         initializeViews(view)
         setupPeriodSpinner()
         setupSaveButton()
@@ -134,10 +137,14 @@ class CheckAddActivity : BottomSheetDialogFragment() {
             monthDay = if (monthDay.isEmpty()) null else monthDay // 날짜 값이 비어있으면 null, 아니면 해당 날짜 값 사용
         )
 
-        // IO 스레드에서 비동기로 데이터베이스 작업을 수행하기 위해 CoroutineScope 시작
-        CoroutineScope(Dispatchers.IO).launch {
-            db.getChecklistDao().insertChecklistItem(ChecklistItemData) // ChecklistItemData 객체를 DB에 저장
-            println("데이터 저장 완료: 제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay") // 저장 완료 로그 출력
+        // IO 스레드에서 비동기로 데이터베이스 작업을 수행하기 위해 lifecycleScope 사용
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                db.getChecklistDao().insertChecklistItem(ChecklistItemData)
+                println("데이터 저장 완료: 제목: $title, 주기: $period, 요일: $weekDay, 날짜: $monthDay")
+            } catch (e: Exception) {
+                Log.e("CheckAddActivity", "Failed to save checklist item: ${e.message}")
+            }
         }
     }
 
