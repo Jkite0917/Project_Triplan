@@ -2,7 +2,6 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageButton
@@ -27,7 +26,7 @@ class WeatherActivity : AppCompatActivity() {
         setupButtonListeners()
 
 
-        weatherlistRecyclerView = findViewById(R.id.weatherlist_recycler_view)
+        weatherlistRecyclerView = findViewById(R.id.WeatherlistRecyclerView)
         items.add(WeatherListItem("예시 제목 1", R.drawable.weather_sun_icon, "오기전날"))
         items.add(WeatherListItem("예시 제목 1", R.drawable.weather_rain_icon, "하루종일"))
 

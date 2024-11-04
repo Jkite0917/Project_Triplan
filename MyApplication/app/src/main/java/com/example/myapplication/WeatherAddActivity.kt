@@ -17,7 +17,7 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
 
     private var selectedWeatherIcon: Int = 0 // 선택한 날씨 아이콘의 ID 저장
     private lateinit var selectedTimeButton: Button // 선택된 시간 버튼 참조
-    private lateinit var etContent: EditText
+    private lateinit var editTExt: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,9 +26,9 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         // 레이아웃을 인플레이트
         val view = inflater.inflate(R.layout.weather_add, container, false)
 
-        val gridWeather: GridLayout = view.findViewById(R.id.gridWeather)
-        selectedTimeButton = view.findViewById(R.id.button_time_now) // 기본 시간 버튼
-        etContent = view.findViewById(R.id.etContent)
+        val gridWeather: GridLayout = view.findViewById(R.id.WeatherAddGridLayout)
+        selectedTimeButton = view.findViewById(R.id.WeatherAddTimeNowButton) // 기본 시간 버튼
+        editTExt = view.findViewById(R.id.WeatherAddEditText)
 
         // 날씨 아이콘 버튼 선택 처리
         gridWeather.children.forEach { child ->
@@ -45,9 +45,9 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
 
         // 시간 선택 버튼들
         val timeButtons = listOf(
-            view.findViewById<Button>(R.id.button_before_day),
-            view.findViewById<Button>(R.id.button_time_now),
-            view.findViewById<Button>(R.id.button_all_day)
+            view.findViewById<Button>(R.id.WeatherAddBeforeDayButton),
+            view.findViewById<Button>(R.id.WeatherAddTimeNowButton),
+            view.findViewById<Button>(R.id.WeatherAddAllDayButton)
         )
 
         timeButtons.forEach { button ->
@@ -55,8 +55,8 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         }
 
         // 저장 버튼 클릭 시 입력 내용 저장
-        view.findViewById<Button>(R.id.btnSave).setOnClickListener {
-            val contents = etContent.text.toString()
+        view.findViewById<Button>(R.id.WeatherAddSaveButton).setOnClickListener {
+            val contents = editTExt.text.toString()
             val selectedTime = selectedTimeButton.text.toString()
 
             if (contents.isNotEmpty() && selectedTime != "선택된 날짜 없음") {
@@ -77,12 +77,14 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
     private fun selectTimeButton(button: Button, timeButtons: List<Button>) {
         // 모든 버튼 스타일 초기화
         timeButtons.forEach { btn ->
-            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+            btn.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
             btn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
         }
 
         // 선택된 버튼 강조 표시
-        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC))
+        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
         button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
         selectedTimeButton = button // 선택된 버튼을 저장
     }
@@ -92,11 +94,13 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         // 모든 날씨 버튼 스타일 초기화
         gridWeather.children.forEach { child ->
             if (child is ImageButton) {
-                child.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+                child.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+                child.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
             }
         }
 
         // 선택된 날씨 버튼 강조 표시
-        selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC))
+        selectedButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+        selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
     }
 }

@@ -8,7 +8,7 @@
 
     <!-- 날씨 선택 텍스트 -->
     <TextView
-        android:id="@+id/tvWeather"
+        android:id="@+id/WeatherAddTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="날씨 알림 추가"
@@ -22,20 +22,20 @@
 
     <!-- 날씨 선택 버튼들 (GridLayout) -->
     <GridLayout
-        android:id="@+id/gridWeather"
+        android:id="@+id/WeatherAddGridLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:columnCount="3"
         android:rowCount="2"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="10dp"
-        app:layout_constraintTop_toBottomOf="@id/tvWeather"
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <!-- 날씨 아이콘 버튼들 -->
         <ImageButton
-            android:id="@+id/weather_sun_icon"
+            android:id="@+id/WeatherAddSunIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -46,7 +46,7 @@
             android:padding="8dp" />
 
         <ImageButton
-            android:id="@+id/weather_cloud_icon"
+            android:id="@+id/WeatherAddCloudIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -57,7 +57,7 @@
             android:padding="8dp" />
 
         <ImageButton
-            android:id="@+id/weather_rain_icon"
+            android:id="@+id/WeatherAddRainIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -68,7 +68,7 @@
             android:padding="8dp" />
 
         <ImageButton
-            android:id="@+id/weather_thunder_icon"
+            android:id="@+id/WeatherAddThunderIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -79,7 +79,7 @@
             android:padding="8dp" />
 
         <ImageButton
-            android:id="@+id/weather_snow_icon"
+            android:id="@+id/WeatherAddSnowIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -90,7 +90,7 @@
             android:padding="8dp" />
 
         <ImageButton
-            android:id="@+id/weather_suncloud_icon"
+            android:id="@+id/WeatherAddSuncloudIcon"
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_columnWeight="1"
@@ -103,7 +103,7 @@
 
     <!-- 시간 선택 텍스트 -->
     <TextView
-        android:id="@+id/tvTime"
+        android:id="@+id/WeatherAddTimeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="  시간"
@@ -111,23 +111,22 @@
         android:textSize="16sp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/gridWeather"
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddGridLayout"
         app:layout_constraintStart_toStartOf="parent" />
-
     <!-- 시간 선택 버튼들 (수평 LinearLayout) -->
     <LinearLayout
-        android:id="@+id/linearTime"
+        android:id="@+id/WeatherAddLinerLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="16dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/tvTime"
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddTimeTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
-            android:id="@+id/button_before_day"
+            android:id="@+id/WeatherAddBeforeDayButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -136,7 +135,7 @@
             android:text="오기전날" />
 
         <Button
-            android:id="@+id/button_time_now"
+            android:id="@+id/WeatherAddTimeNowButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -145,7 +144,7 @@
             android:text="오늘순간" />
 
         <Button
-            android:id="@+id/button_all_day"
+            android:id="@+id/WeatherAddAllDayButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -156,7 +155,7 @@
 
     <!-- 내용 입력 텍스트 -->
     <TextView
-        android:id="@+id/tvContent"
+        android:id="@+id/WeatherAddContentsTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="   내용"
@@ -164,12 +163,12 @@
         android:textSize="16sp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/linearTime"
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddLinerLayout"
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- 내용 입력 (EditText) -->
     <EditText
-        android:id="@+id/etContent"
+        android:id="@+id/WeatherAddEditText"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:background="@android:drawable/editbox_background_normal"
@@ -184,10 +183,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvContent" />
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddContentsTextView" />
 
     <Button
-        android:id="@+id/btnSave"
+        android:id="@+id/WeatherAddSaveButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -198,6 +197,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etContent" />
+        app:layout_constraintTop_toBottomOf="@id/WeatherAddEditText" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="380dp"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="16dp"
     android:background="@drawable/item_border_shape">
 
     <TextView
-        android:id="@+id/weatherlist_item_contents"
+        android:id="@+id/WeatherItemTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -18,7 +18,7 @@
         android:textSize="16sp" />
 
     <FrameLayout
-        android:id="@+id/weatherlist_item_icon_container"
+        android:id="@+id/WeatherItemIconFrameLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -26,7 +26,7 @@
         android:gravity="center">
 
         <ImageView
-            android:id="@+id/weatherlist_item_icon"
+            android:id="@+id/WeatherItemIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/weather_snow_icon"
@@ -34,7 +34,7 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/weatherlist_time"
+        android:id="@+id/WeatherItemTimeTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -45,7 +45,7 @@
         android:textSize="16sp" />
 
     <Button
-        android:id="@+id/weatherlist_item_delete"
+        android:id="@+id/WeatherItemDeleteButton"
         android:layout_width="0dp"
         android:layout_height="29dp"
         android:layout_marginStart="8dp"
