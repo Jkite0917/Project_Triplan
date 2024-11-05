@@ -66,7 +66,8 @@ dependencies {
     implementation(libs.androidx.recyclerview)
 
     // Room 관련 의존성 추가
-    implementation(libs.androidx.room.ktx) // Kotlin Extensions
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.ui.test.android) // Kotlin Extensions
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

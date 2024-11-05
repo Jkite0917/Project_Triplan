@@ -10,13 +10,13 @@
         layout="@layout/main_calendar" />
 
     <TextView
-        android:id="@+id/WeatherTextView"
+        android:id="@+id/DateWeatherTextView"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginBottom="13dp"
         android:gravity="center_vertical"
-        android:text="   MM DD 날씨"
-        android:textSize="25dp"
+        android:text="   MM DD 날씨 정보입니다."
+        android:textSize="23dp"
         android:textColor="@color/black"
         android:shadowDx="3"
         android:shadowDy="3"

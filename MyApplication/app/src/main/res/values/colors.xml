@@ -10,4 +10,6 @@
     <color name="buttonC">#B0D3E0</color>
     <color name="Red">#9B111E</color>
     <color name="Saturday">#50bcdf</color>
+    <color name="Sunday">#BE2E22</color>
+    <color name="Today">#257968</color>
 </resources>
