@@ -5,17 +5,9 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_background_image">
 
-    <CalendarView
+    <include
         android:id="@+id/MainCalendarView"
-        android:layout_width="match_parent"
-        android:layout_height="315dp"
-        android:layout_marginTop="40dp"
-        android:textColor="@android:color/black"
-        android:dateTextAppearance="@style/CalendarDateTextAppearance"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        layout="@layout/main_calendar" />
 
     <TextView
         android:id="@+id/WeatherTextView"

@@ -3,10 +3,13 @@ package com.example.myapplication
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.CalendarView
+import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -18,35 +21,29 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonRight2: ImageButton
     private lateinit var buttonCenter: ImageButton
 
-    private lateinit var calendarView: CalendarView
-    private lateinit var selectedDate: TextView
-
-    // 다년 공휴일 리스트
-    private val holidayMap = mapOf(
-        2024 to listOf("2024-01-01", "2024-12-25"),
-        2025 to listOf("2025-01-01", "2025-12-25"),
-        // 필요한 연도를 추가
-    )
+    private lateinit var tvCurrentMonth: TextView
+    private lateinit var gridCalendar: GridLayout
+    private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         setupButtonListeners()
 
-        calendarView = findViewById(R.id.MainCalendarView)
-        selectedDate = findViewById(R.id.WeatherTextView)
+        tvCurrentMonth = findViewById(R.id.CalenderYearMonth)
+        gridCalendar = findViewById(R.id.gridCalendar)
 
-        // 현재 날짜를 설정하고 표시
-        setCurrentDate()
-
-        // 날짜 선택 리스너 등록
-        calendarView.setOnDateChangeListener { _, year, month, dayOfMonth ->
-            val selectedCalendar = Calendar.getInstance().apply {
-                set(year, month, dayOfMonth)
-            }
-            updateSelectedDate(selectedCalendar)
-            updateDateTextColor(selectedCalendar)
+        findViewById<ImageButton>(R.id.btnPrevMonthLeft).setOnClickListener {
+            calendar.add(Calendar.MONTH, -1)
+            updateCalendar()
         }
+
+        findViewById<ImageButton>(R.id.btnPrevMonthRight).setOnClickListener {
+            calendar.add(Calendar.MONTH, 1)
+            updateCalendar()
+        }
+
+        updateCalendar()
     }
 
     private fun setupButtonListeners() {
@@ -82,41 +79,67 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setCurrentDate() {
-        val calendar = Calendar.getInstance()
-        calendarView.date = calendar.timeInMillis
-        updateSelectedDate(calendar)
-        updateDateTextColor(calendar)
-    }
+    private fun updateCalendar() {
+        // 월/연도 업데이트
+        val dateFormat = SimpleDateFormat("yyyy년 MM월", Locale.getDefault())
+        tvCurrentMonth.text = dateFormat.format(calendar.time)
 
-    private fun updateDateTextColor(calendar: Calendar) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formattedDate = dateFormat.format(calendar.time)
-        val year = calendar.get(Calendar.YEAR)
-        val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+        // 달력 초기화
+        gridCalendar.removeAllViews()
 
-        // 기본 색상 설정
-        var color = Color.BLACK
+        // 첫 날 설정
+        val firstDayOfMonth = calendar.apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+        }.get(Calendar.DAY_OF_WEEK)
 
-        // 요일별 색상 설정
-        when (dayOfWeek) {
-            Calendar.SUNDAY -> color = Color.RED
-            Calendar.SATURDAY -> color = Color.BLUE
-        }
+        val maxDaysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
 
-        // 공휴일 색상 적용
-        holidayMap[year]?.let { holidays ->
-            if (holidays.contains(formattedDate)) {
-                color = Color.RED
+        // 이전 달 마지막 일수 계산
+        val prevMonthDays = firstDayOfMonth - 1
+
+        // 현재 날짜
+        val today = Calendar.getInstance()
+
+        // 날짜 채우기
+        for (i in 1..prevMonthDays + maxDaysInMonth) {
+            val dayTextView = TextView(this).apply {
+                layoutParams = GridLayout.LayoutParams().apply {
+                    width = 0
+                    height = GridLayout.LayoutParams.WRAP_CONTENT
+                    columnSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                    rowSpec = GridLayout.spec(GridLayout.UNDEFINED, 1f)
+                }
+                gravity = Gravity.CENTER
+                textSize = 23f
+                text = if (i > prevMonthDays) (i - prevMonthDays).toString() else ""
+
+                // 현재 날짜 하이라이트를 원형 배경으로 설정
+                if (calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                    text == today.get(Calendar.DAY_OF_MONTH).toString()) {
+                    setBackgroundResource(R.drawable.rounded_button)
+                }
+
+                // 요일 색상 설정
+                when ((i - 1) % 7) {
+                    0 -> setTextColor(Color.parseColor("#BE2E22")) // 일요일
+                    6 -> setTextColor(Color.parseColor("#009688")) // 토요일
+                    else -> setTextColor(Color.BLACK)
+                }
+
+                // 13일에 밑줄 추가
+                if (text == "13") {
+                    setCompoundDrawablesWithIntrinsicBounds(
+                        null, // 왼쪽
+                        null, // 위쪽
+                        null, // 오른쪽
+                        ContextCompat.getDrawable(context, R.drawable.underline) // 아래쪽
+                    )
+                    compoundDrawablePadding = 1 // 텍스트와 밑줄 사이 간격
+                }
             }
+            gridCalendar.addView(dayTextView)
         }
-    }
-
-
-    private fun updateSelectedDate(calendar: Calendar) {
-        val month = calendar.get(Calendar.MONTH) + 1 // 월은 0부터 시작하므로 +1
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        selectedDate.text = "  $month/$day  날씨"
     }
 }
 
