@@ -10,9 +10,9 @@ data class DailySchedule (
     @ColumnInfo(name = "Info") val Info: String // 내용
 )
 
-@Entity(tableName = "WeatherText")
-data class WeatherText (
-    @PrimaryKey(autoGenerate = true) val WNo: Int = 0, // 날씨 pk, 자동 생성
+@Entity(tableName = "WeatherList")
+data class WeatherList (
+    @PrimaryKey(autoGenerate = true) val WNo: Long = 0, // 날씨 pk, 자동 생성
     @ColumnInfo val Weather: Int, // 날씨 아이콘 리소스
     @ColumnInfo val WTime: String, // 알림 시간
     @ColumnInfo val WText: String // 내용

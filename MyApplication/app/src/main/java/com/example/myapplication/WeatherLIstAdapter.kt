@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 data class WeatherListItem(
+    val wNo: Long,
     val contents: String,
     val weather: Int,
     val time: String,
@@ -16,7 +17,7 @@ data class WeatherListItem(
 
 class WeatherListAdapter(
     private val items: MutableList<WeatherListItem>,
-    private val onDeleteClick: (Int) -> Unit
+    private val onDeleteClick: (Long) -> Unit
 ) : RecyclerView.Adapter<WeatherListAdapter.WeatherListViewHolder>() {
 
     inner class WeatherListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -31,7 +32,7 @@ class WeatherListAdapter(
             time.text = item.time
 
             deleteButton.setOnClickListener {
-                onDeleteClick(position)
+                onDeleteClick(item.wNo) // 삭제 시 데이터베이스의 기본 키 전달
             }
         }
     }
@@ -48,3 +49,4 @@ class WeatherListAdapter(
 
     override fun getItemCount(): Int = items.size
 }
+

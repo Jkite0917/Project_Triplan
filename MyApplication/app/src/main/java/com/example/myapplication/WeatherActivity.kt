@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class WeatherActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -14,31 +18,56 @@ class WeatherActivity : AppCompatActivity() {
     private lateinit var buttonRight2: ImageButton
     private lateinit var buttonCenter: ImageButton
 
-
     private lateinit var adapter: WeatherListAdapter
     private val items = mutableListOf<WeatherListItem>()
-
     private lateinit var weatherlistRecyclerView: RecyclerView
+    private lateinit var database: LocalDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather) // 메인 레이아웃 설정
         setupButtonListeners()
 
+        // 데이터베이스 초기화
+        database = LocalDatabase.getDatabase(this)
 
         weatherlistRecyclerView = findViewById(R.id.WeatherlistRecyclerView)
-        items.add(WeatherListItem("예시 제목 1", R.drawable.weather_sun_icon, "오기전날"))
-        items.add(WeatherListItem("예시 제목 1", R.drawable.weather_rain_icon, "하루종일"))
 
-        adapter = WeatherListAdapter(items) { position ->
-            // 삭제 버튼 클릭 시 아이템 삭제
-            items.removeAt(position)
-            adapter.notifyItemRemoved(position)
+        // 어댑터 설정
+        adapter = WeatherListAdapter(items) { wNo ->
+            val position = items.indexOfFirst { it.wNo == wNo }
+            if (position != -1) {
+                items.removeAt(position)
+                adapter.notifyItemRemoved(position)
+
+                // 데이터베이스에서도 삭제
+                lifecycleScope.launch {
+                    withContext(Dispatchers.IO) {
+                        database.getWeatherTextDao().deleteWeatherListById(wNo) // 기본 키를 사용해 삭제
+                    }
+                }
+            }
         }
+
 
         weatherlistRecyclerView.adapter = adapter
         weatherlistRecyclerView.layoutManager = LinearLayoutManager(this)
 
+        // 데이터베이스에서 저장된 데이터 불러오기
+        lifecycleScope.launch {
+            val savedItems = withContext(Dispatchers.IO) {
+                database.getWeatherTextDao().getAllWeatherList()
+            }
+            items.addAll(savedItems.map { weatherList ->
+                WeatherListItem(
+                    wNo = weatherList.WNo,
+                    contents = weatherList.WText,
+                    weather = weatherList.Weather,
+                    time = weatherList.WTime
+                )
+            })
+            adapter.notifyDataSetChanged()
+        }
     }
 
     private fun setupButtonListeners() {
@@ -54,7 +83,6 @@ class WeatherActivity : AppCompatActivity() {
 
         buttonLeft2.setOnClickListener {
             if (this is WeatherActivity) {
-                // 현재 Activity가 MainActivity이면 아무것도 하지 않음
                 return@setOnClickListener
             }
         }
@@ -68,8 +96,31 @@ class WeatherActivity : AppCompatActivity() {
         }
 
         buttonCenter.setOnClickListener {
-            val bottomSheet = WeatherAddActivity()
+            val bottomSheet = WeatherAddActivity { newItem ->
+                addItemToWeatherList(newItem)
+            }
             bottomSheet.show(supportFragmentManager, bottomSheet.tag)
+        }
+    }
+
+    // 새로운 아이템을 리스트에 추가하고 데이터베이스에 저장하는 함수
+    private fun addItemToWeatherList(newItem: WeatherListItem) {
+        lifecycleScope.launch {
+            val weatherList = WeatherList(
+                Weather = newItem.weather,
+                WTime = newItem.time,
+                WText = newItem.contents
+            )
+
+            // 삽입된 항목의 기본 키 ID를 Long 타입으로 받음
+            val insertedId = withContext(Dispatchers.IO) {
+                database.getWeatherTextDao().insertWeatherList(weatherList)
+            }
+
+            // 새로 추가된 아이템에 WNo를 업데이트하고 리스트에 추가
+            val updatedItem = newItem.copy(wNo = insertedId)
+            items.add(updatedItem)
+            adapter.notifyItemInserted(items.size - 1)
         }
     }
 }
