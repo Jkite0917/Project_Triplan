@@ -26,7 +26,7 @@ class WeatherListAdapter(
         private val time: TextView = itemView.findViewById(R.id.WeatherItemTimeTextView)
         private val deleteButton: Button = itemView.findViewById(R.id.WeatherItemDeleteButton)
 
-        fun bind(item: WeatherListItem, position: Int) {
+        fun bind(item: WeatherListItem) {
             contents.text = item.contents
             weather.setImageResource(item.weather) // 저장된 drawable ID로 이미지 설정
             time.text = item.time
@@ -44,7 +44,7 @@ class WeatherListAdapter(
     }
 
     override fun onBindViewHolder(holder: WeatherListViewHolder, position: Int) {
-        holder.bind(items[position], position)
+        holder.bind(items[position])
     }
 
     override fun getItemCount(): Int = items.size

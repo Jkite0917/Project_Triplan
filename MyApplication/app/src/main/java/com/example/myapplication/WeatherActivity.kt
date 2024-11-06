@@ -35,20 +35,22 @@ class WeatherActivity : AppCompatActivity() {
 
         // 어댑터 설정
         adapter = WeatherListAdapter(items) { wNo ->
-            val position = items.indexOfFirst { it.wNo == wNo }
-            if (position != -1) {
-                items.removeAt(position)
-                adapter.notifyItemRemoved(position)
+            val itemToRemoveIndex = items.indexOfFirst { it.wNo == wNo }
+            if (itemToRemoveIndex != -1) {
+                val itemToRemove = items[itemToRemoveIndex]
+                items.removeAt(itemToRemoveIndex)
+                adapter.notifyItemRemoved(itemToRemoveIndex)
 
                 // 데이터베이스에서도 삭제
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
-                        database.getWeatherTextDao().deleteWeatherListById(wNo) // 기본 키를 사용해 삭제
+                        database.getWeatherTextDao().deleteWeatherList(
+                            WeatherList(WNo = itemToRemove.wNo, Weather = itemToRemove.weather, WTime = itemToRemove.time, WText = itemToRemove.contents)
+                        )
                     }
                 }
             }
         }
-
 
         weatherlistRecyclerView.adapter = adapter
         weatherlistRecyclerView.layoutManager = LinearLayoutManager(this)
@@ -66,25 +68,19 @@ class WeatherActivity : AppCompatActivity() {
                     time = weatherList.WTime
                 )
             })
-            adapter.notifyDataSetChanged()
+            adapter.notifyItemRangeInserted(0, savedItems.size)
         }
     }
 
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
-        buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
-        buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
-        buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
+        buttonLeft1 = findViewById(R.id.button_left1)
+        buttonLeft2 = findViewById(R.id.button_left2)
+        buttonRight1 = findViewById(R.id.button_right1)
+        buttonRight2 = findViewById(R.id.button_right2)
         buttonCenter = findViewById(R.id.button_center)
 
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
-        }
-
-        buttonLeft2.setOnClickListener {
-            if (this is WeatherActivity) {
-                return@setOnClickListener
-            }
         }
 
         buttonRight1.setOnClickListener {
@@ -105,14 +101,13 @@ class WeatherActivity : AppCompatActivity() {
 
     // 새로운 아이템을 리스트에 추가하고 데이터베이스에 저장하는 함수
     private fun addItemToWeatherList(newItem: WeatherListItem) {
+        // 데이터베이스에 새로운 항목 저장
         lifecycleScope.launch {
             val weatherList = WeatherList(
                 Weather = newItem.weather,
                 WTime = newItem.time,
                 WText = newItem.contents
             )
-
-            // 삽입된 항목의 기본 키 ID를 Long 타입으로 받음
             val insertedId = withContext(Dispatchers.IO) {
                 database.getWeatherTextDao().insertWeatherList(weatherList)
             }
