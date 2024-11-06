@@ -4,10 +4,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ColumnInfo
 
-@Entity(tableName = "DayText")
-data class DateText (
+@Entity(tableName = "DailySchedule")
+data class DailySchedule (
     @PrimaryKey val Date: String, // 메모 날짜, pk
-    @ColumnInfo(name = "DayText") val DText: String // 내용
+    @ColumnInfo(name = "Info") val Info: String // 내용
 )
 
 @Entity(tableName = "WeatherText")

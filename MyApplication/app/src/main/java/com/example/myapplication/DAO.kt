@@ -3,24 +3,27 @@ package com.example.myapplication
 import androidx.room.*
 
 @Dao
-interface DateTextDao {
-    @Query("SELECT * FROM DayText")
-    fun getAllDateText(): List<DateText>
+interface DailyScheduleDao {
+    @Query("SELECT * FROM DailySchedule")
+    fun getAllDailyScheduleInfo(): List<DailySchedule>
 
-    @Query("SELECT * FROM DayText WHERE Date = :date")
-    suspend fun getDateText(date: String): DateText?
+    @Query("SELECT Date FROM DailySchedule")
+    fun getAllInfoDate(): List<String>
+
+    @Query("SELECT * FROM DailySchedule WHERE Date = :date")
+    suspend fun getDailyScheduleInfo(date: String): DailySchedule?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDateText(dateText: DateText)
+    suspend fun insertDailyScheduleInfo(dateText: DailySchedule)
 
     @Update
-    suspend fun updateDateText(dateText: DateText)
+    suspend fun updateDailyScheduleInfo(dateText: DailySchedule)
 
     @Delete
-    suspend fun deleteDateText(dateText: DateText)
+    suspend fun deleteDailyScheduleInfo(dateText: DailySchedule)
 
-    @Query("DELETE FROM DayText")
-    suspend fun deleteAllDateTexts()
+    @Query("DELETE FROM DailySchedule")
+    suspend fun deleteAllDailyScheduleInfo()
 }
 
 @Dao

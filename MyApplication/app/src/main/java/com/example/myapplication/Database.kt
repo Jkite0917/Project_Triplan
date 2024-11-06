@@ -5,9 +5,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import android.content.Context
 
-@Database(entities = [DateText::class, WeatherText::class, Checklist::class], version = 1)
+@Database(entities = [DailySchedule::class, WeatherText::class, Checklist::class], version = 2)
 abstract class LocalDatabase : RoomDatabase() {
-    abstract fun getDateTextDao(): DateTextDao
+    abstract fun getDailyScheduleDao(): DailyScheduleDao
     abstract fun getWeatherTextDao(): WeatherTextDao
     abstract fun getChecklistDao(): ChecklistDao
 

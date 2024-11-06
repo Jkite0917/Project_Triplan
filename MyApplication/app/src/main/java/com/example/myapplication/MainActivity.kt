@@ -13,7 +13,6 @@ import java.util.Calendar
 import java.util.Locale
 import androidx.core.content.ContextCompat
 
-
 class MainActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
     private lateinit var buttonLeft2: ImageButton
@@ -26,8 +25,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gridCalendar: GridLayout
     private val calendar = Calendar.getInstance()
 
+    private lateinit var db: LocalDatabase
+
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
+
+    // 선택한 날짜를 저장할 변수
+    private var savedDates: List<String> = listOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,9 +47,10 @@ class MainActivity : AppCompatActivity() {
 
         val today = Calendar.getInstance()
         updateSelectedDateText(today)
+
     }
 
-    // 버튼과 제스처 설정 통합 함수
+    // 버튼 액션 통합 함수
     private fun setupCalendarControls() {
         findViewById<ImageButton>(R.id.btnPrevMonthLeft).setOnClickListener { navigateMonth(-1) }
         findViewById<ImageButton>(R.id.btnPrevMonthRight).setOnClickListener { navigateMonth(1) }
@@ -83,7 +88,6 @@ class MainActivity : AppCompatActivity() {
                 dayTextView.setTextColor(ContextCompat.getColor(this, R.color.Today))  // 오늘 날짜 하이라이트
             }
 
-
             // 날짜 클릭 시 처리
             dayTextView.setOnClickListener { onDaySelected(dayTextView) }
             gridCalendar.addView(dayTextView)
@@ -102,6 +106,9 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER
             textSize = 23f
             text = if (dayIndex > prevMonthDays) (dayIndex - prevMonthDays).toString() else ""
+
+            // 위아래 간격 조정
+            setPadding(0, 8, 0, 8) // top과 bottom에 각각 20dp 간격 추가
         }
     }
 
@@ -155,6 +162,12 @@ class MainActivity : AppCompatActivity() {
     private fun showBottomSheet(selectedDate: Calendar) {
         // 여기에 바텀 시트를 보여주는 코드를 작성
         Log.d("showBottomSheetLog", "111111")
+    }
+
+    // DB
+    private suspend fun getSavedDates(): List<String> {
+        val savedSchedules = db.getDailyScheduleDao().getAllInfoDate() // 저장된 일정 가져오기
+        return savedSchedules
     }
 
     // 하단 메뉴바 화면 이동 기능
