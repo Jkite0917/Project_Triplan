@@ -192,11 +192,7 @@ class MainActivity : AppCompatActivity() {
         buttonCenter = findViewById(R.id.button_center)
 
         buttonLeft1.setOnClickListener {
-            // 현재 Activity가 MainActivity인지 확인
-            if (this is MainActivity) {
-                return@setOnClickListener
-            }
-            startActivity(Intent(this, MainActivity::class.java))
+            // 현재 액티비티가 MainActivity일 때 아무 동작도 하지 않음
         }
 
         buttonLeft2.setOnClickListener {

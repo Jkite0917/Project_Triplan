@@ -31,7 +31,7 @@ interface WeatherListDao {
     @Query("SELECT * FROM WeatherList")
     fun getAllWeatherList(): List<WeatherList>
 
-    @Query("SELECT * FROM WeatherList WHERE WNo = :wNo")
+    @Query("SELECT * FROM WeatherList WHERE wNo = :wNo")
     suspend fun getWeatherList(wNo: Long): WeatherList?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -43,7 +43,7 @@ interface WeatherListDao {
     @Delete
     suspend fun deleteWeatherList(weatherList: WeatherList)
 
-    @Query("DELETE FROM WeatherList WHERE WNo = :wNo")
+    @Query("DELETE FROM WeatherList WHERE wNo = :wNo")
     suspend fun deleteWeatherListById(wNo: Long)
 
     @Query("DELETE FROM WeatherList")
@@ -56,13 +56,13 @@ interface ChecklistDao {
     fun getAllChecklistItems(): List<Checklist>
 
     @Query("SELECT * FROM Checklist WHERE cNo = :cNo")
-    suspend fun getChecklistItem(cNo: Int): Checklist?
+    suspend fun getChecklistItem(cNo: Long): Checklist?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertChecklistItem(checklist: Checklist)
+    suspend fun insertChecklistItem(checklist: Checklist): Long
 
     @Query("DELETE FROM Checklist WHERE cNo = :cNo")
-    suspend fun deleteChecklistItemByCNo(cNo: Int)
+    suspend fun deleteChecklistItemByCNo(cNo: Long)
 
     @Update
     suspend fun updateChecklistItem(checklist: Checklist)

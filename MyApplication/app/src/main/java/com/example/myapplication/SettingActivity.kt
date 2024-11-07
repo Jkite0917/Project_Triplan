@@ -48,11 +48,7 @@ class SettingActivity : AppCompatActivity() {
         }
 
         buttonRight2.setOnClickListener {
-            // 현재 Activity가 MainActivity인지 확인
-            if (this is SettingActivity) {
-                return@setOnClickListener
-            }
-            startActivity(Intent(this, SettingActivity::class.java))
+            // 현재 액티비티가 SettingActivity일 때 아무 동작도 하지 않음
         }
 
     }
