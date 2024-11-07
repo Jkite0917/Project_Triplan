@@ -27,24 +27,27 @@ interface DailyScheduleDao {
 }
 
 @Dao
-interface WeatherTextDao {
-    @Query("SELECT * FROM WeatherText")
-    fun getAllWeatherText(): List<WeatherText>
+interface WeatherListDao {
+    @Query("SELECT * FROM WeatherList")
+    fun getAllWeatherList(): List<WeatherList>
 
-    @Query("SELECT * FROM WeatherText WHERE WNo = :wNo")
-    suspend fun getWeatherText(wNo: Int): WeatherText?
+    @Query("SELECT * FROM WeatherList WHERE WNo = :wNo")
+    suspend fun getWeatherList(wNo: Long): WeatherList?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertWeatherText(weatherText: WeatherText)
+    suspend fun insertWeatherList(weatherList: WeatherList): Long
 
     @Update
-    suspend fun updateWeatherText(weatherText: WeatherText)
+    suspend fun updateWeatherList(weatherList: WeatherList)
 
     @Delete
-    suspend fun deleteWeatherText(weatherText: WeatherText)
+    suspend fun deleteWeatherList(weatherList: WeatherList)
 
-    @Query("DELETE FROM WeatherText")
-    suspend fun deleteAllWeatherTexts()
+    @Query("DELETE FROM WeatherList WHERE WNo = :wNo")
+    suspend fun deleteWeatherListById(wNo: Long)
+
+    @Query("DELETE FROM WeatherList")
+    suspend fun deleteAllWeatherLists()
 }
 
 @Dao

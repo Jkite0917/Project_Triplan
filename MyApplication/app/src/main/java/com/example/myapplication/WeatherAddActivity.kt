@@ -13,10 +13,11 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class WeatherAddActivity : BottomSheetDialogFragment() {
+class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : BottomSheetDialogFragment() {
 
-    private var selectedWeatherIcon: Int = 0 // 선택한 날씨 아이콘의 ID 저장
-    private lateinit var selectedTimeButton: Button // 선택된 시간 버튼 참조
+    private var selectedWeatherIcon: Int = 0 // 선택한 날씨 아이콘의 리소스 ID 저장
+    private var isWeatherIconSelected: Boolean = false // 날씨 버튼 선택 여부 저장
+    private var selectedTimeButton: Button? = null // 선택된 시간 버튼 참조
     private lateinit var editTExt: EditText
 
     override fun onCreateView(
@@ -27,7 +28,6 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         val view = inflater.inflate(R.layout.weather_add, container, false)
 
         val gridWeather: GridLayout = view.findViewById(R.id.WeatherAddGridLayout)
-        selectedTimeButton = view.findViewById(R.id.WeatherAddTimeNowButton) // 기본 시간 버튼
         editTExt = view.findViewById(R.id.WeatherAddEditText)
 
         // 날씨 아이콘 버튼 선택 처리
@@ -35,7 +35,18 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
             if (child is ImageButton) {
                 child.setOnClickListener {
                     // 선택된 아이콘의 drawable ID 저장
-                    selectedWeatherIcon = child.tag?.toString()?.toIntOrNull() ?: 0
+                    selectedWeatherIcon = when (child.id) {
+                        R.id.WeatherAddSunIcon -> R.drawable.weather_sun_icon
+                        R.id.WeatherAddCloudIcon -> R.drawable.weather_cloud_icon
+                        R.id.WeatherAddRainIcon -> R.drawable.weather_rain_icon
+                        R.id.WeatherAddThunderIcon -> R.drawable.weather_thunder_icon
+                        R.id.WeatherAddSnowIcon -> R.drawable.weather_snow_icon
+                        R.id.WeatherAddSuncloudIcon -> R.drawable.weather_suncloud_icon
+                        else -> 0
+                    }
+
+                    // 날씨 아이콘 선택됨을 표시
+                    isWeatherIconSelected = true
 
                     // 선택된 날씨 아이콘 버튼 강조 표시
                     highlightSelectedWeatherButton(child, gridWeather)
@@ -57,16 +68,29 @@ class WeatherAddActivity : BottomSheetDialogFragment() {
         // 저장 버튼 클릭 시 입력 내용 저장
         view.findViewById<Button>(R.id.WeatherAddSaveButton).setOnClickListener {
             val contents = editTExt.text.toString()
-            val selectedTime = selectedTimeButton.text.toString()
+            val selectedTime = selectedTimeButton?.text?.toString() ?: ""
 
-            if (contents.isNotEmpty() && selectedTime != "선택된 날짜 없음") {
-                // Room DB에 데이터 저장
-                // WeatherListItem을 생성하고 필요한 데이터를 전달
-                val weatherItem = WeatherListItem(contents, selectedWeatherIcon, selectedTime)
-                // 데이터를 어댑터나 데이터베이스로 전달하는 로직 추가 가능
-                dismiss() // 다이얼로그 닫기
-            } else {
-                Toast.makeText(requireContext(), "선택과 내용을 전부 입력해주세요.", Toast.LENGTH_SHORT).show()
+            when {
+                !isWeatherIconSelected -> {
+                    Toast.makeText(requireContext(), "날씨 버튼을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                }
+                selectedTimeButton == null -> {
+                    Toast.makeText(requireContext(), "시간 버튼을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                }
+                contents.isEmpty() -> {
+                    Toast.makeText(requireContext(), "내용을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    // 새로운 아이템 생성 및 저장 콜백 호출
+                    val newItem = WeatherListItem(
+                        wNo = 0L,                        // 처음에는 기본값으로 설정
+                        contents = contents,             // 입력한 내용
+                        weather = selectedWeatherIcon,   // 선택된 날씨 아이콘
+                        time = selectedTime              // 선택된 시간
+                    )
+                    onSave(newItem)
+                    dismiss() // 다이얼로그 닫기
+                }
             }
         }
 
