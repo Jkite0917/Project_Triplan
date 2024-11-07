@@ -41,16 +41,16 @@ class MainAddActivity : BottomSheetDialogFragment() {
 
     // View 및 버튼 액션 통합 함수
     private fun setupViewAndButton(view: View) {
-        editText = view.findViewById(R.id.EditID)
-        selectedDateTextView = view.findViewById(R.id.selectedDateTextView)
+        editText = view.findViewById(R.id.MainAddEditID)
+        selectedDateTextView = view.findViewById(R.id.MainAddDateText)
 
         // 날짜 선택 버튼 클릭 리스너
-        view.findViewById<Button>(R.id.buttonSelectDate).setOnClickListener {
+        view.findViewById<Button>(R.id.MainAddDateSelectButton).setOnClickListener {
             showDatePickerDialog()
         }
 
         // 저장 버튼 클릭 리스너
-        view.findViewById<Button>(R.id.buttonSave).setOnClickListener {
+        view.findViewById<Button>(R.id.MainAddInsertButton).setOnClickListener {
             saveData()
         }
     }
@@ -66,7 +66,7 @@ class MainAddActivity : BottomSheetDialogFragment() {
         // 날짜 선택 다이얼로그 생성
         val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
             // 선택한 날짜를 TextView에 표시
-            val selectedDate = "$selectedYear-${selectedMonth + 1}-$selectedDay"
+            val selectedDate = String.format("%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
             selectedDateTextView.text = selectedDate
         }, year, month, day)
 

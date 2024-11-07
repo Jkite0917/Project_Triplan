@@ -2,16 +2,25 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.util.Log
 import android.view.Gravity
+import android.widget.Button
+import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.core.content.ContextCompat
+import androidx.room.Room
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -158,11 +167,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 바텀 시트를 보여주는 메소드 (로그 대신 실제 바텀 시트를 구현할 수 있음)
+    // 바텀 시트를 보여주는 메소드
     private fun showBottomSheet(selectedDate: Calendar) {
-        // 여기에 바텀 시트를 보여주는 코드를 작성
-        Log.d("showBottomSheetLog", "111111")
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate: String = dateFormat.format(selectedDate.time)
+
+        val bottomSheet = MainDateInfoActivity(formattedDate)
+        bottomSheet.show(supportFragmentManager, "DateInfoBottomSheet")
     }
+
 
     // DB
     private suspend fun getSavedDates(): List<String> {

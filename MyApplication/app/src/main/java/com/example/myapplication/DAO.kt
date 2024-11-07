@@ -10,17 +10,17 @@ interface DailyScheduleDao {
     @Query("SELECT Date FROM DailySchedule")
     fun getAllInfoDate(): List<String>
 
-    @Query("SELECT * FROM DailySchedule WHERE Date = :date")
-    suspend fun getDailyScheduleInfo(date: String): DailySchedule?
+    @Query("SELECT Info FROM DailySchedule WHERE Date = :date LIMIT 1")  // 하나만 가져오기
+    suspend fun getDailyScheduleInfo(date: String): String?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertDailyScheduleInfo(dateText: DailySchedule)
+    suspend fun insertDailyScheduleInfo(date: DailySchedule)
 
     @Update
-    suspend fun updateDailyScheduleInfo(dateText: DailySchedule)
+    suspend fun updateDailyScheduleInfo(date: DailySchedule)
 
-    @Delete
-    suspend fun deleteDailyScheduleInfo(dateText: DailySchedule)
+    @Query("DELETE FROM DailySchedule WHERE Date = :date")
+    suspend fun deleteDailyScheduleInfo(date: String)
 
     @Query("DELETE FROM DailySchedule")
     suspend fun deleteAllDailyScheduleInfo()

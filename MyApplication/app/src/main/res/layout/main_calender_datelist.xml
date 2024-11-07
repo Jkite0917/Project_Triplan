@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:id="@+id/MainAddID"
+    android:id="@+id/MainDateInfo"
     android:background="@drawable/add_layout_border">
 
     <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->
     <TextView
-        android:id="@+id/TitleID"
+        android:id="@+id/MainDateInfoText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -18,51 +18,62 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="5dp"
-        android:text="일정 확인/수정"
+        android:text="일정 확인 및 수정"
         android:textSize="20sp"
         android:textColor="@color/black"
         android:gravity="center" />
 
     <!-- 내용 입력 -->
     <EditText
-        android:id="@+id/EditID"
-        app:layout_constraintTop_toBottomOf="@id/TitleID"
+        android:id="@+id/MainDateInfoEditText"
+        app:layout_constraintTop_toBottomOf="@+id/MainDateInfoText"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="10dp"
-        android:hint="    작성한 내용 확인"
+        android:hint="    내용을 작성하세요"
         android:background="@android:drawable/editbox_background_normal"/>
 
     <LinearLayout
-        android:id="@+id/DateSelectLinear"
+        android:id="@+id/MainDateInfoDeleteAndDateLinear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/EditID">
+        app:layout_constraintTop_toBottomOf="@+id/MainDateInfoEditText">
 
         <!-- 선택된 날짜 표시 TextView -->
         <TextView
-            android:id="@+id/selectedDateTextView"
+            android:id="@+id/MainDateInfoDateText"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="몇월 몇일임"
+            android:text="선택된 날짜 없음"
             android:textSize="16sp"
             android:textColor="@color/black"
             android:layout_marginTop="8dp"
             android:gravity="center" />
     </LinearLayout>
 
-    <!-- 저장 버튼 -->
+    <!-- 날짜 선택 버튼 -->
     <Button
-        android:id="@+id/buttonSave"
-        app:layout_constraintTop_toBottomOf="@id/DateSelectLinear"
+        android:id="@+id/MainDateInfoDeleteButton"
+        app:layout_constraintTop_toBottomOf="@id/MainDateInfoDeleteAndDateLinear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="삭제"
+        android:textSize = "18sp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/rounded_date_button_red"/>
+
+    <!-- 저장 버튼 -->
+    <!--<Button
+        android:id="@+id/MainDateInfoUpdateButton"
+        app:layout_constraintTop_toBottomOf="@id/MainDateInfoDeleteAndDateLinear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="수정"
         android:textSize="18dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/rounded_button"/>
-
+    -->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
