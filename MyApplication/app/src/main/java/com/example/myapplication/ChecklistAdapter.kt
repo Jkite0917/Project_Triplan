@@ -15,10 +15,10 @@ class ChecklistAdapter(
 ) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
 
     inner class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.checklist_item_checkbox)
-        val titleTextView: TextView = itemView.findViewById(R.id.checklist_item_title)
-        val periodTextView: TextView = itemView.findViewById(R.id.checklist_item_period)
-        val deleteButton: Button = itemView.findViewById(R.id.checklist_item_delete)
+        val checkBox: CheckBox = itemView.findViewById(R.id.checkbox_checklistItem_checkbox)
+        val titleTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_title)
+        val periodTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_period)
+        val deleteButton: Button = itemView.findViewById(R.id.button_checklistItem_delete)
 
         fun bind(item: Checklist) {
             titleTextView.text = item.cTitle

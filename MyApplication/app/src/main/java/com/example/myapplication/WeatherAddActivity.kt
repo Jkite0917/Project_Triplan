@@ -27,8 +27,8 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         // 레이아웃을 인플레이트
         val view = inflater.inflate(R.layout.bottomsheet_weather_add, container, false)
 
-        val gridWeather: GridLayout = view.findViewById(R.id.WeatherAddGridLayout)
-        editTExt = view.findViewById(R.id.WeatherAddEditText)
+        val gridWeather: GridLayout = view.findViewById(R.id.gridLayout_weatherAdd_selectWeather)
+        editTExt = view.findViewById(R.id.edittext_weatherAdd_inputText)
 
         // 날씨 아이콘 버튼 선택 처리
         gridWeather.children.forEach { child ->
@@ -36,12 +36,12 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
                 child.setOnClickListener {
                     // 선택된 아이콘의 drawable ID 저장
                     selectedWeatherIcon = when (child.id) {
-                        R.id.WeatherAddSunIcon -> R.drawable.weather_sun_icon
-                        R.id.WeatherAddCloudIcon -> R.drawable.weather_cloud_icon
-                        R.id.WeatherAddRainIcon -> R.drawable.weather_rain_icon
-                        R.id.WeatherAddThunderIcon -> R.drawable.weather_thunder_icon
-                        R.id.WeatherAddSnowIcon -> R.drawable.weather_snow_icon
-                        R.id.WeatherAddSuncloudIcon -> R.drawable.weather_suncloud_icon
+                        R.id.imageButton_weatherAdd_Icon_Sun -> R.drawable.weather_sun_icon
+                        R.id.imageButton_weatherAdd_Icon_Cloud -> R.drawable.weather_cloud_icon
+                        R.id.imageButton_weatherAdd_Icon_Rain -> R.drawable.weather_rain_icon
+                        R.id.imageButton_weatherAdd_Icon_Thunder -> R.drawable.weather_thunder_icon
+                        R.id.imageButton_weatherAdd_Icon_Show -> R.drawable.weather_snow_icon
+                        R.id.imageButton_weatherAdd_Icon_SunCloud -> R.drawable.weather_suncloud_icon
                         else -> 0
                     }
 
@@ -56,9 +56,9 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
 
         // 시간 선택 버튼들
         val timeButtons = listOf(
-            view.findViewById<Button>(R.id.WeatherAddBeforeDayButton),
-            view.findViewById<Button>(R.id.WeatherAddTimeNowButton),
-            view.findViewById<Button>(R.id.WeatherAddAllDayButton)
+            view.findViewById<Button>(R.id.button_weatherAdd_dayBefore),
+            view.findViewById<Button>(R.id.button_weatherAdd_timeNow),
+            view.findViewById<Button>(R.id.button_weatherAdd_allDay)
         )
 
         timeButtons.forEach { button ->
@@ -66,7 +66,7 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         }
 
         // 저장 버튼 클릭 시 입력 내용 저장
-        view.findViewById<Button>(R.id.WeatherAddSaveButton).setOnClickListener {
+        view.findViewById<Button>(R.id.button_weatherAdd_saveData).setOnClickListener {
             val contents = editTExt.text.toString()
             val selectedTime = selectedTimeButton?.text?.toString() ?: ""
 

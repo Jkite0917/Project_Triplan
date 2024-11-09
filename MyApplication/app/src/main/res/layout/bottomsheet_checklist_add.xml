@@ -6,12 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:id="@+id/constraintLayout_mainAdd"
+    android:id="@+id/constraintLayout_checklist"
     android:background="@drawable/add_layout_border">
 
     <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->
     <TextView
-        android:id="@+id/CheckPageTitleID"
+        android:id="@+id/textview_checklist_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,7 +27,7 @@
     <!-- 날짜 선택 버튼 -->
 
     <EditText
-        android:id="@+id/CheckPageEditID"
+        android:id="@+id/edittext_checklist_input"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_marginTop="36dp"
@@ -36,39 +36,39 @@
         android:inputType="text"
         android:singleLine="true"
         android:imeOptions="flagNoExtractUi"
-        app:layout_constraintTop_toBottomOf="@id/CheckPageTitleID"
+        app:layout_constraintTop_toBottomOf="@id/textview_checklist_title"
         tools:layout_editor_absoluteX="-5dp" />
 
     <!-- 저장 버튼 -->
     <Spinner
-        android:id="@+id/CheckPageperiodSpinner"
+        android:id="@+id/spinner_checklist_periodDefault"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
-        app:layout_constraintTop_toBottomOf="@id/CheckPageEditID"
+        app:layout_constraintTop_toBottomOf="@id/edittext_checklist_input"
         tools:layout_editor_absoluteX="-47dp"
         />
 
     <!-- 요일 선택 Spinner (매주일 경우) -->
     <Spinner
-        android:id="@+id/CheckPageweekDaySpinner"
+        android:id="@+id/spinner_checklist_periodWeek"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/CheckPageperiodSpinner"
+        app:layout_constraintTop_toBottomOf="@id/spinner_checklist_periodDefault"
         android:visibility="gone" /> <!-- 기본적으로 숨김 -->
 
     <!-- 날짜 선택 Spinner (매월일 경우) -->
     <Spinner
-        android:id="@+id/CheckPagemonthDaySpinner"
+        android:id="@+id/spinner_checklist_periodMonth"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/CheckPageperiodSpinner"
+        app:layout_constraintTop_toBottomOf="@id/spinner_checklist_periodDefault"
         android:visibility="gone" /> <!-- 기본적으로 숨김 -->
 
     <Button
-        android:id="@+id/CheckPagebuttonSave"
+        android:id="@+id/button_checklist_saveData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_button"
@@ -77,7 +77,7 @@
         tools:layout_editor_absoluteX="20dp"
         tools:layout_editor_absoluteY="282dp"
         android:layout_marginTop="48dp"
-        app:layout_constraintTop_toBottomOf="@id/CheckPagemonthDaySpinner"/>
+        app:layout_constraintTop_toBottomOf="@id/spinner_checklist_periodMonth"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

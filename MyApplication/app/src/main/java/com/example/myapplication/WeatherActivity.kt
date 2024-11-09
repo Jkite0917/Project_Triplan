@@ -31,7 +31,7 @@ class WeatherActivity : AppCompatActivity() {
         // 데이터베이스 초기화
         database = LocalDatabase.getDatabase(this)
 
-        weatherlistRecyclerView = findViewById(R.id.WeatherlistRecyclerView)
+        weatherlistRecyclerView = findViewById(R.id.recyclerview_weather_list)
 
         // 어댑터 설정
         adapter = WeatherListAdapter(items) { wNo ->

@@ -7,7 +7,7 @@
     android:background="@drawable/item_border_shape">
 
     <TextView
-        android:id="@+id/WeatherItemTextView"
+        android:id="@+id/textview_weatherItem_text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -18,7 +18,7 @@
         android:textSize="16sp" />
 
     <FrameLayout
-        android:id="@+id/WeatherItemIconFrameLayout"
+        android:id="@+id/frameLayout_weatherItem_iconFrame"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -26,7 +26,7 @@
         android:gravity="center">
 
         <ImageView
-            android:id="@+id/WeatherItemIcon"
+            android:id="@+id/imageview_weatherItem_selectedWeatherIcon"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/weather_snow_icon"
@@ -34,7 +34,7 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/WeatherItemTimeTextView"
+        android:id="@+id/textview_weatherItem_selectedTime"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
@@ -45,7 +45,7 @@
         android:textSize="16sp" />
 
     <Button
-        android:id="@+id/WeatherItemDeleteButton"
+        android:id="@+id/button_weatherItem_delete"
         android:layout_width="0dp"
         android:layout_height="29dp"
         android:layout_marginStart="8dp"

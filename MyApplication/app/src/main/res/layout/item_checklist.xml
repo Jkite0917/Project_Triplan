@@ -9,20 +9,20 @@
     >
 
     <LinearLayout
-        android:id="@+id/itemLinearBox"
+        android:id="@+id/linearLayout_checklistItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <CheckBox
-            android:id="@+id/checklist_item_checkbox"
+            android:id="@+id/checkbox_checklistItem_checkbox"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.5"/>
 
         <TextView
-            android:id="@+id/checklist_item_title"
+            android:id="@+id/textview_checklistItem_title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1.5"
@@ -33,7 +33,7 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/checklist_item_period"
+            android:id="@+id/textview_checklistItem_period"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -44,7 +44,7 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/checklist_item_delete"
+            android:id="@+id/button_checklistItem_delete"
             android:layout_width="39dp"
             android:layout_height="29dp"
             android:layout_marginStart="8dp"

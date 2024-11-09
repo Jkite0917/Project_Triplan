@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDialogFragment() {
     private lateinit var titleEditText: EditText
@@ -46,11 +41,11 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
     
     // 뷰 id 지정
     private fun initializeViews(view: View) {
-        titleEditText = view.findViewById(R.id.CheckPageEditID)
-        periodSpinner = view.findViewById(R.id.CheckPageperiodSpinner)
-        weekDaySpinner = view.findViewById(R.id.CheckPageweekDaySpinner)
-        monthDaySpinner = view.findViewById(R.id.CheckPagemonthDaySpinner)
-        saveButton = view.findViewById(R.id.CheckPagebuttonSave)
+        titleEditText = view.findViewById(R.id.edittext_checklist_input)
+        periodSpinner = view.findViewById(R.id.spinner_checklist_periodDefault)
+        weekDaySpinner = view.findViewById(R.id.spinner_checklist_periodWeek)
+        monthDaySpinner = view.findViewById(R.id.spinner_checklist_periodMonth)
+        saveButton = view.findViewById(R.id.button_checklist_saveData)
     }
 
     // 주기 선택 Spinner 리스트 설정

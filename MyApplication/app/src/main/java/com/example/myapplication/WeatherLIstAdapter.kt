@@ -21,10 +21,10 @@ class WeatherListAdapter(
 ) : RecyclerView.Adapter<WeatherListAdapter.WeatherListViewHolder>() {
 
     inner class WeatherListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val contents: TextView = itemView.findViewById(R.id.WeatherItemTextView)
-        private val weather: ImageView = itemView.findViewById(R.id.WeatherItemIcon)
-        private val time: TextView = itemView.findViewById(R.id.WeatherItemTimeTextView)
-        private val deleteButton: Button = itemView.findViewById(R.id.WeatherItemDeleteButton)
+        private val contents: TextView = itemView.findViewById(R.id.textview_weatherItem_text)
+        private val weather: ImageView = itemView.findViewById(R.id.imageview_weatherItem_selectedWeatherIcon)
+        private val time: TextView = itemView.findViewById(R.id.textview_weatherItem_selectedTime)
+        private val deleteButton: Button = itemView.findViewById(R.id.button_weatherItem_delete)
 
         fun bind(item: WeatherListItem) {
             contents.text = item.contents

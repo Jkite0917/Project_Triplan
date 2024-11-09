@@ -22,7 +22,7 @@ class SettingActivity : AppCompatActivity() {
         val regionList = listOf("서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종")
 
         // Spinner와 어댑터 설정
-        val spinner: Spinner = findViewById(R.id.PositionSpinner)
+        val spinner: Spinner = findViewById(R.id.spinner_setting_selectPosition)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, regionList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter

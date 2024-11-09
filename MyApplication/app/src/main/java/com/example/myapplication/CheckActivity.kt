@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageButton
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,7 +31,7 @@ class CheckActivity : AppCompatActivity() {
     }
 
     private fun loadChecklistItems() {
-        recyclerView = findViewById(R.id.checklist_recyclerview)
+        recyclerView = findViewById(R.id.recyclerview_checklist_list)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         lifecycleScope.launch(Dispatchers.IO) {
@@ -56,12 +55,13 @@ class CheckActivity : AppCompatActivity() {
             }
         }
     }
+
+    // 체크박스 상태 변경 아이템 처리 함수
     private fun updateChecklistItem(item: Checklist) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 // 데이터베이스에서 업데이트
-                LocalDatabase.getDatabase(this@CheckActivity).getChecklistDao()
-                    .updateChecklistItem(item)
+                LocalDatabase.getDatabase(this@CheckActivity).getChecklistDao().updateChecklistItem(item)
                 val position = checklistItems.indexOfFirst { it.cNo == item.cNo }
                 withContext(Dispatchers.Main) {
                     checklistAdapter.notifyItemChanged(position) // 변경된 항목만 업데이트
@@ -75,7 +75,7 @@ class CheckActivity : AppCompatActivity() {
 
     // 삭제 아이템 처리 함수
     private fun deleteChecklistItem(item: Checklist) {
-        lifecycleScope.launch(Dispatchers.IO){
+        lifecycleScope.launch(Dispatchers.IO) {
             // 데이터베이스에서 삭제
             LocalDatabase.getDatabase(this@CheckActivity).getChecklistDao().deleteChecklistItemByCNo(item.cNo)
             val position = checklistItems.indexOf(item)
@@ -112,6 +112,7 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
+    // 새로운 아이템을 리스트에 추가하고 데이터베이스에 저장하는 함수
     private fun addItemToChecklist(newItem: Checklist) {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
