@@ -103,5 +103,14 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation("androidx.room:room-paging:$room_version")
+
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+
+    // Retrofit Gson Converter
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+
 }
 

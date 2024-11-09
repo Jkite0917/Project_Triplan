@@ -53,13 +53,7 @@
                 android:orientation="horizontal">
 
                 <include layout="@layout/item_weather_hour" />
-                <include layout="@layout/item_weather_hour1" />
-                <include layout="@layout/item_weather_hour2" />
-                <include layout="@layout/item_weather_hour3" />
-                <include layout="@layout/item_weather_hour4" />
-                <include layout="@layout/item_weather_hour5" />
-                <include layout="@layout/item_weather_hour6" />
-                <include layout="@layout/item_weather_hour7" />
+
 
             </LinearLayout>
         </HorizontalScrollView>
