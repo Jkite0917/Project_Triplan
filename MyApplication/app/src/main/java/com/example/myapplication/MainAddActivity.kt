@@ -28,7 +28,7 @@ class MainAddActivity : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.main_add, container, false)
+        return inflater.inflate(R.layout.bottomsheet_main_add, container, false)
     }
 
     // 뷰 생성 시 실행되는 함수
@@ -41,16 +41,16 @@ class MainAddActivity : BottomSheetDialogFragment() {
 
     // View 및 버튼 액션 통합 함수
     private fun setupViewAndButton(view: View) {
-        editText = view.findViewById(R.id.MainAddEditID)
-        selectedDateTextView = view.findViewById(R.id.MainAddDateText)
+        editText = view.findViewById(R.id.edittext_mainAdd_input)
+        selectedDateTextView = view.findViewById(R.id.textview_mainAdd_printDate)
 
         // 날짜 선택 버튼 클릭 리스너
-        view.findViewById<Button>(R.id.MainAddDateSelectButton).setOnClickListener {
+        view.findViewById<Button>(R.id.button_mainAdd_selectDate).setOnClickListener {
             showDatePickerDialog()
         }
 
         // 저장 버튼 클릭 리스너
-        view.findViewById<Button>(R.id.MainAddInsertButton).setOnClickListener {
+        view.findViewById<Button>(R.id.button_mainAdd_saveData).setOnClickListener {
             saveData()
         }
     }

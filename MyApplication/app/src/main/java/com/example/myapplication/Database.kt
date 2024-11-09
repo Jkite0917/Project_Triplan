@@ -29,7 +29,8 @@ abstract class LocalDatabase : RoomDatabase() {
                     context.applicationContext,
                     LocalDatabase::class.java,
                     "calendar_database" // 데이터베이스 이름 설정
-                ).build().also { INSTANCE = it }
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
+                // 주의 fallback....() 사용 시 버전 업 경우 데이터 전부 삭제
             }
         }
     }

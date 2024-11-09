@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:id="@+id/MainDateInfo"
+    android:id="@+id/constraintLayout_mainCheck"
     android:background="@drawable/add_layout_border">
 
     <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->
     <TextView
-        android:id="@+id/MainDateInfoText"
+        android:id="@+id/textview_mainCheck_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,8 +25,8 @@
 
     <!-- 내용 입력 -->
     <EditText
-        android:id="@+id/MainDateInfoEditText"
-        app:layout_constraintTop_toBottomOf="@+id/MainDateInfoText"
+        android:id="@+id/edittext_mainCheck_input"
+        app:layout_constraintTop_toBottomOf="@+id/textview_mainCheck_title"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="10dp"
@@ -34,14 +34,14 @@
         android:background="@android:drawable/editbox_background_normal"/>
 
     <LinearLayout
-        android:id="@+id/MainDateInfoDeleteAndDateLinear"
+        android:id="@+id/linearLayout_mainCheck_dateLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/MainDateInfoEditText">
+        app:layout_constraintTop_toBottomOf="@+id/edittext_mainCheck_input">
 
         <!-- 선택된 날짜 표시 TextView -->
         <TextView
-            android:id="@+id/MainDateInfoDateText"
+            android:id="@+id/textview_mainCheck_selectedDate"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -54,8 +54,8 @@
 
     <!-- 날짜 선택 버튼 -->
     <Button
-        android:id="@+id/MainDateInfoDeleteButton"
-        app:layout_constraintTop_toBottomOf="@id/MainDateInfoDeleteAndDateLinear"
+        android:id="@+id/button_mainAdd_deleteData"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout_mainCheck_dateLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="삭제"

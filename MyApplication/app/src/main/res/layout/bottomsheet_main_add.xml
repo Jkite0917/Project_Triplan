@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:id="@+id/MainAddID"
+    android:id="@+id/constraintLayout_mainAdd"
     android:background="@drawable/add_layout_border">
 
     <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->
     <TextView
-        android:id="@+id/MainAddTitleID"
+        android:id="@+id/textview_mainAdd_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,8 +25,8 @@
 
     <!-- 내용 입력 -->
     <EditText
-        android:id="@+id/MainAddEditID"
-        app:layout_constraintTop_toBottomOf="@id/MainAddTitleID"
+        android:id="@+id/edittext_mainAdd_input"
+        app:layout_constraintTop_toBottomOf="@id/textview_mainAdd_title"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="10dp"
@@ -34,15 +34,15 @@
         android:background="@android:drawable/editbox_background_normal"/>
 
     <LinearLayout
-        android:id="@+id/MainAddButtonAndDateLinear"
+        android:id="@+id/linearLayout_mainAdd_dateLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/MainAddEditID">
+        app:layout_constraintTop_toBottomOf="@+id/edittext_mainAdd_input">
 
         <!-- 날짜 선택 버튼 -->
         <Button
-            android:id="@+id/MainAddDateSelectButton"
-            app:layout_constraintTop_toBottomOf="@id/MainAddEditID"
+            android:id="@+id/button_mainAdd_selectDate"
+            app:layout_constraintTop_toBottomOf="@id/edittext_mainAdd_input"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -52,7 +52,7 @@
 
         <!-- 선택된 날짜 표시 TextView -->
         <TextView
-            android:id="@+id/MainAddDateText"
+            android:id="@+id/textview_mainAdd_printDate"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -65,8 +65,8 @@
 
     <!-- 저장 버튼 -->
     <Button
-        android:id="@+id/MainAddInsertButton"
-        app:layout_constraintTop_toBottomOf="@id/MainAddButtonAndDateLinear"
+        android:id="@+id/button_mainAdd_saveData"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout_mainAdd_dateLine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="저장"

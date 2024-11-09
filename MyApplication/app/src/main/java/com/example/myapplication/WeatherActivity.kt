@@ -73,11 +73,11 @@ class WeatherActivity : AppCompatActivity() {
     }
 
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById(R.id.button_left1)
-        buttonLeft2 = findViewById(R.id.button_left2)
-        buttonRight1 = findViewById(R.id.button_right1)
-        buttonRight2 = findViewById(R.id.button_right2)
-        buttonCenter = findViewById(R.id.button_center)
+        buttonLeft1 = findViewById(R.id.button_all_cardview_left1)
+        buttonLeft2 = findViewById(R.id.button_all_cardview_left2)
+        buttonRight1 = findViewById(R.id.button_all_cardview_right1)
+        buttonRight2 = findViewById(R.id.button_all_cardview_right2)
+        buttonCenter = findViewById(R.id.button_all_cardview_center)
 
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))

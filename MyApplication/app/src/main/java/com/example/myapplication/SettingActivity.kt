@@ -30,10 +30,10 @@ class SettingActivity : AppCompatActivity() {
     }
 
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
-        buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
-        buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
-        buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
+        buttonLeft1 = findViewById<ImageButton>(R.id.button_all_cardview_left1)
+        buttonLeft2 = findViewById<ImageButton>(R.id.button_all_cardview_left2)
+        buttonRight1 = findViewById<ImageButton>(R.id.button_all_cardview_right1)
+        buttonRight2 = findViewById<ImageButton>(R.id.button_all_cardview_right2)
 
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))

@@ -28,12 +28,12 @@
         android:layout_height="623dp"
         android:layout_marginTop="10dp"
         android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/bottomCardView"
+        app:layout_constraintBottom_toTopOf="@+id/cardview_all_bottomMenu"
         app:layout_constraintTop_toBottomOf="@id/WeatherListPageText"
         tools:layout_editor_absoluteX="-5dp" />
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/bottomCardView"
+        android:id="@+id/cardview_all_bottomMenu"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_marginBottom="12dp"
@@ -51,7 +51,7 @@
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton
-                android:id="@+id/button_left1"
+                android:id="@+id/button_all_cardview_left1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu_calendar_icon"
@@ -59,14 +59,14 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_left2"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_left2"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
             <!-- 왼쪽 두 번째 버튼 -->
             <ImageButton
-                android:id="@+id/button_left2"
+                android:id="@+id/button_all_cardview_left2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu_weather_icon"
@@ -74,14 +74,14 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_center"
-                app:layout_constraintStart_toEndOf="@id/button_left1"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_center"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_left1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
             <!-- 가운데 버튼 -->
             <ImageButton
-                android:id="@+id/button_center"
+                android:id="@+id/button_all_cardview_center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu_plus_icon"
@@ -89,14 +89,14 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_right1"
-                app:layout_constraintStart_toEndOf="@id/button_left2"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_right1"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_left2"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
             <!-- 오른쪽 첫 번째 버튼 -->
             <ImageButton
-                android:id="@+id/button_right1"
+                android:id="@+id/button_all_cardview_right1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu_check_icon"
@@ -104,14 +104,14 @@
                 android:padding="10dp"
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_right2"
-                app:layout_constraintStart_toEndOf="@id/button_center"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_right2"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_center"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
             <!-- 오른쪽 두 번째 버튼 -->
             <ImageButton
-                android:id="@+id/button_right2"
+                android:id="@+id/button_all_cardview_right2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/menu_setting_icon"
@@ -120,7 +120,7 @@
                 android:background="@android:color/transparent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/button_right1"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_right1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 

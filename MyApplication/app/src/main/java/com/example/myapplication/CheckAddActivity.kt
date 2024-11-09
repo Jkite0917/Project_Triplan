@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,7 +13,6 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -32,7 +30,7 @@ class CheckAddActivity : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
         ): View? {
-        return inflater.inflate(R.layout.checklist_add, container, false)
+        return inflater.inflate(R.layout.bottomsheet_checklist_add, container, false)
 
     }
 

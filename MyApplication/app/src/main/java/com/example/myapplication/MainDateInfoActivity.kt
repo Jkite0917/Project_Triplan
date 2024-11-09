@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -29,10 +28,10 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.main_calender_datelist, container, false)
-        editText = view.findViewById(R.id.MainDateInfoEditText)
-        TextView = view.findViewById(R.id.MainDateInfoDateText)
-        deleteButton = view.findViewById(R.id.MainDateInfoDeleteButton)
+        val view = inflater.inflate(R.layout.bottomsheet_main_checkanddelete, container, false)
+        editText = view.findViewById(R.id.edittext_mainCheck_input)
+        TextView = view.findViewById(R.id.textview_mainCheck_selectedDate)
+        deleteButton = view.findViewById(R.id.button_mainAdd_deleteData)
 
         // Room 데이터베이스 초기화
         db = Room.databaseBuilder(

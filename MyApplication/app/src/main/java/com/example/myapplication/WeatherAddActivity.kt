@@ -25,7 +25,7 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         savedInstanceState: Bundle?
     ): View? {
         // 레이아웃을 인플레이트
-        val view = inflater.inflate(R.layout.weather_add, container, false)
+        val view = inflater.inflate(R.layout.bottomsheet_weather_add, container, false)
 
         val gridWeather: GridLayout = view.findViewById(R.id.WeatherAddGridLayout)
         editTExt = view.findViewById(R.id.WeatherAddEditText)

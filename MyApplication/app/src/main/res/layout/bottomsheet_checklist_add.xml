@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:id="@+id/MainAddID"
+    android:id="@+id/constraintLayout_mainAdd"
     android:background="@drawable/add_layout_border">
 
     <!-- 일정 추가 텍스트 android:background="@drawable/rounded_background"-->

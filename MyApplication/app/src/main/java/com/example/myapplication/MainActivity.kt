@@ -2,25 +2,16 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
 import android.util.Log
 import android.view.Gravity
-import android.widget.Button
-import android.widget.EditText
 import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 import androidx.core.content.ContextCompat
-import androidx.room.Room
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -39,17 +30,14 @@ class MainActivity : AppCompatActivity() {
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
 
-    // 선택한 날짜를 저장할 변수
-    private var savedDates: List<String> = listOf()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+        setContentView(R.layout.activity_main)
         setupButtonListeners()
 
-        gridCalendar = findViewById(R.id.gridCalendar)
-        selectedDateTextView = findViewById(R.id.DateWeatherTextView)
-        tvCurrentMonth = findViewById(R.id.CalenderYearMonth)
+        gridCalendar = findViewById(R.id.gridLayout_calender_date)
+        selectedDateTextView = findViewById(R.id.textview_main_dateWeather)
+        tvCurrentMonth = findViewById(R.id.textview_calender_yearMonth)
 
         setupCalendarControls()
         updateCalendar()
@@ -61,8 +49,8 @@ class MainActivity : AppCompatActivity() {
 
     // 버튼 액션 통합 함수
     private fun setupCalendarControls() {
-        findViewById<ImageButton>(R.id.btnPrevMonthLeft).setOnClickListener { navigateMonth(-1) }
-        findViewById<ImageButton>(R.id.btnPrevMonthRight).setOnClickListener { navigateMonth(1) }
+        findViewById<ImageButton>(R.id.imageButton_calender_monthLeft).setOnClickListener { navigateMonth(-1) }
+        findViewById<ImageButton>(R.id.imageButton_calender_monthRight).setOnClickListener { navigateMonth(1) }
     }
 
     // 달력 업데이트 함수
@@ -185,11 +173,11 @@ class MainActivity : AppCompatActivity() {
 
     // 하단 메뉴바 화면 이동 기능
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById<ImageButton>(R.id.button_left1)
-        buttonLeft2 = findViewById<ImageButton>(R.id.button_left2)
-        buttonRight1 = findViewById<ImageButton>(R.id.button_right1)
-        buttonRight2 = findViewById<ImageButton>(R.id.button_right2)
-        buttonCenter = findViewById(R.id.button_center)
+        buttonLeft1 = findViewById<ImageButton>(R.id.button_all_cardview_left1)
+        buttonLeft2 = findViewById<ImageButton>(R.id.button_all_cardview_left2)
+        buttonRight1 = findViewById<ImageButton>(R.id.button_all_cardview_right1)
+        buttonRight2 = findViewById<ImageButton>(R.id.button_all_cardview_right2)
+        buttonCenter = findViewById(R.id.button_all_cardview_center)
 
         buttonLeft1.setOnClickListener {
             // 현재 Activity가 MainActivity인지 확인
