@@ -12,34 +12,27 @@ import android.widget.Spinner
 import android.widget.Toast
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDialogFragment() {
+class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomSheetDialogFragment() {
     private lateinit var titleEditText: EditText
     private lateinit var periodSpinner: Spinner
     private lateinit var weekDaySpinner: Spinner
     private lateinit var monthDaySpinner: Spinner
     private lateinit var saveButton: Button
 
-
-    // 시작 레이아웃 뷰 설정
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.bottomsheet_checklist_add, container, false)
-
     }
 
-    // 뷰 생성 시 실행되는 함수
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         initializeViews(view)
         setupPeriodSpinner()
         setupSaveButton()
-
     }
-    
-    // 뷰 id 지정
+
     private fun initializeViews(view: View) {
         titleEditText = view.findViewById(R.id.edittext_checklist_input)
         periodSpinner = view.findViewById(R.id.spinner_checklist_periodDefault)
@@ -48,7 +41,6 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
         saveButton = view.findViewById(R.id.button_checklist_saveData)
     }
 
-    // 주기 선택 Spinner 리스트 설정
     private fun setupPeriodSpinner() {
         val periods = arrayOf("선택하세요", "매일", "매주", "매월")
         val periodAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, periods)
@@ -59,14 +51,19 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 when (periods[position]) {
                     "매주" -> {
-                        setSpinnerVisibility(weekDaySpinnerVisible = true, monthDaySpinnerVisible = false)
+                        weekDaySpinner.visibility = View.VISIBLE
+                        monthDaySpinner.visibility = View.GONE
                         setupWeekDaySpinner()
                     }
                     "매월" -> {
-                        setSpinnerVisibility(weekDaySpinnerVisible = false, monthDaySpinnerVisible = true)
+                        weekDaySpinner.visibility = View.GONE
+                        monthDaySpinner.visibility = View.VISIBLE
                         setupMonthDaySpinner()
                     }
-                    else -> setSpinnerVisibility(weekDaySpinnerVisible = false, monthDaySpinnerVisible = false)
+                    else -> {
+                        weekDaySpinner.visibility = View.GONE
+                        monthDaySpinner.visibility = View.GONE
+                    }
                 }
             }
 
@@ -74,13 +71,6 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
         }
     }
 
-    // 주기 선택 Spinner 주기에 따른 Visibility 설정
-    private fun setSpinnerVisibility(weekDaySpinnerVisible: Boolean, monthDaySpinnerVisible: Boolean) {
-        weekDaySpinner.visibility = if (weekDaySpinnerVisible) View.VISIBLE else View.GONE
-        monthDaySpinner.visibility = if (monthDaySpinnerVisible) View.VISIBLE else View.GONE
-    }
-
-    // 주기에 따른 주마다 선택할 요일
     private fun setupWeekDaySpinner() {
         val weekDays = arrayOf("일", "월", "화", "수", "목", "금", "토")
         val weekDayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, weekDays)
@@ -88,7 +78,6 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
         weekDaySpinner.adapter = weekDayAdapter
     }
 
-    // 주기에 따른 달마다 선택할 날짜
     private fun setupMonthDaySpinner() {
         val monthDays = (1..31).map { it.toString() }.toTypedArray()
         val monthDayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, monthDays)
@@ -96,34 +85,25 @@ class CheckAddActivity(private val onSave: (Checklist) -> Unit) : BottomSheetDia
         monthDaySpinner.adapter = monthDayAdapter
     }
 
-    // 저장 버튼 입력 로직
     private fun setupSaveButton() {
         saveButton.setOnClickListener {
             val title = titleEditText.text.toString()
             val period = periodSpinner.selectedItem.toString()
-            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString() else ""
-            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString() else ""
+            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString() else null
+            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString() else null
 
-            if (isInputValid(title, period)) {
-                // 새로운 체크리스트 아이템 생성 후 onSave 콜백 호출
-                val checklistItemData = Checklist(
-                    cTitle = title,
-                    isChecked = false,
-                    period = period,
-                    weekDay = if (weekDay.isEmpty()) null else weekDay,
-                    monthDay = if (monthDay.isEmpty()) null else monthDay
-                )
-                onSave(checklistItemData)
-                dismiss()
+            if (title.isEmpty() || period == "선택하세요") {
+                Toast.makeText(requireContext(), "제목과 주기를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "내용과 주기를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
+                val newItem = ChecklistItem(
+                    cTitle = title,
+                    period = period,
+                    weekDay = weekDay,
+                    monthDay = monthDay
+                )
+                onSave(newItem)
+                dismiss()
             }
         }
     }
-
-    // 저장 시 미입력 방지 구문
-    private fun isInputValid(title: String, period: String): Boolean {
-        return title.isNotEmpty() && period != "선택하세요"
-    }
-
 }

@@ -8,38 +8,46 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
+data class ChecklistItem(
+    val cNo: Long = 0, // Primary Key
+    val cTitle: String, // 제목
+    var isChecked: Boolean = false, // 체크 상태
+    val period: String, // 주기
+    val weekDay: String? = null, // 요일 (선택 사항)
+    val monthDay: String? = null // 날짜 (선택 사항)
+)
+
 class ChecklistAdapter(
-    private val items: MutableList<Checklist>,
-    private val onDeleteClick: (Checklist) -> Unit,
-    private val onCheckedChange: (Checklist) -> Unit // 체크박스 변경 리스너 추가
+    private val items: MutableList<ChecklistItem>,
+    private val onDeleteClick: (Long) -> Unit,
+    private val onCheckedChange: (ChecklistItem) -> Unit
 ) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
-
     inner class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkBox: CheckBox = itemView.findViewById(R.id.checkbox_checklistItem_checkbox)
-        val titleTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_title)
-        val periodTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_period)
-        val deleteButton: Button = itemView.findViewById(R.id.button_checklistItem_delete)
+        private val checkBox: CheckBox = itemView.findViewById(R.id.checkbox_checklistItem_checkbox)
+        private val titleTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_title)
+        private val periodTextView: TextView = itemView.findViewById(R.id.textview_checklistItem_period)
+        private val deleteButton: Button = itemView.findViewById(R.id.button_checklistItem_delete)
 
-        fun bind(item: Checklist) {
+        fun bind(item: ChecklistItem) {
             titleTextView.text = item.cTitle
             checkBox.isChecked = item.isChecked
-
-            // period, weekDay, monthDay가 null이 아닌 경우에만 표시
-            val period = item.period
-            val weekDay = item.weekDay?.let { " $it" + "요일" } ?: ""
-            val monthDay = item.monthDay?.let { " $it" + "일" } ?: ""
-
-            // 모든 값이 null인 경우 빈 문자열이 되도록 조합
-            periodTextView.text = "$period$weekDay$monthDay".trim() // trim()으로 공백 제거
+            periodTextView.text = buildPeriodText(item)
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
                 item.isChecked = isChecked
-                onCheckedChange(item) // 체크박스 상태 변경 시 콜백 호출
+                onCheckedChange(item)
             }
 
             deleteButton.setOnClickListener {
-                onDeleteClick(item)
+                onDeleteClick(item.cNo)
             }
+        }
+
+        private fun buildPeriodText(item: ChecklistItem): String {
+            val period = item.period
+            val weekDay = item.weekDay?.let { " $it" + "요일" } ?: ""
+            val monthDay = item.monthDay?.let { " $it" + "일" } ?: ""
+            return "$period$weekDay$monthDay".trim()
         }
     }
 
@@ -50,8 +58,7 @@ class ChecklistAdapter(
     }
 
     override fun onBindViewHolder(holder: ChecklistViewHolder, position: Int) {
-        val currentItem = items[position]
-        holder.bind(currentItem) // bind 메서드를 통해 데이터 바인딩
+        holder.bind(items[position])
     }
 
     override fun getItemCount(): Int = items.size
