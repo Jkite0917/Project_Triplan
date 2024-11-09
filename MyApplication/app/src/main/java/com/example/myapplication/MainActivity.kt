@@ -25,8 +25,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var gridCalendar: GridLayout
     private val calendar = Calendar.getInstance()
 
-    private lateinit var db: LocalDatabase
-
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
 
@@ -164,12 +162,6 @@ class MainActivity : AppCompatActivity() {
         bottomSheet.show(supportFragmentManager, "DateInfoBottomSheet")
     }
 
-
-    // DB
-    private suspend fun getSavedDates(): List<String> {
-        val savedSchedules = db.getDailyScheduleDao().getAllInfoDate() // 저장된 일정 가져오기
-        return savedSchedules
-    }
 
     // 하단 메뉴바 화면 이동 기능
     private fun setupButtonListeners() {
