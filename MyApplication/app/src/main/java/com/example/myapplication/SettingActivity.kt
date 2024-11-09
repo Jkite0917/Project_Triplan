@@ -16,7 +16,6 @@ class SettingActivity : AppCompatActivity() {
     private lateinit var buttonRight1: ImageButton
     private lateinit var buttonRight2: ImageButton
 
-
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,43 +25,62 @@ class SettingActivity : AppCompatActivity() {
 
         sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
 
-        // Spinner에 사용할 지역 리스트
-        val regionList = listOf(
-            "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
-            "경기도", "강원도", "충청북도", "충청남도", "전라북도", "전라남도", "경상북도", "경상남도",
-            "제주도", "수도권", "호남", "영남", "강원"
+        // 지역 이름과 영문 이름을 매핑한 리스트
+        val regionMap = mapOf(
+            "서울" to "Seoul",
+            "부산" to "Busan",
+            "대구" to "Daegu",
+            "인천" to "Incheon",
+            "광주" to "Gwangju",
+            "대전" to "Daejeon",
+            "울산" to "Ulsan",
+            "세종" to "Sejong",
+            "경기도" to "Gyeonggi-do",
+            "강원도" to "Gangwon-do",
+            "충청북도" to "Chungcheongbuk-do",
+            "충청남도" to "Chungcheongnam-do",
+            "전라북도" to "Jeollabuk-do",
+            "전라남도" to "Jeollanam-do",
+            "경상북도" to "Gyeongsangbuk-do",
+            "경상남도" to "Gyeongsangnam-do",
+            "제주도" to "Jeju-do"
         )
-            // Spinner와 어댑터 설정
+
+        // Spinner에 사용할 지역 리스트 (한국어)
+        val regionList = regionMap.keys.toList()
+
+        // Spinner와 어댑터 설정
         val spinner: Spinner = findViewById(R.id.spinner_setting_selectPosition)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, regionList)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
-            // 이전에 저장된 값이 있으면 그 값을 Spinner에 반영
+        // 이전에 저장된 값이 있으면 그 값을 Spinner에 반영
         val savedRegion = sharedPreferences.getString("selectedRegion", "서울")  // 기본값은 "서울"
         val position = regionList.indexOf(savedRegion)
         if (position >= 0) {
             spinner.setSelection(position)
         }
 
-            // Spinner에서 선택된 값 SharedPreferences에 저장
+        // Spinner에서 선택된 값 SharedPreferences에 저장
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedRegion = regionList[position]
-                sharedPreferences.edit().putString("selectedRegion", selectedRegion).apply()
+                val selectedRegionInEnglish = regionMap[selectedRegion] ?: "Seoul" // 기본값은 "Seoul"
+                sharedPreferences.edit().putString("selectedRegion", selectedRegionInEnglish).apply()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-            // 선택되지 않은 경우 처리 (필요시)
+                // 선택되지 않은 경우 처리 (필요시)
             }
         }
     }
 
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById<ImageButton>(R.id.button_all_cardview_left1)
-        buttonLeft2 = findViewById<ImageButton>(R.id.button_all_cardview_left2)
-        buttonRight1 = findViewById<ImageButton>(R.id.button_all_cardview_right1)
-        buttonRight2 = findViewById<ImageButton>(R.id.button_all_cardview_right2)
+        buttonLeft1 = findViewById(R.id.button_all_cardview_left1)
+        buttonLeft2 = findViewById(R.id.button_all_cardview_left2)
+        buttonRight1 = findViewById(R.id.button_all_cardview_right1)
+        buttonRight2 = findViewById(R.id.button_all_cardview_right2)
 
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
@@ -79,7 +97,5 @@ class SettingActivity : AppCompatActivity() {
         buttonRight2.setOnClickListener {
             // 현재 액티비티가 SettingActivity일 때 아무 동작도 하지 않음
         }
-
     }
-
 }
