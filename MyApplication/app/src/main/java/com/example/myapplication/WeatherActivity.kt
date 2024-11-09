@@ -45,7 +45,7 @@ class WeatherActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         database.getWeatherTextDao().deleteWeatherList(
-                            WeatherList(WNo = itemToRemove.wNo, Weather = itemToRemove.weather, WTime = itemToRemove.time, WText = itemToRemove.contents)
+                            WeatherList(wNo = itemToRemove.wNo, weather = itemToRemove.weather, wTime = itemToRemove.time, wText = itemToRemove.contents)
                         )
                     }
                 }
@@ -62,10 +62,10 @@ class WeatherActivity : AppCompatActivity() {
             }
             items.addAll(savedItems.map { weatherList ->
                 WeatherListItem(
-                    wNo = weatherList.WNo,
-                    contents = weatherList.WText,
-                    weather = weatherList.Weather,
-                    time = weatherList.WTime
+                    wNo = weatherList.wNo,
+                    contents = weatherList.wText,
+                    weather = weatherList.weather,
+                    time = weatherList.wTime
                 )
             })
             adapter.notifyItemRangeInserted(0, savedItems.size)
@@ -81,6 +81,10 @@ class WeatherActivity : AppCompatActivity() {
 
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
+        }
+
+        buttonLeft2.setOnClickListener {
+            // 현재 액티비티가 WeatherActivity일 때 아무 동작도 하지 않음
         }
 
         buttonRight1.setOnClickListener {
@@ -104,9 +108,9 @@ class WeatherActivity : AppCompatActivity() {
         // 데이터베이스에 새로운 항목 저장
         lifecycleScope.launch {
             val weatherList = WeatherList(
-                Weather = newItem.weather,
-                WTime = newItem.time,
-                WText = newItem.contents
+                weather = newItem.weather,
+                wTime = newItem.time,
+                wText = newItem.contents
             )
             val insertedId = withContext(Dispatchers.IO) {
                 database.getWeatherTextDao().insertWeatherList(weatherList)

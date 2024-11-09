@@ -8,9 +8,11 @@ import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class ChecklistAdapter(private val items: MutableList<Checklist>,
-                       private val onDeleteClick: (Checklist) -> Unit)
-    : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
+class ChecklistAdapter(
+    private val items: MutableList<Checklist>,
+    private val onDeleteClick: (Checklist) -> Unit,
+    private val onCheckedChange: (Checklist) -> Unit // 체크박스 변경 리스너 추가
+) : RecyclerView.Adapter<ChecklistAdapter.ChecklistViewHolder>() {
 
     inner class ChecklistViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkBox: CheckBox = itemView.findViewById(R.id.checklist_item_checkbox)
@@ -23,7 +25,7 @@ class ChecklistAdapter(private val items: MutableList<Checklist>,
             checkBox.isChecked = item.isChecked
 
             // period, weekDay, monthDay가 null이 아닌 경우에만 표시
-            val period = item.period ?: ""
+            val period = item.period
             val weekDay = item.weekDay?.let { " $it" + "요일" } ?: ""
             val monthDay = item.monthDay?.let { " $it" + "일" } ?: ""
 
@@ -32,6 +34,7 @@ class ChecklistAdapter(private val items: MutableList<Checklist>,
 
             checkBox.setOnCheckedChangeListener { _, isChecked ->
                 item.isChecked = isChecked
+                onCheckedChange(item) // 체크박스 상태 변경 시 콜백 호출
             }
 
             deleteButton.setOnClickListener {
@@ -52,6 +55,4 @@ class ChecklistAdapter(private val items: MutableList<Checklist>,
     }
 
     override fun getItemCount(): Int = items.size
-
-
 }
