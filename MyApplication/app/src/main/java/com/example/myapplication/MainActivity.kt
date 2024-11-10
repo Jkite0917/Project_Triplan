@@ -1,11 +1,13 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.widget.GridLayout
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
@@ -28,6 +30,10 @@ class MainActivity : AppCompatActivity() {
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
 
+
+    private val apiKey = "74c26aef7529a784cee3247a261edd92" // API 키
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 
         val today = Calendar.getInstance()
         updateSelectedDateText(today)
-
+        
     }
 
     // 버튼 액션 통합 함수
@@ -163,6 +169,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
     // 하단 메뉴바 화면 이동 기능
     private fun setupButtonListeners() {
         buttonLeft1 = findViewById<ImageButton>(R.id.button_all_cardview_left1)
@@ -192,6 +199,8 @@ class MainActivity : AppCompatActivity() {
             bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
     }
+
+
 }
 
 

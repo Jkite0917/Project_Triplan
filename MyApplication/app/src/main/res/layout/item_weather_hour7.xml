@@ -7,7 +7,7 @@
 
     <!-- 시간 표시 -->
     <TextView
-        android:id="@+id/textview_mainScrollItem_time"
+        android:id="@+id/textview_mainScrollItem_time7"
         android:layout_width="126dp"
         android:layout_height="42dp"
         android:layout_marginTop="10dp"
@@ -28,11 +28,11 @@
         android:src="@drawable/menu_weather_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_time" />
+        app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_time7" />
 
     <!-- 온도 표시 -->
     <TextView
-        android:id="@+id/textview_mainScrollItem_temperature"
+        android:id="@+id/textview_mainScrollItem_temperature7"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
@@ -46,24 +46,24 @@
 
     <!-- 강수 확률과 이미지 -->
     <LinearLayout
-        android:id="@+id/linearLayout_mainScrollItem_rainInfoLine"
+        android:id="@+id/linearLayout_mainScrollItem_rainInfoLine7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:orientation="horizontal"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature"
+        app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature7"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
-            android:id="@+id/imageview_mainScrollItem_rainIcon"
+            android:id="@+id/imageview_mainScrollItem_rainIcon7"
             android:layout_width="35dp"
             android:layout_height="36dp"
             android:src="@drawable/rain" />
 
         <TextView
-            android:id="@+id/textview_mainScrollItem_rainText"
+            android:id="@+id/textview_mainScrollItem_rainText7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"

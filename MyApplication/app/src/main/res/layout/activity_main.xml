@@ -52,7 +52,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal">
 
-                <include layout="@layout/item_weather_hour" />
+                <include layout="@layout/item_weather_hour1" />
 
 
             </LinearLayout>
