@@ -1,3 +1,4 @@
+/*
 package com.example.myapplication
 
 import android.util.Log
@@ -132,12 +133,6 @@ class MainActivity : AppCompatActivity() {
                         temperatureTextView.text = "${"%.1f".format(temperature)}°C" // Set temperature
                         rainTextView.text = "${"%.0f".format(precipitationChance * 100)}%" // Set rain probability
 
-                        // Handle rain info visibility
-                        if (precipitationChance > 0) {
-                            rainInfoLayout.visibility = LinearLayout.VISIBLE
-                        } else {
-                            rainInfoLayout.visibility = LinearLayout.GONE
-                        }
                     }
                 } else {
                     Log.e("API_ERROR", "Error code: ${response.code()}")
@@ -151,4 +146,5 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+ */
  */
