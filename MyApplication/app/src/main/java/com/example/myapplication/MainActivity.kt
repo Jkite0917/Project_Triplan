@@ -59,6 +59,9 @@ class MainActivity : AppCompatActivity() {
         // sharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
+        // 초기값 설정
+        initializeDefaultSharedPreferences()
+
         setupCalendarControls()
         updateCalendar()
 
@@ -70,6 +73,16 @@ class MainActivity : AppCompatActivity() {
 
         // 앱 실행 시 날씨 조건 확인 및 알림 설정
         setupWeatherNotifications()
+    }
+
+    // 초기값 설정 함수 정의
+    private fun initializeDefaultSharedPreferences() {
+        if (!sharedPreferences.contains("selectedRegion")) {
+            with(sharedPreferences.edit()) {
+                putString("selectedRegion", "defaultCity")
+                apply() // 비동기적으로 저장
+            }
+        }
     }
 
     // 날씨 알림 설정
