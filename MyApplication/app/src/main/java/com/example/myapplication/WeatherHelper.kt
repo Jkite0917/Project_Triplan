@@ -1,74 +1,3 @@
-/*
-package com.example.myapplication
-
-import android.content.Context
-import android.util.Log
-import android.widget.LinearLayout
-import android.widget.TextView
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.*
-
-class WeatherHelper(
-    private val context: Context,
-    private val city: String,
-    private val selectedDate: String,
-    private val linearLayoutMain: LinearLayout
-) {
-
-    private val apiKey = "74c26aef7529a784cee3247a261edd92"
-
-    fun getWeatherForecast() {
-        val call = ApiClient.weatherApiService.getWeatherForecast(city, apiKey)
-
-        call.enqueue(object : Callback<WeatherForecastResponse> {
-            override fun onResponse(
-                call: Call<WeatherForecastResponse>,
-                response: Response<WeatherForecastResponse>
-            ) {
-                if (response.isSuccessful) {
-                    val forecastResponse = response.body()
-                    forecastResponse?.let {
-                        val forecastList = it.list
-                        val firstForecast = forecastList.first() // 첫 번째 날씨 정보 사용
-                        val time = firstForecast.dt_txt
-                        val temperature = firstForecast.main.temp
-                        val precipitationChance = firstForecast.pop ?: 0.0 // 강수 확률
-
-                        // UI 업데이트
-                        val timeTextView: TextView = linearLayoutMain.findViewById(R.id.textview_mainScrollItem_time1)
-                        val temperatureTextView: TextView = linearLayoutMain.findViewById(R.id.textview_mainScrollItem_temperature1)
-                        val rainTextView: TextView = linearLayoutMain.findViewById(R.id.textview_mainScrollItem_rainText1)
-
-                        // 시간 형식 변경 (UTC -> KST)
-                        val utcDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                        utcDateFormat.timeZone = TimeZone.getTimeZone("UTC")  // API에서 제공하는 시간은 UTC 기준
-                        val date = utcDateFormat.parse(time)
-
-                        val kstDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                        kstDateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")  // 한국 시간대로 설정
-                        val formattedTime = kstDateFormat.format(date)
-
-                        timeTextView.text = formattedTime // 시간 설정
-                        temperatureTextView.text = "${"%.1f".format(temperature)}°C" // 온도 설정
-                        rainTextView.text = "${"%.0f".format(precipitationChance * 100)}%" // 강수 확률 설정
-                        Log.e("API_CONNECT", "Check var[ time: ${formattedTime} | temperature: ${temperature} | rain: ${precipitationChance} ] ")
-                    }
-                } else {
-                    Log.e("API_ERROR", "Error code: ${response.code()}")
-                    Log.e("API_ERROR", "city check, ${city}")
-                }
-            }
-
-            override fun onFailure(call: Call<WeatherForecastResponse>, t: Throwable) {
-                Log.e("API_FAILURE", "Error: ${t.message}")
-            }
-        })
-    }
-}
-*/
 package com.example.myapplication
 
 import android.content.Context
@@ -105,10 +34,15 @@ class WeatherHelper(
                     forecastResponse?.let {
                         val forecastList = it.list
 
-                        // 반복적으로 UI 업데이트하는 부분을 함수로 호출
-                        for (i in 0 until 8) { // 예시로 8개의 블럭을 순차적으로 업데이트
-                            val forecast = forecastList[i]  // 0번부터 7번까지의 예보를 가져옴
-                            updateWeatherUI(forecast, i)
+                        // selectedDate에 해당하는 예보 항목 찾기
+                        val selectedForecasts = forecastList.filter { forecast ->
+                            // forecast.dt_txt 형식은 "yyyy-MM-dd HH:mm:ss"이고, selectedDate는 "yyyy-MM-dd" 형식이라고 가정
+                            forecast.dt_txt.startsWith(selectedDate)  // 날짜만 비교
+                        }
+
+                        // selectedForecasts에 맞는 데이터를 UI에 업데이트
+                        selectedForecasts.forEachIndexed { index, forecast ->
+                            updateWeatherUI(forecast, index)
                         }
                     }
                 } else {
@@ -161,7 +95,6 @@ class WeatherHelper(
         Log.e("API_CONNECT", "Check var[ time: ${formattedTime} | temperature: ${forecast.main.temp} | rain: ${forecast.pop} | description: ${forecast.weather.firstOrNull()?.description} ] ")
         Log.e("API_CONNECT_ICON", "icon: $iconUrl")
     }
-
 
     // 각 TextView ID를 동적으로 가져오는 함수들
     private fun getTimeTextViewId(index: Int): Int {

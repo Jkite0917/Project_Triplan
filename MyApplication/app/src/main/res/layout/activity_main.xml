@@ -10,6 +10,24 @@
         layout="@layout/view_main_calender" />
 
     <TextView
+        android:id="@+id/textview_main_notice"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginBottom="13dp"
+        android:gravity="center_vertical"
+        android:text="   날짜를 두 번 누르면 일정 확인이 가능합니다.\n   + 버튼을 통해 일정을 추가해 보세요!"
+        android:textSize="12dp"
+        android:textColor="@color/gray"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="3"
+        app:layout_constraintTop_toBottomOf="@+id/customCalender_main"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
         android:id="@+id/textview_main_dateWeather"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -21,7 +39,6 @@
         android:shadowDx="3"
         android:shadowDy="3"
         android:shadowRadius="3"
-        app:layout_constraintTop_toBottomOf="@+id/customCalender_main"
         app:layout_constraintBottom_toTopOf="@+id/cardview_main_weatherScroll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

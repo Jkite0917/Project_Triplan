@@ -35,8 +35,7 @@ class MainActivity : AppCompatActivity() {
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
 
-
-    private val apiKey = "74c26aef7529a784cee3247a261edd92" // API 키
+    // 지역 정보 저장 공유 변수
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
