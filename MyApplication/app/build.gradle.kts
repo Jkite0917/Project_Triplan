@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-kapt")
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
 }
 
@@ -111,7 +112,9 @@ dependencies {
     // Retrofit Gson Converter
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    
+    implementation("com.github.bumptech.glide:glide:4.13.2")
+    kapt("com.github.bumptech.glide:compiler:4.13.2")
+
 
 }
 
