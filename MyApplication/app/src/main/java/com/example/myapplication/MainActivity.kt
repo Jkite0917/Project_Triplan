@@ -1,8 +1,11 @@
 package com.example.myapplication
 
 import android.content.Context
+import android.Manifest
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -11,10 +14,11 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import androidx.core.content.ContextCompat
 
 class MainActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -38,6 +42,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // 알림 권한 요청
+        requestNotificationPermissionIfNeeded()
+
         setupButtonListeners()
 
         gridCalendar = findViewById(R.id.gridLayout_calender_date)
@@ -63,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         // 예를 들어, "city"라는 키로 저장된 값을 가져와서 변수에 할당
         val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
         Log.e("API_LOG_Checking_Region", "selected Region is : ${city}")
-        
+
         // selectedDate가 Calender 타입이라 String으로
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(selectedDate.time)
@@ -71,6 +79,28 @@ class MainActivity : AppCompatActivity() {
         // WeatherHelper 인스턴스 생성 및 날씨 정보 요청
         val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
         weatherHelper.getWeatherForecast()
+    }
+
+    // 알림 권한을 요청하는 함수 (Android 13 이상)
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 100)
+            }
+        }
+    }
+
+    // 권한 요청 결과 처리
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 100) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                Log.d("MainActivity", "알림 권한이 허용되었습니다.")
+            } else {
+                Log.d("MainActivity", "알림 권한이 거부되었습니다. 알림 기능이 제한됩니다.")
+            }
+        }
     }
 
     // 버튼 액션 통합 함수
@@ -146,7 +176,7 @@ class MainActivity : AppCompatActivity() {
     private fun updateSelectedDateText(selectedDate: Calendar) {
         val selectedDateFormat = SimpleDateFormat("  MM월 dd일 날씨 정보입니다", Locale.getDefault())
         selectedDateTextView.text = selectedDateFormat.format(selectedDate.time)
-        
+
         // 스크롤뷰에도 업데이트 반영
         updateWeatherScrollView(sharedPreferences, selectedDate)
     }

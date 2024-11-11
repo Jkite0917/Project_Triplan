@@ -141,7 +141,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/rounded_button"
-            android:text="오늘순간" />
+            android:text="오는순간" />
 
         <Button
             android:id="@+id/button_weatherAdd_allDay"
