@@ -11,9 +11,7 @@ import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 
 class WeatherNotificationManager(val context: Context, val database: LocalDatabase) {
 
@@ -46,23 +44,34 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
 
+            val currentTime = Calendar.getInstance()
+
             savedWeatherItems.forEach { savedItem ->
                 val matchingForecast = forecastList.find { forecast ->
                     val forecastTimeKST = convertToSelectedTimeZone(forecast.dt_txt)
                     val matchesWeather = savedItem.weather == getWeatherIconId(forecast.weather[0].description)
 
-                    // "오는 순간"의 현재 시간 조건 추가 비교
+                    // 조건에 따라 시간을 설정
                     val matchesTime = when (savedItem.wTime) {
-                        "오기전날" -> isTomorrow(forecast.dt_txt)
-                        "오는순간" -> isCurrentTime(forecast.dt_txt)
-                        "하루종일" -> true
+                        "하루종일" -> {
+                            // 하루종일은 오전 6시에 알림 설정
+                            currentTime.set(Calendar.HOUR_OF_DAY, 6)
+                            currentTime.set(Calendar.MINUTE, 0)
+                            currentTime.set(Calendar.SECOND, 0)
+                            isScheduledTime(forecastTimeKST, currentTime)
+                        }
+                        "오기전날" -> {
+                            // 오기 전날은 오후 9시에 알림 설정
+                            currentTime.set(Calendar.HOUR_OF_DAY, 21)
+                            currentTime.set(Calendar.MINUTE, 0)
+                            currentTime.set(Calendar.SECOND, 0)
+                            isScheduledTime(forecastTimeKST, currentTime)
+                        }
+                        "오는순간" -> isCurrentTime(forecastTimeKST) // 현재 시간과 비교
                         else -> false
                     }
 
-                    // 로그 추가
                     Log.d("WeatherCheck", "Comparing saved weather: ${savedItem.weather} with forecast: ${forecast.weather[0].description} at time: $forecastTimeKST")
-                    Log.d("WeatherCheck", "Current time matches: $matchesTime")
-
                     matchesWeather && matchesTime
                 }
 
@@ -96,45 +105,24 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     }
 
     private fun getWeatherIconId(weatherDescription: String): Int {
-        return when (weatherDescription.toLowerCase(Locale.ROOT)) {
-            // Clear Sky
-            "clear sky" -> R.drawable.weather_sun_icon
-
-            // Partly Cloudy (별도로 유지)
+        return when (weatherDescription.toLowerCase()) {
+            "clear" -> R.drawable.weather_sun_icon
+            "clouds" -> R.drawable.weather_cloud_icon
+            "rain" -> R.drawable.weather_rain_icon
+            "thunderstorm" -> R.drawable.weather_thunder_icon
+            "snow" -> R.drawable.weather_snow_icon
             "partly cloudy" -> R.drawable.weather_suncloud_icon
-
-            // Clouds, Mist, Fog (구름 및 안개 상태 통합)
-            "few clouds", "scattered clouds", "broken clouds", "overcast clouds", "mist", "fog", "haze" -> R.drawable.weather_cloud_icon
-
-            // Rain and Drizzle
-            "light rain", "moderate rain", "heavy intensity rain", "light intensity drizzle", "drizzle" -> R.drawable.weather_rain_icon
-
-            // Thunderstorm
-            "thunderstorm", "thunderstorm with light rain", "thunderstorm with heavy rain" -> R.drawable.weather_thunder_icon
-
-            // Snow
-            "light snow", "snow", "heavy snow" -> R.drawable.weather_snow_icon
-
-            // 기본 아이콘 설정
             else -> R.drawable.weather_sun_icon
         }
     }
 
     // 내일 날짜인지 확인하는 함수
-    private fun isTomorrow(forecastDate: String): Boolean {
+    private fun isScheduledTime(forecastTime: String, scheduledTime: Calendar): Boolean {
         val forecastCalendar = Calendar.getInstance().apply {
-            time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecastDate)!!
+            time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecastTime)!!
         }
-        val tomorrowCalendar = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, 1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-
-        return forecastCalendar.get(Calendar.YEAR) == tomorrowCalendar.get(Calendar.YEAR) &&
-                forecastCalendar.get(Calendar.DAY_OF_YEAR) == tomorrowCalendar.get(Calendar.DAY_OF_YEAR)
+        return forecastCalendar.get(Calendar.HOUR_OF_DAY) == scheduledTime.get(Calendar.HOUR_OF_DAY) &&
+                forecastCalendar.get(Calendar.MINUTE) == scheduledTime.get(Calendar.MINUTE)
     }
 
     // 현재 시간을 기준으로 알림이 오도록 확인하는 함수
@@ -146,14 +134,10 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
             // 현재 시간과 예보 시간이 동일한 3시간 간격 블록에 있는지 확인
             val threeHoursInMillis = 3 * 60 * 60 * 1000 // 3시간(밀리초)
             val difference = Math.abs(currentTime - forecastTimeMillis)
-
-            // 디버그 로그 추가
-            Log.d("TimeCheck", "Current time: $currentTime, Forecast time: $forecastTimeMillis, Difference: $difference")
-
-            // 1.5시간 이내일 때 일치한다고 간주
-            difference <= threeHoursInMillis / 2
+            difference <= threeHoursInMillis / 2 // 1.5시간 이내일 때 일치한다고 간주
         } ?: false
     }
+
     private fun convertToSelectedTimeZone(utcTime: String): String {
         val utcFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         utcFormat.timeZone = TimeZone.getTimeZone("UTC")
