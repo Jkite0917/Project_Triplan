@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -43,12 +44,33 @@ class MainActivity : AppCompatActivity() {
         selectedDateTextView = findViewById(R.id.textview_main_dateWeather)
         tvCurrentMonth = findViewById(R.id.textview_calender_yearMonth)
 
+        // sharedPreferences 초기화
+        sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+
         setupCalendarControls()
         updateCalendar()
 
         val today = Calendar.getInstance()
         updateSelectedDateText(today)
+    }
+
+
+    // api 파일에 값 넣어서 실행하도록 보내기
+    private fun updateWeatherScrollView(sharedPreferences: SharedPreferences, selectedDate: Calendar) {
+        // 레이아웃 참조
+        val weatherScrollLayout: LinearLayout = findViewById(R.id.linearLayout_main_in_scrollview)
+
+        // 예를 들어, "city"라는 키로 저장된 값을 가져와서 변수에 할당
+        val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
+        Log.e("API_LOG_Checking_Region", "selected Region is : ${city}")
         
+        // selectedDate가 Calender 타입이라 String으로
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate: String = dateFormat.format(selectedDate.time)
+
+        // WeatherHelper 인스턴스 생성 및 날씨 정보 요청
+        val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
+        weatherHelper.getWeatherForecast()
     }
 
     // 버튼 액션 통합 함수
@@ -124,6 +146,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateSelectedDateText(selectedDate: Calendar) {
         val selectedDateFormat = SimpleDateFormat("  MM월 dd일 날씨 정보입니다", Locale.getDefault())
         selectedDateTextView.text = selectedDateFormat.format(selectedDate.time)
+        
+        // 스크롤뷰에도 업데이트 반영
+        updateWeatherScrollView(sharedPreferences, selectedDate)
     }
 
     // 현재 달 표시 업데이트 함수
