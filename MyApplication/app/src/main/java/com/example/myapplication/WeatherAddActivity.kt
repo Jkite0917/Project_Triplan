@@ -101,13 +101,13 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
     private fun selectTimeButton(button: Button, timeButtons: List<Button>) {
         // 모든 버튼 스타일 초기화
         timeButtons.forEach { btn ->
-            btn.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+            btn.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
             btn.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
             btn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
         }
 
         // 선택된 버튼 강조 표시
-        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
         button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
         button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
         selectedTimeButton = button // 선택된 버튼을 저장
@@ -118,13 +118,13 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         // 모든 날씨 버튼 스타일 초기화
         gridWeather.children.forEach { child ->
             if (child is ImageButton) {
-                child.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+                child.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
                 child.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
             }
         }
 
         // 선택된 날씨 버튼 강조 표시
-        selectedButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button)
+        selectedButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
         selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
     }
 }

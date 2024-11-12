@@ -48,7 +48,7 @@
             android:layout_weight="1"
             android:text="날짜 선택"
             android:layout_marginTop="16dp"
-            android:background="@drawable/rounded_date_button"/>
+            android:background="@drawable/bottomsheet_button_background"/>
 
         <!-- 선택된 날짜 표시 TextView -->
         <TextView
@@ -72,7 +72,7 @@
         android:text="저장"
         android:textSize="18dp"
         android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_button"/>
+        android:background="@drawable/bottomsheet_button_background"/>
 
 
 

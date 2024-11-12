@@ -71,7 +71,7 @@
         android:id="@+id/button_checklist_saveData"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_button"
+        android:background="@drawable/bottomsheet_button_background"
         android:text="저장"
         android:textSize="18dp"
         tools:layout_editor_absoluteX="20dp"

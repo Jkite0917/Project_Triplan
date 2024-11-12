@@ -67,7 +67,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/delete_border_shape"
+                android:background="@drawable/item_delete_button_border"
                 android:foreground="?attr/selectableItemBackground"
                 android:text="삭제" />
         </LinearLayout>

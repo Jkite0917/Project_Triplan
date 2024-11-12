@@ -47,7 +47,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/menu_background_image">
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton

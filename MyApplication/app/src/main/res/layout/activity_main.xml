@@ -59,7 +59,7 @@
             android:textSize="18dp"
             android:textColor="@color/black"
             android:gravity="center"
-            android:background="@drawable/test2"
+            android:background="@drawable/menu_background_image"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent" />
 
@@ -68,7 +68,7 @@
             android:layout_width="match_parent"
             android:layout_height="280dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/test2"
+            android:background="@drawable/menu_background_image"
             android:scrollbars="none"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -102,7 +102,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/test2">
+            android:background="@drawable/menu_background_image">
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton

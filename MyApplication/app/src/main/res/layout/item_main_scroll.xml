@@ -90,7 +90,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon1"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText1"
@@ -180,7 +180,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon2"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText2"
@@ -270,7 +270,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon3"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText3"
@@ -360,7 +360,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon4"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText4"
@@ -450,7 +450,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon5"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText5"
@@ -540,7 +540,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon6"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText6"
@@ -630,7 +630,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon7"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText7"
@@ -720,7 +720,7 @@
                     android:id="@+id/imageview_mainScrollItem_rainIcon8"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/rain" />
+                    android:src="@drawable/raindrop_icon" />
 
                 <TextView
                     android:id="@+id/textview_mainScrollItem_rainText8"
