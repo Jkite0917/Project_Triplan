@@ -68,7 +68,8 @@ dependencies {
 
     // Room 관련 의존성 추가
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.ui.test.android) // Kotlin Extensions
+    implementation(libs.androidx.ui.test.android)
+    implementation(libs.junit.junit) // Kotlin Extensions
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

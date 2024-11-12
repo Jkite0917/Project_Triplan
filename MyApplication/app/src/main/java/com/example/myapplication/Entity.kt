@@ -25,5 +25,6 @@ data class Checklist(
     @ColumnInfo var isChecked: Boolean = false, // 체크리스트 선택
     @ColumnInfo val period: String, // 주기
     @ColumnInfo val weekDay: String? = null, // 요일 (선택 사항)
-    @ColumnInfo val monthDay: String? = null // 날짜 (선택 사항)
+    @ColumnInfo val monthDay: String? = null, // 날짜 (선택 사항)
+    val lastCheckedDate: Long = System.currentTimeMillis() // 체크된 날짜를 현재 시간으로 초기화
 )

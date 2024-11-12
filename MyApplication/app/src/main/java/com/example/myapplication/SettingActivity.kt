@@ -55,18 +55,23 @@ class SettingActivity : AppCompatActivity() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
+        // 영어로 저장된 값 읽어오기
+        val savedRegionInEnglish = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
+
+        // 영어 값을 한국어로 변환
+        val savedRegion = regionMap.filter { it.value == savedRegionInEnglish }.keys.firstOrNull() ?: "서울"
+
         // 이전에 저장된 값이 있으면 그 값을 Spinner에 반영
-        val savedRegion = sharedPreferences.getString("selectedRegion", "서울")  // 기본값은 "서울"
         val position = regionList.indexOf(savedRegion)
         if (position >= 0) {
             spinner.setSelection(position)
         }
 
-        // Spinner에서 선택된 값 SharedPreferences에 저장
+        // Spinner에서 선택된 값 SharedPreferences에 영어로 저장
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val selectedRegion = regionList[position]
-                val selectedRegionInEnglish = regionMap[selectedRegion] ?: "Seoul" // 기본값은 "Seoul"
+                val selectedRegionInEnglish = regionMap[selectedRegion] ?: "Seoul" // 영어로 저장
                 sharedPreferences.edit().putString("selectedRegion", selectedRegionInEnglish).apply()
             }
 
@@ -74,6 +79,7 @@ class SettingActivity : AppCompatActivity() {
                 // 선택되지 않은 경우 처리 (필요시)
             }
         }
+
     }
 
     private fun setupButtonListeners() {

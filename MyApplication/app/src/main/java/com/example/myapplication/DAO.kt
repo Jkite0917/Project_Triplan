@@ -49,9 +49,9 @@ interface WeatherListDao {
     @Query("DELETE FROM WeatherList")
     suspend fun deleteAllWeatherLists()
 }
-
 @Dao
 interface ChecklistDao {
+
     @Query("SELECT * FROM Checklist")
     fun getAllChecklistItems(): List<Checklist>
 
@@ -67,9 +67,16 @@ interface ChecklistDao {
     @Update
     suspend fun updateChecklistItem(checklist: Checklist)
 
+    // lastCheckedDate와 isChecked만 업데이트하는 쿼리
+    @Query("""
+        UPDATE Checklist
+        SET isChecked = :isChecked, lastCheckedDate = :lastCheckedDate
+        WHERE cNo = :cNo
+    """)
+    suspend fun updateChecklistItemById(cNo: Long, isChecked: Boolean, lastCheckedDate: Long)
+
     @Query("DELETE FROM Checklist")
     suspend fun deleteAllChecklistItems()
 }
-
 
 

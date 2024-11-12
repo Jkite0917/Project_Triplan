@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     private fun initializeDefaultSharedPreferences() {
         if (!sharedPreferences.contains("selectedRegion")) {
             with(sharedPreferences.edit()) {
-                putString("selectedRegion", "defaultCity")
+                putString("selectedRegion", "Seoul")
                 apply() // 비동기적으로 저장
             }
         }
