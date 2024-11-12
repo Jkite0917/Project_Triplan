@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background_image">
+    android:background="@drawable/background_image">
 
     <TextView
         android:id="@+id/textview_checklist_title"
@@ -47,8 +47,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/menubar_image">
+            android:layout_height="match_parent">
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton

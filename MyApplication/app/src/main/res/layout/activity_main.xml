@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/main_background_image">
+    android:background="@drawable/background_image">
 
     <include
         android:id="@+id/customCalender_main"
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="280dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/main_background_image"
+            android:background="@drawable/test2"
             android:scrollbars="none"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -91,7 +91,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@drawable/menubar_image">
+            android:background="@color/test">
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton
