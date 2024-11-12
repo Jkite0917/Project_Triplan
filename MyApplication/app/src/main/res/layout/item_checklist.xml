@@ -57,6 +57,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/delete_border_shape"
+                android:foreground="?attr/selectableItemBackground"
                 android:text="삭제"
                 />
         </LinearLayout>

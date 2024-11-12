@@ -9,7 +9,10 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.View
 import android.widget.GridLayout
+import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -254,9 +257,28 @@ class MainActivity : AppCompatActivity() {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(selectedDate.time)
 
-        // WeatherHelper 인스턴스 생성 및 날씨 정보 요청
-        val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
-        weatherHelper.getWeatherForecast()
+        // 현재 날짜와 비교
+        val currentDate = Calendar.getInstance()
+
+        // 5일 후 날짜 구하기
+        val fiveDaysLater = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 5)
+        }
+
+
+        val parentScrollView: HorizontalScrollView = findViewById(R.id.scrollview_main_in_cardview)
+
+        // selectedDate가 현재 날짜보다 뒤거나, 현재 날짜에서 5일 이후보다 많은 날짜일 경우
+        if (selectedDate.after(currentDate) && selectedDate.after(fiveDaysLater)) {
+            // 1. include된 레이아웃 숨기기
+            parentScrollView.visibility = View.GONE  // 숨기기
+
+        } else {
+            // 정상적인 날짜라면, 날씨 정보 요청
+            parentScrollView.visibility = View.VISIBLE  // 숨기기
+            val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
+            weatherHelper.getWeatherForecast()
+        }
     }
 
     // 하단 메뉴바 화면 이동 기능

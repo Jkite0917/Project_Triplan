@@ -17,14 +17,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="280dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time1"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -104,14 +107,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout2"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time2"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -191,14 +197,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout3"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time3"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -278,14 +287,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout4"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time4"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -365,14 +377,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout5"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time5"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -452,14 +467,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout6"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time6"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -539,14 +557,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout7"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time7"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -626,14 +647,17 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout8"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
 
             <!-- 시간 표시 -->
             <TextView
                 android:id="@+id/textview_mainScrollItem_time8"
                 android:layout_width="126dp"
                 android:layout_height="42dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="16dp"
                 android:text="00:00"
                 android:textAlignment="center"
                 android:textColor="@color/black"

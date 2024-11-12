@@ -21,7 +21,9 @@
             android:contentDescription="Previous Month"
             android:src="@drawable/arrow_left_icon"
             android:scaleType="centerInside"
-            android:background="#00FFFFFF"/>
+            android:background="#00FFFFFF"
+
+            />
 
         <TextView
             android:id="@+id/textview_calender_yearMonth"
