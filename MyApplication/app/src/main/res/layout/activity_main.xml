@@ -91,7 +91,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/test">
+            android:background="@drawable/test2">
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton

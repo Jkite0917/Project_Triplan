@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 // DateInfoBottomSheet.kt
 class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialogFragment() {
 
-    private lateinit var editText: EditText
+    private lateinit var editText: TextView
     private lateinit var TextView : TextView
     private lateinit var deleteButton: Button
     private lateinit var db: LocalDatabase
@@ -29,7 +29,7 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.bottomsheet_main_checkanddelete, container, false)
-        editText = view.findViewById(R.id.edittext_mainCheck_input)
+        editText = view.findViewById(R.id.textview_mainCheck_input)
         TextView = view.findViewById(R.id.textview_mainCheck_selectedDate)
         deleteButton = view.findViewById(R.id.button_mainAdd_deleteData)
 

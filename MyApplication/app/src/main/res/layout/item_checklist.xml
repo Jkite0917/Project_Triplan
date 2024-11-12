@@ -3,56 +3,71 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-    android:padding="16dp"
-    android:background="@drawable/item_border_shape"
-    >
+    android:orientation="horizontal">
 
-    <LinearLayout
-        android:id="@+id/linearLayout_checklistItem"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintlayout_checklistItem_layoutBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/item_border_shape"
+        android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <CheckBox
-            android:id="@+id/checkbox_checklistItem_checkbox"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="0.5"/>
+        <LinearLayout
+            android:id="@+id/linearLayout_checklistItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textview_checklistItem_title"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1.5"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:text="defalut text title"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
+            <CheckBox
+                android:id="@+id/checkbox_checklistItem_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"/>
 
-        <TextView
-            android:id="@+id/textview_checklistItem_period"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:text="defalut text cycle"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
+            <TextView
+                android:id="@+id/textview_checklistItem_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1.5"
+                android:text="defalut text title"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/button_checklistItem_delete"
-            android:layout_width="39dp"
-            android:layout_height="29dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/delete_border_shape"
-            android:text="삭제"
-            />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/textview_checklistItem_period"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="8dp"
+                android:text="defalut text cycle"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/button_checklistItem_delete"
+                android:layout_width="39dp"
+                android:layout_height="29dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/delete_border_shape"
+                android:text="삭제"
+                />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintlayout_checklistItem_layoutBox"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
