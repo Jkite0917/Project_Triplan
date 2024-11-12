@@ -16,6 +16,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -37,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     // 지역 정보 저장 공유 변수
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var weatherNotificationManager: WeatherNotificationManager // 알림 매니저 인스턴스
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,30 +59,44 @@ class MainActivity : AppCompatActivity() {
         // sharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
+        // 초기값 설정
+        initializeDefaultSharedPreferences()
+
         setupCalendarControls()
         updateCalendar()
 
         val today = Calendar.getInstance()
         updateSelectedDateText(today)
+
+        // 알림 매니저 초기화
+        weatherNotificationManager = WeatherNotificationManager(this, LocalDatabase.getDatabase(this))
+
+        // 앱 실행 시 날씨 조건 확인 및 알림 설정
+        setupWeatherNotifications()
     }
 
+    // 초기값 설정 함수 정의
+    private fun initializeDefaultSharedPreferences() {
+        if (!sharedPreferences.contains("selectedRegion")) {
+            with(sharedPreferences.edit()) {
+                putString("selectedRegion", "defaultCity")
+                apply() // 비동기적으로 저장
+            }
+        }
+    }
 
-    // api 파일에 값 넣어서 실행하도록 보내기
-    private fun updateWeatherScrollView(sharedPreferences: SharedPreferences, selectedDate: Calendar) {
-        // 레이아웃 참조
-        val weatherScrollLayout: LinearLayout = findViewById(R.id.linearLayout_main_in_scrollview)
+    // 날씨 알림 설정
+    private fun setupWeatherNotifications() {
+        lifecycleScope.launch {
+            val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
+            val apiService = ApiClient.weatherApiService
+            val apiKey = "74c26aef7529a784cee3247a261edd92" // 실제 OpenWeather API 키로 변경 필요
 
-        // 예를 들어, "city"라는 키로 저장된 값을 가져와서 변수에 할당
-        val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
-        Log.e("API_LOG_Checking_Region", "selected Region is : ${city}")
-
-        // selectedDate가 Calender 타입이라 String으로
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val formattedDate: String = dateFormat.format(selectedDate.time)
-
-        // WeatherHelper 인스턴스 생성 및 날씨 정보 요청
-        val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
-        weatherHelper.getWeatherForecast()
+            // 날씨 조건 확인 및 알림 설정
+            withContext(Dispatchers.IO) {
+                weatherNotificationManager.checkWeatherConditions(apiService, apiKey, selectedRegion)
+            }
+        }
     }
 
     // 알림 권한을 요청하는 함수 (Android 13 이상)
@@ -222,7 +241,23 @@ class MainActivity : AppCompatActivity() {
         bottomSheet.show(supportFragmentManager, "DateInfoBottomSheet")
     }
 
+    // api 파일에 값 넣어서 실행하도록 보내기
+    private fun updateWeatherScrollView(sharedPreferences: SharedPreferences, selectedDate: Calendar) {
+        // 레이아웃 참조
+        val weatherScrollLayout: LinearLayout = findViewById(R.id.linearLayout_main_in_scrollview)
 
+        // 예를 들어, "city"라는 키로 저장된 값을 가져와서 변수에 할당
+        val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
+        Log.e("API_LOG_Checking_Region", "selected Region is : ${city}")
+
+        // selectedDate가 Calender 타입이라 String으로
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val formattedDate: String = dateFormat.format(selectedDate.time)
+
+        // WeatherHelper 인스턴스 생성 및 날씨 정보 요청
+        val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
+        weatherHelper.getWeatherForecast()
+    }
 
     // 하단 메뉴바 화면 이동 기능
     private fun setupButtonListeners() {
@@ -253,12 +288,4 @@ class MainActivity : AppCompatActivity() {
             bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
     }
-
-
 }
-
-
-
-
-
-
