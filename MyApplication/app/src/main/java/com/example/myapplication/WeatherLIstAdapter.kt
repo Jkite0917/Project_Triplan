@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import java.util.Locale
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 // WeatherListItem 데이터 클래스: 각 날씨 항목에 대한 데이터를 저장
 data class WeatherListItem(
-    val wNo: Long,         // 기본 키
-    val contents: String,  // 내용
-    val weather: Int,      // 날씨 아이콘 리소스 ID
-    val time: String       // 알림 시간
+    val wNo: Long,          // 기본 키
+    val contents: String,   // 내용
+    val weather: String,    // 날씨 설명 (String 타입으로 변경됨)
+    val time: String        // 알림 시간
 )
 
 // WeatherListAdapter 클래스: 날씨 항목 리스트를 RecyclerView에 표시하기 위한 어댑터
@@ -33,12 +34,31 @@ class WeatherListAdapter(
         fun bind(item: WeatherListItem) {
             // WeatherListItem의 데이터를 뷰에 설정
             contents.text = item.contents
-            weather.setImageResource(item.weather) // 저장된 drawable ID로 이미지 설정
             time.text = item.time
+
+            // weather 설명에 따른 아이콘 설정
+            weather.setImageResource(getWeatherIconId(item.weather))
 
             // 삭제 버튼 클릭 리스너 설정
             deleteButton.setOnClickListener {
                 onDeleteClick(item.wNo) // 삭제 시 해당 아이템의 기본 키 전달
+            }
+        }
+
+        // weather 설명에 따른 아이콘을 가져오는 함수
+        private fun getWeatherIconId(weatherDescription: String): Int {
+            return when (weatherDescription.lowercase(Locale.ROOT)) {
+                "clear sky" -> R.drawable.weather_sun_icon
+                "partly cloudy" -> R.drawable.weather_suncloud_icon
+                "few clouds", "scattered clouds", "broken clouds", "overcast clouds",
+                "mist", "fog", "haze", "smoke", "dust", "sand", "ash" -> R.drawable.weather_cloud_icon
+                "light rain", "moderate rain", "heavy intensity rain", "very heavy rain", "extreme rain",
+                "light intensity drizzle", "drizzle", "heavy intensity drizzle", "shower rain", "ragged shower rain" -> R.drawable.weather_rain_icon
+                "thunderstorm", "thunderstorm with light rain", "thunderstorm with rain", "thunderstorm with heavy rain",
+                "light thunderstorm", "heavy thunderstorm", "ragged thunderstorm" -> R.drawable.weather_thunder_icon
+                "light snow", "snow", "heavy snow", "sleet", "light shower sleet", "shower sleet",
+                "light rain and snow", "rain and snow", "light shower snow", "shower snow", "heavy shower snow" -> R.drawable.weather_snow_icon
+                else -> R.drawable.weather_sun_icon // 기본 아이콘
             }
         }
     }
