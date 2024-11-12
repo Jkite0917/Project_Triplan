@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.GridLayout
 import android.widget.HorizontalScrollView
@@ -276,8 +275,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             // 정상적인 날짜라면, 날씨 정보 요청
             parentScrollView.visibility = View.VISIBLE  // 숨기기
-            val weatherHelper = WeatherHelper(this, city, formattedDate, weatherScrollLayout)
-            weatherHelper.getWeatherForecast()
+            val mainScrollView = MainScrollView(this, city, formattedDate, weatherScrollLayout)
+            mainScrollView.getWeatherForecast()
         }
     }
 

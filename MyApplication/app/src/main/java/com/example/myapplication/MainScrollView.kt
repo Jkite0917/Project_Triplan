@@ -12,7 +12,7 @@ import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WeatherHelper(
+class MainScrollView(
     private val context: Context,
     private val city: String,
     private val selectedDate: String,
