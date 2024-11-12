@@ -15,7 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : BottomSheetDialogFragment() {
 
-    private var selectedWeatherIcon: Int = 0 // 선택한 날씨 아이콘의 리소스 ID 저장
+    private lateinit var selectedWeatherDescription: String // 선택한 날씨 설명 저장
     private var isWeatherIconSelected: Boolean = false // 날씨 버튼 선택 여부 저장
     private var selectedTimeButton: Button? = null // 선택된 시간 버튼 참조
     private lateinit var editTExt: EditText
@@ -34,15 +34,15 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         gridWeather.children.forEach { child ->
             if (child is ImageButton) {
                 child.setOnClickListener {
-                    // 선택된 아이콘의 drawable ID 저장
-                    selectedWeatherIcon = when (child.id) {
-                        R.id.imageButton_weatherAdd_Icon_Sun -> R.drawable.weather_sun_icon
-                        R.id.imageButton_weatherAdd_Icon_Cloud -> R.drawable.weather_cloud_icon
-                        R.id.imageButton_weatherAdd_Icon_Rain -> R.drawable.weather_rain_icon
-                        R.id.imageButton_weatherAdd_Icon_Thunder -> R.drawable.weather_thunder_icon
-                        R.id.imageButton_weatherAdd_Icon_Show -> R.drawable.weather_snow_icon
-                        R.id.imageButton_weatherAdd_Icon_SunCloud -> R.drawable.weather_suncloud_icon
-                        else -> 0
+                    // 선택된 날씨 설명 문자열 저장
+                    selectedWeatherDescription = when (child.id) {
+                        R.id.imageButton_weatherAdd_Icon_Sun -> "clear sky"
+                        R.id.imageButton_weatherAdd_Icon_Cloud -> "few clouds"
+                        R.id.imageButton_weatherAdd_Icon_Rain -> "light rain"
+                        R.id.imageButton_weatherAdd_Icon_Thunder -> "thunderstorm"
+                        R.id.imageButton_weatherAdd_Icon_Show -> "snow"
+                        R.id.imageButton_weatherAdd_Icon_SunCloud -> "partly cloudy"
+                        else -> ""
                     }
 
                     // 날씨 아이콘 선택됨을 표시
@@ -85,7 +85,7 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
                     val newItem = WeatherListItem(
                         wNo = 0L,                        // 처음에는 기본값으로 설정
                         contents = contents,             // 입력한 내용
-                        weather = selectedWeatherIcon,   // 선택된 날씨 아이콘
+                        weather = selectedWeatherDescription,  // 선택된 날씨 설명 문자열
                         time = selectedTime              // 선택된 시간
                     )
                     onSave(newItem)

@@ -44,46 +44,44 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
 
-            val currentTime = Calendar.getInstance()
+            // SharedPreferences 준비
+            val prefs = context.getSharedPreferences("NotificationPrefs", Context.MODE_PRIVATE)
+            val lastNotifiedWeather = prefs.getString("lastWeather", "")
+            val lastNotifiedTime = prefs.getString("lastTime", "")
 
             savedWeatherItems.forEach { savedItem ->
                 val matchingForecast = forecastList.find { forecast ->
+                    val forecastDescription = forecast.weather[0].description.lowercase(Locale.ROOT)
                     val forecastTimeKST = convertToSelectedTimeZone(forecast.dt_txt)
-                    val matchesWeather = savedItem.weather == getWeatherIconId(forecast.weather[0].description)
 
-                    // 조건에 따라 시간을 설정
-                    val matchesTime = when (savedItem.wTime) {
-                        "하루종일" -> {
-                            // 하루종일은 오전 6시에 알림 설정
-                            currentTime.set(Calendar.HOUR_OF_DAY, 6)
-                            currentTime.set(Calendar.MINUTE, 0)
-                            currentTime.set(Calendar.SECOND, 0)
-                            isScheduledTime(forecastTimeKST, currentTime)
-                        }
-                        "오기전날" -> {
-                            // 오기 전날은 오후 9시에 알림 설정
-                            currentTime.set(Calendar.HOUR_OF_DAY, 21)
-                            currentTime.set(Calendar.MINUTE, 0)
-                            currentTime.set(Calendar.SECOND, 0)
-                            isScheduledTime(forecastTimeKST, currentTime)
-                        }
-                        "오는순간" -> isCurrentTime(forecastTimeKST) // 현재 시간과 비교
-                        else -> false
+                    val matchesWeather = savedItem.weather == forecastDescription
+
+                    // 오는순간 조건: 시간 비교 없이, 이전과 동일한 알림인지 확인
+                    val shouldNotify = savedItem.wTime == "오는순간" &&
+                            (lastNotifiedWeather != forecastDescription || lastNotifiedTime != forecastTimeKST)
+
+                    if (shouldNotify && matchesWeather) {
+                        // 알림을 보내고 상태 업데이트
+                        sendNotification(savedItem.wText, forecastDescription)
+                        prefs.edit().putString("lastWeather", forecastDescription).apply()
+                        prefs.edit().putString("lastTime", forecastTimeKST).apply()
+                        true
+                    } else {
+                        false
                     }
-
-                    Log.d("WeatherCheck", "Comparing saved weather: ${savedItem.weather} with forecast: ${forecast.weather[0].description} at time: $forecastTimeKST")
-                    matchesWeather && matchesTime
                 }
 
-                if (matchingForecast != null) {
-                    Log.d("NotificationCheck", "Matching forecast found: ${matchingForecast.weather[0].description}, sending notification")
+                // 다른 조건들: 하루종일, 오기전날 조건은 기존 로직대로 시간을 확인하며 알림
+                if (savedItem.wTime != "오는순간" && matchingForecast != null) {
+                    // 기존 로직으로 알림을 처리
                     sendNotification(savedItem.wText, matchingForecast.weather[0].description)
-                } else {
-                    Log.d("NotificationCheck", "No matching forecast found for saved item: ${savedItem.wText}")
                 }
             }
+        } else {
+            Log.d("WeatherCheck", "API call failed with code: ${response.code()}")
         }
     }
+
 
     // 알림을 보내는 메서드
     fun sendNotification(content: String, weatherDescription: String) {
@@ -105,37 +103,18 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     }
 
     private fun getWeatherIconId(weatherDescription: String): Int {
-        return when (weatherDescription.toLowerCase()) {
-            "clear" -> R.drawable.weather_sun_icon
-            "clouds" -> R.drawable.weather_cloud_icon
-            "rain" -> R.drawable.weather_rain_icon
-            "thunderstorm" -> R.drawable.weather_thunder_icon
-            "snow" -> R.drawable.weather_snow_icon
+        return when (weatherDescription.lowercase(Locale.ROOT)) {
+            "clear sky" -> R.drawable.weather_sun_icon
             "partly cloudy" -> R.drawable.weather_suncloud_icon
+            "few clouds", "scattered clouds", "broken clouds", "overcast clouds", "mist", "fog", "haze", "smoke", "dust", "sand", "ash" -> R.drawable.weather_cloud_icon
+            "light rain", "moderate rain", "heavy intensity rain", "very heavy rain", "extreme rain",
+            "light intensity drizzle", "drizzle", "heavy intensity drizzle", "shower rain", "ragged shower rain" -> R.drawable.weather_rain_icon
+            "thunderstorm", "thunderstorm with light rain", "thunderstorm with rain", "thunderstorm with heavy rain",
+            "light thunderstorm", "heavy thunderstorm", "ragged thunderstorm" -> R.drawable.weather_thunder_icon
+            "light snow", "snow", "heavy snow", "sleet", "light shower sleet", "shower sleet",
+            "light rain and snow", "rain and snow", "light shower snow", "shower snow", "heavy shower snow" -> R.drawable.weather_snow_icon
             else -> R.drawable.weather_sun_icon
         }
-    }
-
-    // 내일 날짜인지 확인하는 함수
-    private fun isScheduledTime(forecastTime: String, scheduledTime: Calendar): Boolean {
-        val forecastCalendar = Calendar.getInstance().apply {
-            time = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecastTime)!!
-        }
-        return forecastCalendar.get(Calendar.HOUR_OF_DAY) == scheduledTime.get(Calendar.HOUR_OF_DAY) &&
-                forecastCalendar.get(Calendar.MINUTE) == scheduledTime.get(Calendar.MINUTE)
-    }
-
-    // 현재 시간을 기준으로 알림이 오도록 확인하는 함수
-    private fun isCurrentTime(forecastTime: String): Boolean {
-        val currentTime = System.currentTimeMillis()
-        val forecastDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecastTime)
-
-        return forecastDate?.time?.let { forecastTimeMillis ->
-            // 현재 시간과 예보 시간이 동일한 3시간 간격 블록에 있는지 확인
-            val threeHoursInMillis = 3 * 60 * 60 * 1000 // 3시간(밀리초)
-            val difference = Math.abs(currentTime - forecastTimeMillis)
-            difference <= threeHoursInMillis / 2 // 1.5시간 이내일 때 일치한다고 간주
-        } ?: false
     }
 
     private fun convertToSelectedTimeZone(utcTime: String): String {
@@ -143,8 +122,7 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         utcFormat.timeZone = TimeZone.getTimeZone("UTC")
 
         val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
-
+        sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
         val timeZoneId = "Asia/Seoul"
 
         val kstFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
