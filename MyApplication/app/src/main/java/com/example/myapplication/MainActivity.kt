@@ -248,33 +248,39 @@ class MainActivity : AppCompatActivity() {
         // 레이아웃 참조
         val weatherScrollLayout: LinearLayout = findViewById(R.id.linearLayout_main_in_scrollview)
 
-        // 예를 들어, "city"라는 키로 저장된 값을 가져와서 변수에 할당
+        // "selectedRegion"이라는 키로 저장된 값을 가져와서 변수에 할당
         val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
-        Log.e("API_LOG_Checking_Region", "selected Region is : ${city}")
+        Log.e("API_LOG_Checking_Region", "selected Region is : $city")
 
-        // selectedDate가 Calender 타입이라 String으로
+        // selectedDate를 문자열로 변환 (yyyy-MM-dd 형식)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(selectedDate.time)
 
-        // 현재 날짜와 비교
-        val currentDate = Calendar.getInstance()
-
-        // 5일 후 날짜 구하기
-        val fiveDaysLater = Calendar.getInstance().apply {
-            add(Calendar.DAY_OF_YEAR, 5)
+        // 현재 날짜와 5일 후 날짜에서 시간 제거
+        val currentDate = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 
+        val fiveDaysLater = Calendar.getInstance().apply {
+            add(Calendar.DAY_OF_YEAR, 5)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
 
         val parentScrollView: HorizontalScrollView = findViewById(R.id.scrollview_main_in_cardview)
 
-        // selectedDate가 현재 날짜보다 뒤거나, 현재 날짜에서 5일 이후보다 많은 날짜일 경우
-        if (selectedDate.after(currentDate) && selectedDate.after(fiveDaysLater)) {
-            // 1. include된 레이아웃 숨기기
-            parentScrollView.visibility = View.GONE  // 숨기기
-
+        // selectedDate가 currentDate와 같거나 이후이면서, fiveDaysLater 이전인 경우에만 날씨 정보 요청
+        if (selectedDate.before(currentDate) || selectedDate.after(fiveDaysLater)) {
+            // 날짜가 유효하지 않으면 레이아웃 숨기기
+            parentScrollView.visibility = View.GONE
         } else {
-            // 정상적인 날짜라면, 날씨 정보 요청
-            parentScrollView.visibility = View.VISIBLE  // 숨기기
+            // 유효한 날짜라면 레이아웃 보이기 및 날씨 정보 요청
+            parentScrollView.visibility = View.VISIBLE
             val mainScrollView = MainScrollView(this, city, formattedDate, weatherScrollLayout)
             mainScrollView.getWeatherForecast()
         }

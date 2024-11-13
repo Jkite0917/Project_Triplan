@@ -57,7 +57,6 @@
         android:id="@+id/cardview_all_bottomMenu"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginBottom="12dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -79,6 +78,7 @@
                 android:scaleType="fitCenter"
                 android:padding="10dp"
                 android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_left2"
                 app:layout_constraintStart_toStartOf="parent"
@@ -94,12 +94,28 @@
                 android:scaleType="fitCenter"
                 android:padding="10dp"
                 android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_right1"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_center"
                 app:layout_constraintStart_toEndOf="@id/button_all_cardview_left1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
+            <!-- 가운데 버튼 -->
+            <ImageButton
+                android:id="@+id/button_all_cardview_center"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/menu_plus_icon"
+                android:scaleType="centerCrop"
+                android:padding="10dp"
+                android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_right1"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_left2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintWidth_percent="0.2" />
 
             <!-- 오른쪽 첫 번째 버튼 -->
             <ImageButton
@@ -110,9 +126,10 @@
                 android:scaleType="fitCenter"
                 android:padding="10dp"
                 android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/button_all_cardview_right2"
-                app:layout_constraintStart_toEndOf="@+id/button_all_cardview_left2"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_center"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
@@ -125,8 +142,10 @@
                 android:scaleType="fitCenter"
                 android:padding="10dp"
                 android:background="@android:color/transparent"
+                android:foreground="?attr/selectableItemBackground"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/button_all_cardview_right1"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintWidth_percent="0.2" />
 
