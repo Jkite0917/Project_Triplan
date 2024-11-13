@@ -51,6 +51,8 @@
         android:id="@+id/cardview_main_weatherScroll"
         android:layout_width="match_parent"
         android:layout_height="280dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         app:cardCornerRadius="16dp"
         app:layout_constraintBottom_toTopOf="@id/cardview_all_bottomMenu"
         app:cardBackgroundColor="@null">
@@ -71,6 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="280dp"
             android:layout_marginBottom="20dp"
+            android:padding="10dp"
             android:background="@drawable/menu_background_image"
             android:scrollbars="none"
             app:layout_constraintEnd_toEndOf="parent"
