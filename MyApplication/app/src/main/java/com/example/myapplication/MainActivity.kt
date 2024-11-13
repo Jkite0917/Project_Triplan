@@ -76,8 +76,11 @@ class MainActivity : AppCompatActivity() {
         // 앱 실행 시 즉시 날씨 조건 확인 (테스트 용)
         // triggerImmediateWeatherCheck()
 
-        // 예약된 날씨 알림 설정
-        scheduleWeatherNotifications()
+        // 앱 첫 실행 시에만 날씨 알림 예약 설정
+        if (!sharedPreferences.getBoolean("isNotificationScheduled", false)) {
+            scheduleWeatherNotifications()
+            sharedPreferences.edit().putBoolean("isNotificationScheduled", true).apply()
+        }
     }
 
     // SharedPreferences에 기본 지역 설정 저장
@@ -128,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 
         WorkManager.getInstance(this).enqueueUniqueWork(
             "InitialWeatherNotification",
-            ExistingWorkPolicy.REPLACE,
+            ExistingWorkPolicy.KEEP,  // REPLACE를 KEEP으로 변경
             firstNotificationRequest
         )
 
@@ -143,7 +146,7 @@ class MainActivity : AppCompatActivity() {
 
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "RepeatingWeatherNotification",
-            ExistingPeriodicWorkPolicy.UPDATE,
+            ExistingPeriodicWorkPolicy.KEEP,  // REPLACE를 KEEP으로 변경
             repeatingRequest
         )
     }

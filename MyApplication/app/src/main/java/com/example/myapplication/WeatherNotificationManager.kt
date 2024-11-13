@@ -54,9 +54,9 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
 
                     // 알림을 보내야 하는 시간을 비교
                     val matchesTime = when (savedItem.wTime) {
-                        "하루종일" -> isScheduledTime(6, 0) // 오전 6시 알림
-                        "오기전날" -> isScheduledTime(21, 0) // 오후 9시 알림
-                        "오는순간" -> true // 시간 비교 없이 날씨만 확인
+                        "오늘 날씨 알림" -> isScheduledTime(6)
+                        "내일 날씨 알림" -> isScheduledTime(21)
+                        "즉시 알림" -> true
                         else -> false
                     }
 
@@ -112,10 +112,20 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         }
     }
 
-    // 특정 시간에 알림을 보내는 조건을 확인하는 함수
-    private fun isScheduledTime(hour: Int, minute: Int): Boolean {
+    // 특정 시간 범위에 알림을 보내는 조건을 확인하는 함수 (예: 5분 범위 내)
+    private fun isScheduledTime(targetHour: Int, targetMinute: Int = 0, rangeMinutes: Int = 5): Boolean {
         val currentTime = Calendar.getInstance()
-        return currentTime.get(Calendar.HOUR_OF_DAY) == hour && currentTime.get(Calendar.MINUTE) == minute
+        val targetTime = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, targetHour)
+            set(Calendar.MINUTE, targetMinute)
+            set(Calendar.SECOND, 0)
+        }
+
+        // 현재 시간과 목표 시간의 차이 계산 (밀리초 단위)
+        val timeDifference = Math.abs(currentTime.timeInMillis - targetTime.timeInMillis)
+
+        // 차이가 rangeMinutes 내라면 true 반환
+        return timeDifference <= rangeMinutes * 60 * 1000
     }
 
     private fun convertToCommonWeatherDescription(description: String): String {
@@ -136,9 +146,6 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     private fun convertToSelectedTimeZone(utcTime: String): String {
         val utcFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         utcFormat.timeZone = TimeZone.getTimeZone("UTC")
-
-        val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
         val timeZoneId = "Asia/Seoul"
 
         val kstFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())

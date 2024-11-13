@@ -106,7 +106,7 @@
         android:id="@+id/textview_weatherAdd_timeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="  시간"
+        android:text="  알림 시간 설정"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_marginBottom="8dp"
@@ -132,7 +132,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="오기전날" />
+            android:text="내일 날씨 알림" />
 
         <Button
             android:id="@+id/button_weatherAdd_timeNow"
@@ -141,7 +141,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="오는순간" />
+            android:text="즉시 알림" />
 
         <Button
             android:id="@+id/button_weatherAdd_allDay"
@@ -150,7 +150,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="하루종일" />
+            android:text="오늘 날씨 알림" />
     </LinearLayout>
 
     <!-- 내용 입력 텍스트 -->
