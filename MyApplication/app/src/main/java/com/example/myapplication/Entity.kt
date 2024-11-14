@@ -15,7 +15,8 @@ data class WeatherList (
     @PrimaryKey(autoGenerate = true) val wNo: Long = 0, // 날씨 pk, 자동 생성
     @ColumnInfo val weather: String, // 날씨 아이콘 리소스
     @ColumnInfo val wTime: String, // 알림 시간
-    @ColumnInfo val wText: String // 내용
+    @ColumnInfo val wText: String, // 내용
+    @ColumnInfo var isNotified: Boolean = false // 알림 여부 (중복 방지)
 )
 
 @Entity(tableName = "Checklist")

@@ -18,13 +18,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import androidx.work.*
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -49,21 +47,23 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 알림 권한 요청
+        // Android 13 이상에서 알림 권한 요청
         requestNotificationPermissionIfNeeded()
 
+        // 버튼 리스너 설정
         setupButtonListeners()
 
         gridCalendar = findViewById(R.id.gridLayout_calender_date)
         selectedDateTextView = findViewById(R.id.textview_main_dateWeather)
         tvCurrentMonth = findViewById(R.id.textview_calender_yearMonth)
 
-        // sharedPreferences 초기화
+        // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
 
         // 초기값 설정
         initializeDefaultSharedPreferences()
 
+        // 캘린더 컨트롤 설정 및 업데이트
         setupCalendarControls()
         updateCalendar()
 
@@ -73,11 +73,17 @@ class MainActivity : AppCompatActivity() {
         // 알림 매니저 초기화
         weatherNotificationManager = WeatherNotificationManager(this, LocalDatabase.getDatabase(this))
 
-        // 앱 실행 시 날씨 조건 확인 및 알림 설정
-        setupWeatherNotifications()
+        // 앱 실행 시 즉시 날씨 조건 확인 (테스트 용)
+        // triggerImmediateWeatherCheck()
+
+        // 앱 첫 실행 시에만 날씨 알림 예약 설정
+        if (!sharedPreferences.getBoolean("isNotificationScheduled", false)) {
+            scheduleWeatherNotifications()
+            sharedPreferences.edit().putBoolean("isNotificationScheduled", true).apply()
+        }
     }
 
-    // 초기값 설정 함수 정의
+    // SharedPreferences에 기본 지역 설정 저장
     private fun initializeDefaultSharedPreferences() {
         if (!sharedPreferences.contains("selectedRegion")) {
             with(sharedPreferences.edit()) {
@@ -87,18 +93,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 날씨 알림 설정
-    private fun setupWeatherNotifications() {
-        lifecycleScope.launch {
-            val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
-            val apiService = ApiClient.weatherApiService
-            val apiKey = "74c26aef7529a784cee3247a261edd92" // 실제 OpenWeather API 키로 변경 필요
-
-            // 날씨 조건 확인 및 알림 설정
-            withContext(Dispatchers.IO) {
-                weatherNotificationManager.checkWeatherConditions(apiService, apiKey, selectedRegion)
-            }
-        }
+    // 테스트용으로 앱 시작 시 즉시 WeatherWorker 실행
+    private fun triggerImmediateWeatherCheck() {
+        val immediateWorkRequest = OneTimeWorkRequestBuilder<WeatherWorker>().build()
+        WorkManager.getInstance(this).enqueue(immediateWorkRequest)
     }
 
     // 알림 권한을 요청하는 함수 (Android 13 이상)
@@ -123,7 +121,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 버튼 액션 통합 함수
+    // 매 정각에 알림을 예약하는 함수
+    private fun scheduleWeatherNotifications() {
+        // 다음 1시간 정각까지 남은 시간 계산
+        val initialDelay = calculateInitialDelay()
+        val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS) // 정각에 맞춰 첫 알림 실행
+            .build()
+
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "HourlyWeatherNotification",
+            ExistingWorkPolicy.REPLACE,
+            notificationRequest
+        )
+    }
+
+    // 다음 1시간 정각까지 남은 초기 지연 시간 계산
+    private fun calculateInitialDelay(): Long {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR_OF_DAY, 1)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        return calendar.timeInMillis - System.currentTimeMillis()
+    }
+
+    // 캘린더 컨트롤 설정
     private fun setupCalendarControls() {
         findViewById<ImageButton>(R.id.imageButton_calender_monthLeft).setOnClickListener { navigateMonth(-1) }
         findViewById<ImageButton>(R.id.imageButton_calender_monthRight).setOnClickListener { navigateMonth(1) }

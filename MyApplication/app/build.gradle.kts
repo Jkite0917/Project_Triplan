@@ -117,5 +117,10 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.13.2")
 
 
+    // 백그라운드 라이브러리
+    val work_version = "2.9.1"
+
+    // Kotlin + coroutines
+    implementation("androidx.work:work-runtime-ktx:$work_version")
 }
 

@@ -14,7 +14,8 @@ data class WeatherListItem(
     val wNo: Long,          // 기본 키
     val contents: String,   // 내용
     val weather: String,    // 날씨 설명 (String 타입으로 변경됨)
-    val time: String        // 알림 시간
+    val time: String,       // 알림 시간
+    val isNotified: Boolean // 알림 여부 (중복 방지용)
 )
 
 // WeatherListAdapter 클래스: 날씨 항목 리스트를 RecyclerView에 표시하기 위한 어댑터
@@ -38,6 +39,9 @@ class WeatherListAdapter(
 
             // weather 설명에 따른 아이콘 설정
             weather.setImageResource(getWeatherIconId(item.weather))
+
+            // isNotified 상태에 따라 항목의 투명도 조정 (알림이 전송된 경우 흐리게 표시)
+            itemView.alpha = if (item.isNotified) 0.5f else 1.0f
 
             // 삭제 버튼 클릭 리스너 설정
             deleteButton.setOnClickListener {

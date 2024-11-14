@@ -25,7 +25,6 @@ class WeatherActivity : AppCompatActivity() {
     private lateinit var weatherlistRecyclerView: RecyclerView
     private lateinit var database: LocalDatabase
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var weatherNotificationManager: WeatherNotificationManager // 알림 매니저 인스턴스
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +35,6 @@ class WeatherActivity : AppCompatActivity() {
         database = LocalDatabase.getDatabase(this)
         // SharedPreferences 초기화
         sharedPreferences = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-
-        // 알림 매니저 초기화
-        weatherNotificationManager = WeatherNotificationManager(this, database)
 
         // RecyclerView 설정
         weatherlistRecyclerView = findViewById(R.id.recyclerview_weather_list)
@@ -53,7 +49,13 @@ class WeatherActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         database.getWeatherTextDao().deleteWeatherList(
-                            WeatherList(wNo = itemToRemove.wNo, weather = itemToRemove.weather, wTime = itemToRemove.time, wText = itemToRemove.contents)
+                            WeatherList(
+                                wNo = itemToRemove.wNo,
+                                weather = itemToRemove.weather,
+                                wTime = itemToRemove.time,
+                                wText = itemToRemove.contents,
+                                isNotified = itemToRemove.isNotified // 삭제 시 현재 알림 상태를 그대로 전달
+                            )
                         )
                     }
                 }
@@ -72,34 +74,11 @@ class WeatherActivity : AppCompatActivity() {
                     wNo = weatherList.wNo,
                     contents = weatherList.wText,
                     weather = weatherList.weather,
-                    time = weatherList.wTime
+                    time = weatherList.wTime,
+                    isNotified = weatherList.isNotified // 알림 여부 설정
                 )
             })
             adapter.notifyItemRangeInserted(0, savedItems.size)
-        }
-
-        // API 호출하여 조건 확인 및 알림 생성
-        lifecycleScope.launch {
-            val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
-            checkWeatherConditions(selectedRegion)
-        }
-    }
-
-    // API를 통해 조건 확인 및 알림 생성
-    private suspend fun checkWeatherConditions(region: String) {
-        val apiService = ApiClient.weatherApiService
-        val apiKey = "74c26aef7529a784cee3247a261edd92" // 실제 OpenWeather API 키로 변경 필요
-
-        val response = withContext(Dispatchers.IO) {
-            apiService.getWeatherForecast(region, apiKey).execute()
-        }
-
-        if (response.isSuccessful) {
-            val forecastList = response.body()?.list ?: return
-            // 알림 매니저를 통해 조건에 맞는 예보가 있는지 확인 및 알림 전송
-            withContext(Dispatchers.IO) {
-                weatherNotificationManager.checkWeatherConditions(apiService, apiKey, region)
-            }
         }
     }
 
@@ -141,7 +120,8 @@ class WeatherActivity : AppCompatActivity() {
             val weatherList = WeatherList(
                 weather = newItem.weather,
                 wTime = newItem.time,
-                wText = newItem.contents
+                wText = newItem.contents,
+                isNotified = newItem.isNotified // 새로운 아이템의 알림 여부 설정
             )
             val insertedId = withContext(Dispatchers.IO) {
                 database.getWeatherTextDao().insertWeatherList(weatherList)
