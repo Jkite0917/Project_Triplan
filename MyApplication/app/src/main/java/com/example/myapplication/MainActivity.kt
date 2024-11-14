@@ -121,44 +121,28 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // 주기적 알림 예약 설정
+    // 매 정각에 알림을 예약하는 함수
     private fun scheduleWeatherNotifications() {
-        // 다음 3시간 간격에 맞춰 첫 알림 예약
+        // 다음 1시간 정각까지 남은 시간 계산
         val initialDelay = calculateInitialDelay()
-        val firstNotificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
-            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS) // 계산된 지연 시간 후에 첫 알림 실행
+        val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
+            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS) // 정각에 맞춰 첫 알림 실행
             .build()
 
         WorkManager.getInstance(this).enqueueUniqueWork(
-            "InitialWeatherNotification",
-            ExistingWorkPolicy.KEEP,  // REPLACE를 KEEP으로 변경
-            firstNotificationRequest
-        )
-
-        // 첫 알림 이후, 3시간마다 반복 알림 예약
-        val repeatingRequest = PeriodicWorkRequestBuilder<WeatherWorker>(3, TimeUnit.HOURS)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            )
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "RepeatingWeatherNotification",
-            ExistingPeriodicWorkPolicy.KEEP,  // REPLACE를 KEEP으로 변경
-            repeatingRequest
+            "HourlyWeatherNotification",
+            ExistingWorkPolicy.REPLACE,
+            notificationRequest
         )
     }
 
-    // 다음 3시간 간격까지 남은 초기 지연 시간 계산
+    // 다음 1시간 정각까지 남은 초기 지연 시간 계산
     private fun calculateInitialDelay(): Long {
         val calendar = Calendar.getInstance()
-        val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
-        val hoursUntilNextInterval = (3 - (currentHour % 3)) % 3
-        calendar.add(Calendar.HOUR_OF_DAY, hoursUntilNextInterval)
+        calendar.add(Calendar.HOUR_OF_DAY, 1)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
 
         return calendar.timeInMillis - System.currentTimeMillis()
     }
