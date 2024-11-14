@@ -218,11 +218,44 @@ class MainActivity : AppCompatActivity() {
 
     // 선택한 날짜 표시 업데이트 함수
     private fun updateSelectedDateText(selectedDate: Calendar) {
-        val selectedDateFormat = SimpleDateFormat("  MM월 dd일 날씨 정보입니다", Locale.getDefault())
+        // SharedPreferences에서 저장된 영어 값을 한국어로 변환
+        val regionInKorean = getRegionInKorean(sharedPreferences)
+        val regionText = "$regionInKorean 날씨 정보입니다."
+        val selectedDateFormat = SimpleDateFormat("  MM월 dd일 $regionText", Locale.getDefault())
         selectedDateTextView.text = selectedDateFormat.format(selectedDate.time)
 
         // 스크롤뷰에도 업데이트 반영
         updateWeatherScrollView(sharedPreferences, selectedDate)
+    }
+
+    // SharedPreferences를 통해 저장된 지역 값을 한국어로 변환하는 함수
+    fun getRegionInKorean(sharedPreferences: SharedPreferences): String {
+        // 영어와 한국어를 매핑한 리스트
+        val regionMap = mapOf(
+            "서울" to "Seoul",
+            "부산" to "Busan",
+            "대구" to "Daegu",
+            "인천" to "Incheon",
+            "광주" to "Gwangju",
+            "대전" to "Daejeon",
+            "울산" to "Ulsan",
+            "세종" to "Sejong",
+            "경기도" to "Gyeonggi-do",
+            "강원도" to "Gangwon-do",
+            "충청북도" to "Chungcheongbuk-do",
+            "충청남도" to "Chungcheongnam-do",
+            "전라북도" to "Jeollabuk-do",
+            "전라남도" to "Jeollanam-do",
+            "경상북도" to "Gyeongsangbuk-do",
+            "경상남도" to "Gyeongsangnam-do",
+            "제주도" to "Jeju-do"
+        )
+
+        // 영어 값을 SharedPreferences에서 가져옴
+        val savedRegionInEnglish = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
+
+        // 영어 값을 한국어로 변환
+        return regionMap.keys.find { regionMap[it] == savedRegionInEnglish } ?: "서울"
     }
 
     // 현재 달 표시 업데이트 함수
