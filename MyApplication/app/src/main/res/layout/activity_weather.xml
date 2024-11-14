@@ -22,14 +22,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textview_weather_notice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:text="        + 버튼을 통해 일정을 추가할 수 있습니다."
+        android:textColor="@color/gray"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/recyclerview_weather_list"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_weather_title"
+        app:layout_constraintVertical_bias="0.0" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerview_weather_list"
         android:layout_width="match_parent"
         android:layout_height="623dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="10dp"b
         android:padding="16dp"
         app:layout_constraintBottom_toTopOf="@+id/cardview_all_bottomMenu"
-        app:layout_constraintTop_toBottomOf="@id/textview_weather_title"
+        app:layout_constraintTop_toBottomOf="@+id/textview_weather_notice"
         app:layout_constraintVertical_bias="0.742"
         tools:layout_editor_absoluteX="-5dp" />
 

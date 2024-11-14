@@ -12,12 +12,12 @@
     <TextView
         android:id="@+id/textview_main_notice"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="40dp"
         android:layout_marginBottom="5dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:gravity="center_vertical"
         android:text="   날짜를 두 번 누르면 일정 확인이 가능합니다.\n   + 버튼을 통해 일정을 추가해 보세요!"
-        android:textSize="12dp"
+        android:textSize="12sp"
         android:textColor="@color/gray"
         android:shadowDx="3"
         android:shadowDy="3"
@@ -32,20 +32,29 @@
     <TextView
         android:id="@+id/textview_main_dateWeather"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="13dp"
+        android:layout_height="50dp"
+        android:layout_marginBottom="22dp"
         android:gravity="center_vertical"
         android:text="   MM DD 날씨 정보입니다."
-        android:textSize="23dp"
+        android:textSize="23sp"
         android:textColor="@color/black"
         android:shadowDx="3"
         android:shadowDy="3"
         android:shadowRadius="3"
         app:layout_constraintTop_toBottomOf="@+id/textview_main_notice"
-        app:layout_constraintBottom_toTopOf="@+id/cardview_main_weatherScroll"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textview_main_scrollNotice"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_marginBottom="1dp"
+        android:text="   좌/우로 드래그하여 날씨를 확인하세요"
+        android:textSize="12sp"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toTopOf="@+id/cardview_main_weatherScroll" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardview_main_weatherScroll"

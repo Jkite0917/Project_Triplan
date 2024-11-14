@@ -22,7 +22,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/textview_setting_notice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:text="    선택한 지역에 따른 날씨가 제공됩니다."
+        android:textColor="@color/gray"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout_setting_regionBox"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textview_setting_title"
+        app:layout_constraintVertical_bias="0.0" />
+
     <LinearLayout
+        android:id="@+id/linearLayout_setting_regionBox"
         android:layout_width="match_parent"
         android:layout_height="76dp"
         android:layout_marginStart="4dp"
@@ -33,7 +50,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textview_setting_title">
+        app:layout_constraintTop_toBottomOf="@id/textview_setting_notice">
 
         <TextView
             android:id="@+id/textview_setting_positionText"
