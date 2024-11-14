@@ -86,7 +86,8 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
                         wNo = 0L,                        // 처음에는 기본값으로 설정
                         contents = contents,             // 입력한 내용
                         weather = selectedWeatherDescription,  // 선택된 날씨 설명 문자열
-                        time = selectedTime              // 선택된 시간
+                        time = selectedTime,             // 선택된 시간
+                        isNotified = false               // 알림 여부 초기값 설정
                     )
                     onSave(newItem)
                     dismiss() // 다이얼로그 닫기

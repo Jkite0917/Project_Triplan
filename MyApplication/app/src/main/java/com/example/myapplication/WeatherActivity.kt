@@ -49,7 +49,13 @@ class WeatherActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     withContext(Dispatchers.IO) {
                         database.getWeatherTextDao().deleteWeatherList(
-                            WeatherList(wNo = itemToRemove.wNo, weather = itemToRemove.weather, wTime = itemToRemove.time, wText = itemToRemove.contents)
+                            WeatherList(
+                                wNo = itemToRemove.wNo,
+                                weather = itemToRemove.weather,
+                                wTime = itemToRemove.time,
+                                wText = itemToRemove.contents,
+                                isNotified = itemToRemove.isNotified // 삭제 시 현재 알림 상태를 그대로 전달
+                            )
                         )
                     }
                 }
@@ -68,7 +74,8 @@ class WeatherActivity : AppCompatActivity() {
                     wNo = weatherList.wNo,
                     contents = weatherList.wText,
                     weather = weatherList.weather,
-                    time = weatherList.wTime
+                    time = weatherList.wTime,
+                    isNotified = weatherList.isNotified // 알림 여부 설정
                 )
             })
             adapter.notifyItemRangeInserted(0, savedItems.size)
@@ -113,7 +120,8 @@ class WeatherActivity : AppCompatActivity() {
             val weatherList = WeatherList(
                 weather = newItem.weather,
                 wTime = newItem.time,
-                wText = newItem.contents
+                wText = newItem.contents,
+                isNotified = newItem.isNotified // 새로운 아이템의 알림 여부 설정
             )
             val insertedId = withContext(Dispatchers.IO) {
                 database.getWeatherTextDao().insertWeatherList(weatherList)

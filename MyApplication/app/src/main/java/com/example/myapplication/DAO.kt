@@ -28,6 +28,7 @@ interface DailyScheduleDao {
 
 @Dao
 interface WeatherListDao {
+    // WeatherList 데이터를 가져오는 쿼리
     @Query("SELECT * FROM WeatherList")
     fun getAllWeatherList(): List<WeatherList>
 
@@ -48,7 +49,12 @@ interface WeatherListDao {
 
     @Query("DELETE FROM WeatherList")
     suspend fun deleteAllWeatherLists()
+
+    // isNotified 필드 업데이트를 위한 쿼리 추가
+    @Query("UPDATE WeatherList SET isNotified = :isNotified WHERE wNo = :wNo")
+    suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean)
 }
+
 @Dao
 interface ChecklistDao {
 
