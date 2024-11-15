@@ -70,10 +70,10 @@ class CheckActivity : AppCompatActivity() {
                     monthDay = checklist.monthDay
                 )
             })
-            // 전체 리스트 초기화 시 notifyItemRangeInserted 사용
-            checklistAdapter.notifyItemRangeInserted(0, checklistItems.size)
+            checklistAdapter.notifyDataSetChanged() // 전체 데이터 갱신
         }
     }
+
 
     // 체크리스트 항목의 상태가 변경되었을 때 해당 항목만 업데이트
     private fun updateChecklistItem(item: ChecklistItem) {
@@ -101,18 +101,18 @@ class CheckActivity : AppCompatActivity() {
     // 체크리스트 항목 삭제 처리
     private fun deleteChecklistItem(cNo: Long) {
         lifecycleScope.launch(Dispatchers.IO) {
-            // 데이터베이스에서 해당 항목 삭제
             database.getChecklistDao().deleteChecklistItemByCNo(cNo)
             withContext(Dispatchers.Main) {
-                // 삭제된 항목의 위치를 찾아 리스트와 RecyclerView 갱신
                 val position = checklistItems.indexOfFirst { it.cNo == cNo }
                 if (position != -1) {
                     checklistItems.removeAt(position)
-                    checklistAdapter.notifyItemRemoved(position) // 삭제된 위치만 업데이트
+                    checklistAdapter.notifyItemRemoved(position)
+                    checklistAdapter.notifyItemRangeChanged(position, checklistItems.size)
                 }
             }
         }
     }
+
 
     // 새로운 체크리스트 항목을 데이터베이스에 추가하고 RecyclerView 갱신
     private fun addItemToChecklist(newItem: ChecklistItem) {
@@ -124,36 +124,36 @@ class CheckActivity : AppCompatActivity() {
                 weekDay = newItem.weekDay,
                 monthDay = newItem.monthDay
             )
-            // 데이터베이스에 항목 추가 후 ID 반환
             val insertedId = withContext(Dispatchers.IO) {
                 database.getChecklistDao().insertChecklistItem(checklist)
             }
-            // 삽입된 ID를 기반으로 새로운 ChecklistItem 생성 및 추가
             val updatedItem = newItem.copy(cNo = insertedId)
-            checklistItems.add(updatedItem)
-            checklistAdapter.notifyItemInserted(checklistItems.size - 1) // 추가된 위치만 업데이트
+            withContext(Dispatchers.Main) {
+                checklistItems.add(updatedItem)
+                checklistAdapter.notifyItemInserted(checklistItems.size - 1)
+            }
         }
     }
 
+
     private fun resetChecklistItemsIfNeeded() {
         lifecycleScope.launch {
-            withContext(Dispatchers.IO) {
+            val resetItems = withContext(Dispatchers.IO) {
                 val currentItems = database.getChecklistDao().getAllChecklistItems()
-                currentItems.forEach { item ->
-                    val shouldReset = shouldResetItem(item)
-                    if (shouldReset) {
-                        // 주기에 맞게 체크리스트 항목을 초기화하고 업데이트
-                        val newCheckedStatus = false
-                        val newLastCheckedDate = System.currentTimeMillis()  // 현재 날짜로 갱신
-                        database.getChecklistDao().updateChecklistItemById(item.cNo, newCheckedStatus, newLastCheckedDate)
-                    }
+                currentItems.filter { shouldResetItem(it) }.onEach { item ->
+                    database.getChecklistDao().updateChecklistItemById(
+                        item.cNo,
+                        isChecked = false,
+                        lastCheckedDate = System.currentTimeMillis()
+                    )
                 }
             }
-            withContext(Dispatchers.Main) {
-                loadChecklistItems() // RecyclerView 갱신
+            if (resetItems.isNotEmpty()) {
+                loadChecklistItems()
             }
         }
     }
+
 
 
     // 특정 체크리스트 항목의 주기 확인 함수
