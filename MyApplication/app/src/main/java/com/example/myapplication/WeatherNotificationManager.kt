@@ -65,17 +65,17 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
 
             for (savedItem in savedWeatherItems) {
                 when (savedItem.time) {
-                    "오늘 날씨 알림" -> {
+                    "당일 오전 6시" -> {
                         if (isWithin6amRange) {
                             handleTodayNotification(savedItem, forecastList)
                         }
                     }
-                    "내일 날씨 알림" -> {
+                    "전날 오후 9시" -> {
                         if (isWithin9pmRange) {
                             handleTomorrowNotification(savedItem, forecastList)
                         }
                     }
-                    "즉시 알림" -> {
+                    "현재 날씨" -> {
                         handleImmediateNotification(savedItem, forecastList, currentTime)
                     }
                 }

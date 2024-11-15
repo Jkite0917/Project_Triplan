@@ -26,9 +26,9 @@
 
     <string name="add_weather_title">날씨 알림 추가</string>
     <string name="add_weather_time_notice">알림 시간 설정</string>
-    <string name="add_weather_time_before">내일 날씨 알림</string>
-    <string name="add_weather_time_now">즉시 알림</string>
-    <string name="add_weather_time_today">오늘 날씨 알림</string>
+    <string name="add_weather_time_before">전날 오후 9시</string>
+    <string name="add_weather_time_now">현재 날씨</string>
+    <string name="add_weather_time_today">당일 오전 6시</string>
     <string name="add_weather_text_notice">내용</string>
     <string name="add_weather_text_hint">내용을 입력해주세요</string>
     <string name="add_weather_save">알림 저장</string>
