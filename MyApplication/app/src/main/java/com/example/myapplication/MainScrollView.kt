@@ -20,6 +20,7 @@ class MainScrollView(
 ) {
 
     private val apiKey = "74c26aef7529a784cee3247a261edd92"
+    private val maxUIItems = 8 // UI에 표시할 최대 시간대
 
     fun getWeatherForecast() {
         val call = ApiClient.weatherApiService.getWeatherForecast(city, apiKey)
@@ -34,15 +35,32 @@ class MainScrollView(
                     forecastResponse?.let {
                         val forecastList = it.list
 
-                        // selectedDate에 해당하는 예보 항목 찾기
-                        val selectedForecasts = forecastList.filter { forecast ->
-                            // forecast.dt_txt 형식은 "yyyy-MM-dd HH:mm:ss"이고, selectedDate는 "yyyy-MM-dd" 형식이라고 가정
-                            forecast.dt_txt.startsWith(selectedDate)  // 날짜만 비교
+                        // 현재 날짜 데이터 필터링
+                        val currentDateForecasts = forecastList.filter { forecast ->
+                            forecast.dt_txt.startsWith(selectedDate)
                         }
 
-                        // selectedForecasts에 맞는 데이터를 UI에 업데이트
-                        selectedForecasts.forEachIndexed { index, forecast ->
-                            updateWeatherUI(forecast, index)
+                        // 다음날 오전 06시 데이터 포함
+                        val nextDateForecasts = forecastList.filter { forecast ->
+                            forecast.dt_txt.startsWith(getNextDateString(selectedDate))
+                        }
+
+                        // 현재 날짜와 다음날 데이터 결합
+                        val combinedForecasts = currentDateForecasts + nextDateForecasts
+
+                        // 현재 시간 이후 데이터만 필터링
+                        val currentTime = System.currentTimeMillis()
+                        val futureForecasts = combinedForecasts.filter { forecast ->
+                            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                                .parse(forecast.dt_txt)?.time ?: 0L
+                            forecastTime >= currentTime
+                        }
+
+                        // UI 업데이트
+                        futureForecasts.forEachIndexed { index, forecast ->
+                            if (index < maxUIItems) { // UI 슬롯 제한 확인
+                                updateWeatherUI(forecast, index)
+                            }
                         }
                     }
                 } else {
@@ -57,46 +75,50 @@ class MainScrollView(
         })
     }
 
-    // 공통적으로 날씨 정보를 업데이트하는 함수
+    // UI 업데이트 함수
     private fun updateWeatherUI(forecast: Forecast, index: Int) {
-        // UI 요소 가져오기
         val timeTextView: TextView = linearLayoutMain.findViewById(getTimeTextViewId(index))
-        val weatherImageView: ImageView = linearLayoutMain.findViewById(getImageViewId(index))  // 날씨 아이콘 추가
-        val descriptionTextView: TextView = linearLayoutMain.findViewById(getWeatherDescriptionTextViewID(index))  // 날씨 설명 추가
+        val weatherImageView: ImageView = linearLayoutMain.findViewById(getImageViewId(index))
+        val descriptionTextView: TextView = linearLayoutMain.findViewById(getWeatherDescriptionTextViewID(index))
         val temperatureTextView: TextView = linearLayoutMain.findViewById(getTemperatureTextViewId(index))
         val rainTextView: TextView = linearLayoutMain.findViewById(getRainTextViewId(index))
 
-        // 시간 형식 변경 (UTC -> KST)
         val utcDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        utcDateFormat.timeZone = TimeZone.getTimeZone("UTC")  // API에서 제공하는 시간은 UTC 기준
+        utcDateFormat.timeZone = TimeZone.getTimeZone("UTC")
         val date = utcDateFormat.parse(forecast.dt_txt)
 
         val kstDateFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-        kstDateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")  // 한국 시간대로 설정
+        kstDateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
         val formattedTime = kstDateFormat.format(date)
 
-        // 날씨 아이콘 로딩 (Glide 사용)
-        val iconCode = forecast.weather.firstOrNull()?.icon ?: "01d" // 기본 아이콘 코드
-        val weatherCategory = getWeatherCategory(iconCode) // 아이콘 코드 필터링
-        val description = getWeatherDescriptionInKorean(iconCode) // 날씨 설명 한글번역
+        val iconCode = forecast.weather.firstOrNull()?.icon ?: "01d"
+        val weatherCategory = getWeatherCategory(iconCode)
+        val description = getWeatherDescriptionInKorean(iconCode)
         val iconUrl = "https://openweathermap.org/img/wn/$weatherCategory@2x.png"
 
-        // UI 업데이트
-        timeTextView.text = formattedTime // 시간 설정
-        temperatureTextView.text = "${"%.1f".format(forecast.main.temp)}°C" // 온도 설정
-        rainTextView.text = "${"%.0f".format(forecast.pop?.times(100) ?: 0)}%" // 강수 확률 설정 (0~100%)
-        descriptionTextView.text = description // 날씨 설명 설정
+        timeTextView.text = formattedTime
+        temperatureTextView.text = "${"%.1f".format(forecast.main.temp)}°C"
+        rainTextView.text = "${"%.0f".format(forecast.pop?.times(100) ?: 0)}%"
+        descriptionTextView.text = description
 
-        // Glide를 사용해 아이콘 설정
         Glide.with(context)
-            .load(iconUrl)  // 아이콘 URL 로드
-            .into(weatherImageView)  // 해당 ImageView에 아이콘 적용
+            .load(iconUrl)
+            .into(weatherImageView)
 
-        Log.e("API_CONNECT", "Check var[ time: ${formattedTime} | temperature: ${forecast.main.temp} | rain: ${forecast.pop} | description: ${forecast.weather.firstOrNull()?.description} ] ")
+        Log.e("API_CONNECT", "Check var[ time: $formattedTime | temperature: ${forecast.main.temp} | rain: ${forecast.pop} | description: ${forecast.weather.firstOrNull()?.description} ]")
         Log.e("API_CONNECT_ICON", "icon: $iconUrl")
     }
 
-    // 각 TextView ID를 동적으로 가져오는 함수들
+    // 다음날 날짜 계산 함수
+    private fun getNextDateString(selectedDate: String): String {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val date = dateFormat.parse(selectedDate) ?: return selectedDate
+        val calendar = Calendar.getInstance().apply { time = date }
+        calendar.add(Calendar.DAY_OF_YEAR, 1)
+        return dateFormat.format(calendar.time)
+    }
+
+    // UI 요소 ID 가져오는 함수들
     private fun getTimeTextViewId(index: Int): Int {
         return when (index) {
             0 -> R.id.textview_mainScrollItem_time1
@@ -139,29 +161,6 @@ class MainScrollView(
         }
     }
 
-    fun getWeatherCategory(iconCode: String): String {
-        return when (iconCode) {
-            // 맑은 날씨  낮, 밤 -> 낮
-            "01d", "01n" -> "01d"
-            // 흐림     적은 구름 낮/밤, 흐림 낮/밤, 구름이 많음 낮/밤 -> 흐림
-            "02d", "02n", "03d", "03n", "04d", "04n" -> "03d"
-            // 비
-            "10d" -> "10d"
-            // 비 (밤)
-            "10n" -> "10n"
-            // 소나기 (둘다 같음)
-            "09d", "09n" -> "09d"
-            // 천둥번개 (둘다 같음)
-            "11d", "11n" -> "11d"
-            // 눈 (둘다 같음)
-            "13d", "13n" -> "13d"
-            // 안개 (둘다 같음)
-            "50d", "50n" -> "50d"
-
-            else -> "알 수 없는 날씨"
-        }
-    }
-
     private fun getWeatherDescriptionTextViewID(index: Int): Int {
         return when (index) {
             0 -> R.id.textview_mainScrollItem_description1
@@ -176,7 +175,34 @@ class MainScrollView(
         }
     }
 
-    fun getWeatherDescriptionInKorean(iconCode: String): String {
+    private fun getRainTextViewId(index: Int): Int {
+        return when (index) {
+            0 -> R.id.textview_mainScrollItem_rainText1
+            1 -> R.id.textview_mainScrollItem_rainText2
+            2 -> R.id.textview_mainScrollItem_rainText3
+            3 -> R.id.textview_mainScrollItem_rainText4
+            4 -> R.id.textview_mainScrollItem_rainText5
+            5 -> R.id.textview_mainScrollItem_rainText6
+            6 -> R.id.textview_mainScrollItem_rainText7
+            7 -> R.id.textview_mainScrollItem_rainText8
+            else -> throw IllegalArgumentException("Invalid index")
+        }
+    }
+
+    private fun getWeatherCategory(iconCode: String): String {
+        return when (iconCode) {
+            "01d", "01n" -> "01d"
+            "02d", "02n", "03d", "03n", "04d", "04n" -> "03d"
+            "10d", "10n" -> "10d"
+            "09d", "09n" -> "09d"
+            "11d", "11n" -> "11d"
+            "13d", "13n" -> "13d"
+            "50d", "50n" -> "50d"
+            else -> "01d"
+        }
+    }
+
+    private fun getWeatherDescriptionInKorean(iconCode: String): String {
         return when (iconCode) {
             "01d" -> "맑은 날씨 (낮)"
             "01n" -> "맑은 날씨 (밤)"
@@ -199,19 +225,5 @@ class MainScrollView(
             else -> "알 수 없는 날씨"
         }
     }
-
-    private fun getRainTextViewId(index: Int): Int {
-        return when (index) {
-            0 -> R.id.textview_mainScrollItem_rainText1
-            1 -> R.id.textview_mainScrollItem_rainText2
-            2 -> R.id.textview_mainScrollItem_rainText3
-            3 -> R.id.textview_mainScrollItem_rainText4
-            4 -> R.id.textview_mainScrollItem_rainText5
-            5 -> R.id.textview_mainScrollItem_rainText6
-            6 -> R.id.textview_mainScrollItem_rainText7
-            7 -> R.id.textview_mainScrollItem_rainText8
-            else -> throw IllegalArgumentException("Invalid index")
-        }
-    }
-
 }
+
