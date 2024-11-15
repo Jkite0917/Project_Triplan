@@ -3,7 +3,7 @@
 
     <string name="main_calender_notice">날짜를 두 번 누르면 일정 확인이 가능합니다.\n + 버튼을 통해 일정을 추가해 보세요!"</string>
     <string name="main_selected_date">MM DD 날씨 정보입니다.</string>
-    <string name="main_scroll_notice"> 좌/우로 드래그하여 날씨를 확인하세요</string>
+    <string name="main_scroll_notice"> 좌/우로 드래그하여 날씨를 확인하세요.  (오류 시 날짜 다시 선택)</string>
     <string name="main_scroll_not_available"> 현재 날짜 기준 5일 이후까지의 데이터만 표시됩니다.</string>
 
     <string name="add_main_title">일정 추가</string>
