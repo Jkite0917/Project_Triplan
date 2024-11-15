@@ -1,6 +1,5 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp"
@@ -11,7 +10,7 @@
         android:id="@+id/textview_weatherAdd_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="날씨 알림 추가"
+        android:text="@string/add_weather_title"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:layout_marginBottom="8dp"
@@ -35,6 +34,7 @@
 
         <!-- 날씨 아이콘 버튼들 -->
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_Sun"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -46,6 +46,7 @@
             android:padding="8dp" />
 
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_Cloud"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -57,6 +58,7 @@
             android:padding="8dp" />
 
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_Rain"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -68,6 +70,7 @@
             android:padding="8dp" />
 
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_Thunder"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -79,6 +82,7 @@
             android:padding="8dp" />
 
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_Show"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -90,6 +94,7 @@
             android:padding="8dp" />
 
         <ImageButton
+            android:contentDescription="@string/item_weather_contentDescription"
             android:id="@+id/imageButton_weatherAdd_Icon_SunCloud"
             android:layout_width="0dp"
             android:layout_height="40dp"
@@ -106,7 +111,7 @@
         android:id="@+id/textview_weatherAdd_timeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="  알림 시간 설정"
+        android:text="@string/add_weather_time_notice"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_marginBottom="8dp"
@@ -126,13 +131,14 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <Button
+
             android:id="@+id/button_weatherAdd_dayBefore"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="내일 날씨 알림" />
+            android:text="@string/add_weather_time_before" />
 
         <Button
             android:id="@+id/button_weatherAdd_timeNow"
@@ -141,7 +147,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="즉시 알림" />
+            android:text="@string/add_weather_time_now" />
 
         <Button
             android:id="@+id/button_weatherAdd_allDay"
@@ -150,7 +156,7 @@
             android:layout_weight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:text="오늘 날씨 알림" />
+            android:text="@string/add_weather_time_today" />
     </LinearLayout>
 
     <!-- 내용 입력 텍스트 -->
@@ -158,26 +164,28 @@
         android:id="@+id/textview_weatherAdd_textTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="   내용"
+        android:text="@string/add_weather_text_notice"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="4dp"
         app:layout_constraintTop_toBottomOf="@id/linearLayout_weatherAdd_selectTime"
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- 내용 입력 (EditText) -->
     <EditText
+        android:importantForAutofill="no"
+        android:inputType="text"
         android:id="@+id/edittext_weatherAdd_inputText"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:background="@android:drawable/editbox_background_normal"
         android:gravity="top|start"
-        android:hint="내용을 입력해주세요"
+        android:hint="@string/add_weather_text_hint"
         android:minHeight="100dp"
         android:padding="8dp"
         android:layout_marginTop="8dp"
-        android:inputType="text"
         android:singleLine="true"
         android:imeOptions="flagNoExtractUi"
         app:layout_constraintEnd_toEndOf="parent"
@@ -193,7 +201,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/bottomsheet_button_background"
-        android:text="저장"
+        android:text="@string/add_weather_save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"

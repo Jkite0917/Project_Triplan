@@ -15,8 +15,9 @@
         android:layout_height="40dp"
         android:layout_marginBottom="5dp"
         android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
         android:gravity="center_vertical"
-        android:text="   날짜를 두 번 누르면 일정 확인이 가능합니다.\n   + 버튼을 통해 일정을 추가해 보세요!"
+        android:text="@string/main_calender_notice"
         android:textSize="12sp"
         android:textColor="@color/gray"
         android:shadowDx="3"
@@ -34,8 +35,9 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginBottom="22dp"
+        android:layout_marginStart="15dp"
         android:gravity="center_vertical"
-        android:text="   MM DD 날씨 정보입니다."
+        android:text="@string/main_selected_date"
         android:textSize="23sp"
         android:textColor="@color/black"
         android:shadowDx="3"
@@ -51,7 +53,8 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:layout_marginBottom="1dp"
-        android:text="   좌/우로 드래그하여 날씨를 확인하세요"
+        android:layout_marginStart="10dp"
+        android:text="@string/main_scroll_notice"
         android:textSize="12sp"
         android:textColor="@color/gray"
         app:layout_constraintBottom_toTopOf="@+id/cardview_main_weatherScroll" />
@@ -69,8 +72,8 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:text=" 현재 날짜 기준 5일 이후까지의 데이터만 표시됩니다."
-            android:textSize="18dp"
+            android:text="@string/main_scroll_not_available"
+            android:textSize="18sp"
             android:textColor="@color/black"
             android:gravity="center"
             android:background="@drawable/menu_background_image"
@@ -120,6 +123,7 @@
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -136,6 +140,7 @@
 
             <!-- 왼쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -152,6 +157,7 @@
 
             <!-- 가운데 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -168,6 +174,7 @@
 
             <!-- 오른쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -184,6 +191,7 @@
 
             <!-- 오른쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

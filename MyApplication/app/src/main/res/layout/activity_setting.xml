@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_image">
@@ -14,7 +13,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:padding="16dp"
-        android:text="환경 설정"
+        android:text="@string/setting_title"
         android:textColor="@color/black"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +27,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
-        android:text="    선택한 지역에 따른 날씨가 제공됩니다."
+        android:layout_marginStart="16dp"
+        android:text="@string/setting_notice"
         android:textColor="@color/gray"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout_setting_regionBox"
@@ -57,7 +57,7 @@
             android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_gravity="center"
-            android:text="  지역 선택"
+            android:text="@string/setting_region_select"
             android:textColor="@color/black"
             android:textSize="24sp" />
 
@@ -88,6 +88,7 @@
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -104,6 +105,7 @@
 
             <!-- 왼쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -121,6 +123,7 @@
 
             <!-- 오른쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -138,6 +141,7 @@
 
             <!-- 오른쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

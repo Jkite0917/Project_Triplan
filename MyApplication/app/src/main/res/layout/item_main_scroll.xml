@@ -12,8 +12,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <!-- 8개의 아이템을 배치 -->
-        <!-- 아래의 ConstraintLayout을 복사하여 8개 배치합니다. -->
+        <!-- 8개의 아이템 배치 -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout_mainScrollItem_layout1"
             android:layout_width="wrap_content"
@@ -28,16 +27,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon1"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -52,10 +52,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon1" />
@@ -66,10 +66,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description1" />
@@ -87,6 +87,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature1">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon1"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -97,10 +98,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -118,16 +119,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon2"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -142,10 +144,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon2" />
@@ -156,10 +158,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description2" />
@@ -177,6 +179,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature2">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon2"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -187,10 +190,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -208,16 +211,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon3"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -232,10 +236,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon3" />
@@ -246,10 +250,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description3" />
@@ -267,6 +271,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature3">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon3"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -277,10 +282,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -298,16 +303,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon4"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -322,10 +328,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon4" />
@@ -336,10 +342,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description4" />
@@ -357,6 +363,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature4">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon4"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -367,10 +374,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -388,16 +395,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon5"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -412,10 +420,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon5" />
@@ -426,10 +434,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description5" />
@@ -447,6 +455,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature5">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon5"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -457,10 +466,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -478,16 +487,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon6"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -502,10 +512,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon6" />
@@ -516,10 +526,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description6" />
@@ -537,6 +547,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature6">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon6"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -547,10 +558,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -568,16 +579,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon7"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -592,10 +604,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon7" />
@@ -606,10 +618,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description7" />
@@ -627,6 +639,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature7">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon7"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -637,10 +650,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -658,16 +671,17 @@
                 android:layout_width="126dp"
                 android:layout_height="42dp"
                 android:layout_marginTop="16dp"
-                android:text="00:00"
+                android:text="@string/scroll_time"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="30dp"
+                android:textSize="30sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <!-- 날씨 아이콘 -->
             <ImageView
+                android:contentDescription="@string/scroll_contentDescription"
                 android:id="@+id/imageview_mainScrollItem_weatherIcon8"
                 android:layout_width="84dp"
                 android:layout_height="80dp"
@@ -682,10 +696,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="설명"
+                android:text="@string/scroll_weather_notice"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="19dp"
+                android:textSize="19sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imageview_mainScrollItem_weatherIcon8" />
@@ -696,10 +710,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="20°C"
+                android:text="@string/scroll_weather_temperature"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_description8" />
@@ -717,6 +731,7 @@
                 app:layout_constraintTop_toBottomOf="@id/textview_mainScrollItem_temperature8">
 
                 <ImageView
+                    android:contentDescription="@string/scroll_raindrop_contentDescription"
                     android:id="@+id/imageview_mainScrollItem_rainIcon8"
                     android:layout_width="30dp"
                     android:layout_height="32dp"
@@ -727,10 +742,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="15%"
+                    android:text="@string/scroll_weather_raindrop"
                     android:textAlignment="center"
                     android:textColor="@color/black"
-                    android:textSize="30dp" />
+                    android:textSize="25sp" />
             </LinearLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

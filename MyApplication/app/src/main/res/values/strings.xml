@@ -1,3 +1,71 @@
 <resources>
     <string name="app_name">Triplan</string>
+
+    <string name="main_calender_notice">날짜를 두 번 누르면 일정 확인이 가능합니다.\n + 버튼을 통해 일정을 추가해 보세요!"</string>
+    <string name="main_selected_date">MM DD 날씨 정보입니다.</string>
+    <string name="main_scroll_notice"> 좌/우로 드래그하여 날씨를 확인하세요</string>
+    <string name="main_scroll_not_available"> 현재 날짜 기준 5일 이후까지의 데이터만 표시됩니다.</string>
+
+    <string name="add_main_title">일정 추가</string>
+    <string name="add_main_edit">내용을 작성하세요</string>
+    <string name="add_main_select_date">날짜 선택</string>
+    <string name="add_main_selected_date">선택된 날짜 없음</string>
+    <string name="add_main_save">저장</string>
+
+    <string name="info_main_title">일정 확인 및 수정</string>
+    <string name="info_main_edit">저장된 일정이 없습니다.  추가해보세요!</string>
+    <string name="info_main_selected_date">선택된 날짜 없음</string>
+    <string name="info_main_delete">일정 삭제</string>
+
+    <string name="weather_list_title">Weather list</string>
+    <string name="weather_list_notice">+ 버튼을 통해 일정을 추가할 수 있습니다</string>
+
+    <string name="item_weather_title">기본 제목</string>
+    <string name="item_weather_time">기본 시간</string>
+    <string name="item_weather_delete">삭제</string>
+
+    <string name="add_weather_title">날씨 알림 추가</string>
+    <string name="add_weather_time_notice">알림 시간 설정</string>
+    <string name="add_weather_time_before">내일 날씨 알림</string>
+    <string name="add_weather_time_now">즉시 알림</string>
+    <string name="add_weather_time_today">오늘 날씨 알림</string>
+    <string name="add_weather_text_notice">내용</string>
+    <string name="add_weather_text_hint">내용을 입력해주세요</string>
+    <string name="add_weather_save">알림 저장</string>
+
+    <string name="checklist_title">Check list</string>
+    <string name="checklist_notice"> "         + 버튼을 통해 체크리스트를 추가할 수 있습니다. \n           선택한 주기에 따라 체크박스가 초기화됩니다."</string>
+
+    <string name="item_check_title">기본 제목</string>
+    <string name="item_checklist_period">기본 시간</string>
+    <string name="item_checklist_delete">삭제</string>
+
+    <string name="add_checklist_title">리스트 추가</string>
+    <string name="add_checklist_edit_hint">리스트 제목을 작성하세요</string>
+    <string name="add_checklist_save">저장</string>
+
+    <string name="setting_title">환경 설정</string>
+    <string name="setting_notice">선택한 지역에 따른 날씨가 제공됩니다.</string>
+    <string name="setting_region_select">지역 선택</string>
+
+    <string name="contentDescription">메뉴 버튼 이미지</string>
+    <string name="calender_contentDescription">달력 버튼 이미지</string>
+    <string name="item_weather_contentDescription">날씨 아이콘</string>
+    <string name="scroll_contentDescription">날씨 이미지</string>
+    <string name="scroll_raindrop_contentDescription">물방울</string>
+
+    <string name="calender_year_month">YYYY년 MM월</string>
+    <string name="calender_mon_text">월</string>
+    <string name="calender_tue_text">화</string>
+    <string name="calender_wed_text">수</string>
+    <string name="calender_thu_text">목</string>
+    <string name="calender_fri_text">금</string>
+    <string name="calender_sat_text">토</string>
+    <string name="calender_son_text">일</string>
+
+    <string name="scroll_time">00:00</string>
+    <string name="scroll_weather_notice">날씨 설명</string>
+    <string name="scroll_weather_temperature">온도</string>
+    <string name="scroll_weather_raindrop">강수량</string>
+
 </resources>

@@ -34,7 +34,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1.5"
-                android:text="defalut text title"
+                android:text="@string/item_check_title"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -45,7 +45,7 @@
                 android:layout_weight="1"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:text="defalut text cycle"
+                android:text="@string/item_checklist_period"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -58,8 +58,7 @@
                 android:layout_marginBottom="8dp"
                 android:background="@drawable/item_delete_button_border"
                 android:foreground="?attr/selectableItemBackground"
-                android:text="삭제"
-                />
+                android:text="@string/item_checklist_delete" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

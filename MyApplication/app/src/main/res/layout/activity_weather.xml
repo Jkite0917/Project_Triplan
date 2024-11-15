@@ -14,7 +14,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
         android:padding="16dp"
-        android:text="Weather list"
+        android:text="@string/weather_list_title"
         android:textSize="24sp"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
@@ -28,7 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="8dp"
-        android:text="        + 버튼을 통해 일정을 추가할 수 있습니다."
+        android:layout_marginStart="15dp"
+        android:text="@string/weather_list_notice"
         android:textColor="@color/gray"
         android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/recyclerview_weather_list"
@@ -67,6 +68,7 @@
 
             <!-- 왼쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -83,6 +85,7 @@
 
             <!-- 왼쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_left2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -99,6 +102,7 @@
 
             <!-- 가운데 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_center"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -115,6 +119,7 @@
 
             <!-- 오른쪽 첫 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -131,6 +136,7 @@
 
             <!-- 오른쪽 두 번째 버튼 -->
             <ImageButton
+                android:contentDescription="@string/contentDescription"
                 android:id="@+id/button_all_cardview_right2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
