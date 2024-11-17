@@ -18,7 +18,24 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
     private lateinit var selectedWeatherDescription: String // 선택한 날씨 설명 저장
     private var isWeatherIconSelected: Boolean = false // 날씨 버튼 선택 여부 저장
     private var selectedTimeButton: Button? = null // 선택된 시간 버튼 참조
-    private lateinit var editTExt: EditText
+    private lateinit var editText: EditText
+
+    // 날씨 버튼 ID와 설명 매핑
+    private val weatherIconMap = mapOf(
+        R.id.imageButton_weatherAdd_Icon_Sun to "clear sky",
+        R.id.imageButton_weatherAdd_Icon_Cloud to "few clouds",
+        R.id.imageButton_weatherAdd_Icon_Rain to "light rain",
+        R.id.imageButton_weatherAdd_Icon_Thunder to "thunderstorm",
+        R.id.imageButton_weatherAdd_Icon_Show to "snow",
+        R.id.imageButton_weatherAdd_Icon_SunCloud to "partly cloudy"
+    )
+
+    // 에러 메시지 매핑
+    private val errorMessageMap = mapOf(
+        "weather" to "날씨 버튼을 선택해주세요.",
+        "time" to "시간 버튼을 선택해주세요.",
+        "content" to "내용을 입력해주세요."
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,28 +45,15 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         val view = inflater.inflate(R.layout.bottomsheet_weather_add, container, false)
 
         val gridWeather: GridLayout = view.findViewById(R.id.gridLayout_weatherAdd_selectWeather)
-        editTExt = view.findViewById(R.id.edittext_weatherAdd_inputText)
+        editText = view.findViewById(R.id.edittext_weatherAdd_inputText)
 
         // 날씨 아이콘 버튼 선택 처리
         gridWeather.children.forEach { child ->
             if (child is ImageButton) {
                 child.setOnClickListener {
-                    // 선택된 날씨 설명 문자열 저장
-                    selectedWeatherDescription = when (child.id) {
-                        R.id.imageButton_weatherAdd_Icon_Sun -> "clear sky"
-                        R.id.imageButton_weatherAdd_Icon_Cloud -> "few clouds"
-                        R.id.imageButton_weatherAdd_Icon_Rain -> "light rain"
-                        R.id.imageButton_weatherAdd_Icon_Thunder -> "thunderstorm"
-                        R.id.imageButton_weatherAdd_Icon_Show -> "snow"
-                        R.id.imageButton_weatherAdd_Icon_SunCloud -> "partly cloudy"
-                        else -> ""
-                    }
-
-                    // 날씨 아이콘 선택됨을 표시
-                    isWeatherIconSelected = true
-
-                    // 선택된 날씨 아이콘 버튼 강조 표시
-                    highlightSelectedWeatherButton(child, gridWeather)
+                    selectedWeatherDescription = weatherIconMap[child.id] ?: ""
+                    isWeatherIconSelected = true // 날씨 버튼 선택됨 표시
+                    highlightSelectedWeatherButton(child, gridWeather) // 버튼 강조
                 }
             }
         }
@@ -67,27 +71,27 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
 
         // 저장 버튼 클릭 시 입력 내용 저장
         view.findViewById<Button>(R.id.button_weatherAdd_saveData).setOnClickListener {
-            val contents = editTExt.text.toString()
+            val contents = editText.text.toString()
             val selectedTime = selectedTimeButton?.text?.toString() ?: ""
 
             when {
                 !isWeatherIconSelected -> {
-                    Toast.makeText(requireContext(), "날씨 버튼을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), errorMessageMap["weather"], Toast.LENGTH_SHORT).show()
                 }
                 selectedTimeButton == null -> {
-                    Toast.makeText(requireContext(), "시간 버튼을 선택해주세요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), errorMessageMap["time"], Toast.LENGTH_SHORT).show()
                 }
                 contents.isEmpty() -> {
-                    Toast.makeText(requireContext(), "내용을 입력해주세요.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), errorMessageMap["content"], Toast.LENGTH_SHORT).show()
                 }
                 else -> {
                     // 새로운 아이템 생성 및 저장 콜백 호출
                     val newItem = WeatherListItem(
-                        wNo = 0L,                        // 처음에는 기본값으로 설정
+                        wNo = 0L,                        // 기본값
                         contents = contents,             // 입력한 내용
-                        weather = selectedWeatherDescription,  // 선택된 날씨 설명 문자열
+                        weather = selectedWeatherDescription,  // 선택된 날씨 설명
                         time = selectedTime,             // 선택된 시간
-                        isNotified = false               // 알림 여부 초기값 설정
+                        isNotified = false               // 알림 여부 초기값
                     )
                     onSave(newItem)
                     dismiss() // 다이얼로그 닫기
@@ -100,32 +104,28 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
 
     // 시간 버튼을 업데이트하는 함수
     private fun selectTimeButton(button: Button, timeButtons: List<Button>) {
-        // 모든 버튼 스타일 초기화
-        timeButtons.forEach { btn ->
-            btn.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
-            btn.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
-            btn.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black))
-        }
-
-        // 선택된 버튼 강조 표시
-        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
-        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
-        button.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.white))
-        selectedTimeButton = button // 선택된 버튼을 저장
+        timeButtons.forEach { resetButtonStyle(it) } // 모든 버튼 초기화
+        applyHighlightStyle(button) // 선택된 버튼 강조
+        selectedTimeButton = button // 선택된 버튼 저장
     }
 
-    // 날씨 버튼을 강조 표시하는 함수
+    // 날씨 버튼 강조 표시 함수
     private fun highlightSelectedWeatherButton(selectedButton: ImageButton, gridWeather: GridLayout) {
-        // 모든 날씨 버튼 스타일 초기화
         gridWeather.children.forEach { child ->
-            if (child is ImageButton) {
-                child.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
-                child.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent)) // 기본 투명색으로 초기화
-            }
+            if (child is ImageButton) resetButtonStyle(child) // 모든 버튼 초기화
         }
+        applyHighlightStyle(selectedButton) // 선택된 버튼 강조
+    }
 
-        // 선택된 날씨 버튼 강조 표시
-        selectedButton.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
-        selectedButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC)) // 버튼 강조 색상 적용
+    // 버튼 스타일 초기화 함수
+    private fun resetButtonStyle(button: View) {
+        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), android.R.color.transparent))
+    }
+
+    // 버튼 강조 스타일 함수
+    private fun applyHighlightStyle(button: View) {
+        button.background = ContextCompat.getDrawable(requireContext(), R.drawable.bottomsheet_button_background)
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.buttonC))
     }
 }
