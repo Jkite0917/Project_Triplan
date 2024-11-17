@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.util.Calendar
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class WeatherWorker(
@@ -44,7 +44,6 @@ class WeatherWorker(
 
     // 다음 정각에 맞춰 알림을 예약하는 함수
     private fun scheduleNextHourlyNotification() {
-        // 다음 1시간 정각까지 남은 시간(밀리초)을 계산합니다.
         val initialDelay = calculateInitialDelay()
 
         // 1시간 후 정각에 작업을 실행하도록 예약합니다.

@@ -55,15 +55,25 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
 
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
-            val currentTime = System.currentTimeMillis()
 
+            // 모든 날씨 설명에 대해 변환 적용
+            forecastList.forEach { forecast ->
+                val originalDescription = forecast.weather[0].description
+                val convertedDescription = convertToCommonWeatherDescription(originalDescription)
+
+                // 변환된 설명 출력
+                Log.d("WeatherCheck", "API에서 받은 날씨 설명: $originalDescription -> 변환된 날씨 설명: $convertedDescription")
+            }
+
+            // 나머지 로직 처리
+            val currentTime = System.currentTimeMillis()
             val isWithin6amRange = isWithinTimeRange(currentTime, 6)
             val isWithin9pmRange = isWithinTimeRange(currentTime, 21)
 
             for (savedItem in savedWeatherItems) {
                 // "현재 날씨" 조건에서만 중복 방지 로직 적용
                 if (savedItem.time == "현재 날씨") {
-                    val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.ROOT))
+                    val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
                     if (savedItem.weather != forecastDescription) {
                         updateNotificationStatus(savedItem.wNo, false) // 상태 초기화
                     }
@@ -79,6 +89,7 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
             Log.d("WeatherCheck", "API call failed with code: ${response.code()}")
         }
     }
+
 
     private fun handleTodayNotification(savedItem: WeatherListItem, forecastList: List<Forecast>) {
         val today = Calendar.getInstance()
@@ -173,16 +184,30 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     }
 
     private fun convertToCommonWeatherDescription(description: String): String {
-        return when (description) {
+        // 소문자 변환 후 양쪽 공백 제거
+        val lowerCaseDescription = description.trim().lowercase(Locale.getDefault())
+
+        val commonDescription = when (lowerCaseDescription) {
             "clear sky" -> "clear sky"
-            "few clouds" -> "partly cloudy"
-            "scattered clouds", "broken clouds", "mist" -> "few clouds"
-            "light rain", "shower rain" -> "light rain"
-            "thunderstorm" -> "thunderstorm"
-            "snow" -> "snow"
-            else -> "clear sky"
+            "few clouds", "scattered clouds" -> "partly cloudy"
+            "broken clouds", "overcast clouds", "mist" -> "few clouds"
+            "drizzle", "light rain", "moderate rain", "heavy intensity rain", "very heavy rain",
+            "extreme rain", "freezing rain", "light intensity shower rain", "shower rain",
+            "heavy intensity shower rain", "ragged shower rain" -> "light rain"
+            "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
+            "light snow", "snow", "heavy snow", "sleet", "light shower sleet", "shower sleet",
+            "light rain and snow", "rain and snow", "light shower snow", "shower snow", "heavy shower snow" -> "snow"
+            else -> "clear sky"  // default fallback description
         }
+
+        // 변환된 날씨 설명 로그로 출력
+        Log.d("WeatherCheck", "날씨 설명 변환: $description -> $commonDescription")
+        Log.d("WeatherCheck", "원래 날씨 설명: $description -> 소문자 변환: $lowerCaseDescription")
+
+        return commonDescription
     }
+
+
 
     private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
         withContext(Dispatchers.IO) {
