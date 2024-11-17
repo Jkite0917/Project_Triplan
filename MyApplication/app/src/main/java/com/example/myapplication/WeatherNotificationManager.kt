@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
-class WeatherNotificationManager(val context: Context, val database: LocalDatabase) {
+class WeatherNotificationManager(val context: Context, private val database: LocalDatabase) {
 
     private val channelId = "weather_notification_channel"
 
@@ -96,7 +96,7 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
             .parse(forecastList[0].dt_txt)?.time ?: return
 
         // 5분 오차 비교
-        if (!isWithinTimeOffset(currentTime, forecastTime, 5)) {
+        if (!isWithinTimeOffset(currentTime, forecastTime)) {
             Log.d("WeatherCheck", "현재 시간과 예보 시간의 오차가 5분 이상으로 무시")
             return
         }
@@ -184,8 +184,8 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     }
 
     // 5분 오차 비교 함수
-    private fun isWithinTimeOffset(baseTime: Long, targetTime: Long, offsetMinutes: Int): Boolean {
-        val offsetMillis = offsetMinutes * 60 * 1000
+    private fun isWithinTimeOffset(baseTime: Long, targetTime: Long): Boolean {
+        val offsetMillis = 5 * 60 * 1000
         return targetTime in (baseTime - offsetMillis)..(baseTime + offsetMillis)
     }
 
