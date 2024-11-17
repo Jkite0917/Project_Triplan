@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -100,15 +101,18 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
     // 저장 버튼 클릭 이벤트 설정 함수
     private fun setupSaveButton() {
         saveButton.setOnClickListener {
-            val title = titleEditText.text.toString() // 제목 입력값
-            val period = periodSpinner.selectedItem.toString() // 선택된 주기
-            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString() else null
-            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString() else null
+            val title = titleEditText.text.toString().trim() // 제목 입력값
+            val period = periodSpinner.selectedItem.toString().trim() // 선택된 주기
+            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString().trim() else null
+            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString().trim() else null
 
             // 입력값 유효성 검사
             if (title.isEmpty() || period == "선택하세요") {
                 Toast.makeText(requireContext(), "제목과 주기를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
+                // 디버깅용 로그 추가
+                Log.d("CheckAddActivity", "Saving ChecklistItem - Title: $title, Period: $period, WeekDay: $weekDay, MonthDay: $monthDay")
+
                 // 새 ChecklistItem 생성하여 onSave 콜백 호출
                 val newItem = ChecklistItem(
                     cTitle = title,
