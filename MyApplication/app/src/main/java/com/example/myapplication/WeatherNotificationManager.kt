@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.abs
 
 class WeatherNotificationManager(val context: Context, val database: LocalDatabase) {
 
@@ -68,13 +67,13 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
                 Log.d("WeatherCheck", "API에서 받은 날씨 설명: $originalDescription -> 변환된 설명: $convertedDescription")
             }
 
-            val currentTime = System.currentTimeMillis()
+            System.currentTimeMillis()
             val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
             Log.d("WeatherCheck", "현재 API 날씨 설명: ${forecastList[0].weather[0].description} -> 변환된: $forecastDescription")
 
             savedWeatherItems.forEach { savedItem ->
                 when (savedItem.time) {
-                    "현재 날씨" -> handleImmediateNotification(savedItem, forecastList, currentTime)
+                    "현재 날씨" -> handleImmediateNotification(savedItem, forecastList)
                     "당일 오전 6시" -> handleTodayNotification(savedItem, forecastList)
                     "전날 오후 9시" -> handleTomorrowNotification(savedItem, forecastList)
                 }
@@ -114,7 +113,10 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         }
     }
 
-    private suspend fun handleImmediateNotification(savedItem: WeatherListItem, forecastList: List<Forecast>, currentTime: Long) {
+    private suspend fun handleImmediateNotification(
+        savedItem: WeatherListItem,
+        forecastList: List<Forecast>
+    ) {
         val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
 
         if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
