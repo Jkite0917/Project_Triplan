@@ -49,6 +49,11 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
             )
         }
 
+        Log.d("WeatherCheck", "DB에서 로드된 항목: ${savedWeatherItems.size}")
+        savedWeatherItems.forEach {
+            Log.d("WeatherCheck", "DB 항목: wNo=${it.wNo}, weather=${it.weather}, time=${it.time}, isNotified=${it.isNotified}")
+        }
+
         val response = withContext(Dispatchers.IO) {
             apiService.getWeatherForecast(region, apiKey).execute()
         }
@@ -56,102 +61,67 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
 
-            // 모든 날씨 설명에 대해 변환 적용
+            Log.d("WeatherCheck", "API 응답에서 가져온 날씨 항목: ${forecastList.size}")
             forecastList.forEach { forecast ->
                 val originalDescription = forecast.weather[0].description
                 val convertedDescription = convertToCommonWeatherDescription(originalDescription)
-
-                // 변환된 설명 출력
-                Log.d("WeatherCheck", "API에서 받은 날씨 설명: $originalDescription -> 변환된 날씨 설명: $convertedDescription")
+                Log.d("WeatherCheck", "API에서 받은 날씨 설명: $originalDescription -> 변환된 설명: $convertedDescription")
             }
 
-            // 나머지 로직 처리
             val currentTime = System.currentTimeMillis()
-            val isWithin6amRange = isWithinTimeRange(currentTime, 6)
-            val isWithin9pmRange = isWithinTimeRange(currentTime, 21)
+            val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
+            Log.d("WeatherCheck", "현재 API 날씨 설명: ${forecastList[0].weather[0].description} -> 변환된: $forecastDescription")
 
-            for (savedItem in savedWeatherItems) {
-                // "현재 날씨" 조건에서만 중복 방지 로직 적용
-                if (savedItem.time == "현재 날씨") {
-                    val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
-                    if (savedItem.weather != forecastDescription) {
-                        updateNotificationStatus(savedItem.wNo, false) // 상태 초기화
-                    }
-                }
-
+            savedWeatherItems.forEach { savedItem ->
                 when (savedItem.time) {
-                    "당일 오전 6시" -> if (isWithin6amRange) handleTodayNotification(savedItem, forecastList)
-                    "전날 오후 9시" -> if (isWithin9pmRange) handleTomorrowNotification(savedItem, forecastList)
                     "현재 날씨" -> handleImmediateNotification(savedItem, forecastList, currentTime)
+                    "당일 오전 6시" -> handleTodayNotification(savedItem, forecastList)
+                    "전날 오후 9시" -> handleTomorrowNotification(savedItem, forecastList)
                 }
             }
         } else {
-            Log.d("WeatherCheck", "API call failed with code: ${response.code()}")
+            Log.d("WeatherCheck", "API 호출 실패: 코드=${response.code()}")
         }
     }
 
-
     private fun handleTodayNotification(savedItem: WeatherListItem, forecastList: List<Forecast>) {
         val today = Calendar.getInstance()
-        for (forecast in forecastList) {
-            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecast.dt_txt)?.time ?: continue
-            if (isSameDay(today.timeInMillis, forecastTime) &&
-                savedItem.weather == convertToCommonWeatherDescription(forecast.weather[0].description.lowercase(Locale.ROOT))) {
-                // 조건이 맞으면 바로 알림 전송
-                sendNotification(savedItem.contents, forecast.weather[0].description)
-                break
+        forecastList.forEach { forecast ->
+            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecast.dt_txt)?.time ?: return@forEach
+            if (isSameDay(today.timeInMillis, forecastTime)) {
+                val forecastDescription = convertToCommonWeatherDescription(forecast.weather[0].description.lowercase(Locale.getDefault()))
+                if (savedItem.weather == forecastDescription) {
+                    Log.d("WeatherCheck", "당일 알림 조건 충족: wNo=${savedItem.wNo}, weather=${savedItem.weather}")
+                    sendNotification(savedItem.contents, forecast.weather[0].description)
+                    return
+                }
             }
         }
     }
 
     private fun handleTomorrowNotification(savedItem: WeatherListItem, forecastList: List<Forecast>) {
         val tomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
-        for (forecast in forecastList) {
-            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecast.dt_txt)?.time ?: continue
-            if (isSameDay(tomorrow.timeInMillis, forecastTime) &&
-                savedItem.weather == convertToCommonWeatherDescription(forecast.weather[0].description.lowercase(Locale.ROOT))) {
-                // 조건이 맞으면 바로 알림 전송
-                sendNotification(savedItem.contents, forecast.weather[0].description)
-                break
-            }
-        }
-    }
-
-    private suspend fun handleImmediateNotification(savedItem: WeatherListItem, forecastList: List<Forecast>, currentTime: Long) {
-        val currentMinute = Calendar.getInstance().get(Calendar.MINUTE)
-        if (currentMinute == 0) {  // 1시간 정각마다 확인
-            for (forecast in forecastList) {
-                val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecast.dt_txt)?.time ?: continue
-                val forecastDescription = convertToCommonWeatherDescription(forecast.weather[0].description.lowercase(Locale.ROOT))
-                if (abs(forecastTime - currentTime) <= 1 * 60 * 60 * 1000 &&
-                    savedItem.weather == forecastDescription) {
-                    if (!savedItem.isNotified) {
-                        sendNotification(savedItem.contents, forecast.weather[0].description)
-                        updateNotificationStatus(savedItem.wNo, true)
-                        break
-                    }
+        forecastList.forEach { forecast ->
+            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(forecast.dt_txt)?.time ?: return@forEach
+            if (isSameDay(tomorrow.timeInMillis, forecastTime)) {
+                val forecastDescription = convertToCommonWeatherDescription(forecast.weather[0].description.lowercase(Locale.getDefault()))
+                if (savedItem.weather == forecastDescription) {
+                    Log.d("WeatherCheck", "전날 알림 조건 충족: wNo=${savedItem.wNo}, weather=${savedItem.weather}")
+                    sendNotification(savedItem.contents, forecast.weather[0].description)
+                    return
                 }
             }
         }
     }
 
-    private fun isWithinTimeRange(currentTime: Long, targetHour: Int): Boolean {
-        val targetCalendar = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, targetHour)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }
-        val lowerBound = targetCalendar.timeInMillis - 5 * 60 * 1000
-        val upperBound = targetCalendar.timeInMillis + 5 * 60 * 1000
-        return currentTime in lowerBound..upperBound
-    }
+    private suspend fun handleImmediateNotification(savedItem: WeatherListItem, forecastList: List<Forecast>, currentTime: Long) {
+        val forecastDescription = convertToCommonWeatherDescription(forecastList[0].weather[0].description.lowercase(Locale.getDefault()))
 
-    private fun isSameDay(time1: Long, time2: Long): Boolean {
-        val cal1 = Calendar.getInstance().apply { timeInMillis = time1 }
-        val cal2 = Calendar.getInstance().apply { timeInMillis = time2 }
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+        if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
+            sendNotification(savedItem.contents, forecastList[0].weather[0].description)
+            updateNotificationStatus(savedItem.wNo, true) // 알림 상태 업데이트
+            Log.d("WeatherCheck", "즉시 알림 조건 충족: wNo=${savedItem.wNo}, contents=${savedItem.contents}")
+        }
     }
 
     private fun sendNotification(content: String, weatherDescription: String) {
@@ -184,34 +154,28 @@ class WeatherNotificationManager(val context: Context, val database: LocalDataba
     }
 
     private fun convertToCommonWeatherDescription(description: String): String {
-        // 소문자 변환 후 양쪽 공백 제거
         val lowerCaseDescription = description.trim().lowercase(Locale.getDefault())
-
-        val commonDescription = when (lowerCaseDescription) {
+        return when (lowerCaseDescription) {
             "clear sky" -> "clear sky"
             "few clouds", "scattered clouds" -> "partly cloudy"
             "broken clouds", "overcast clouds", "mist" -> "few clouds"
-            "drizzle", "light rain", "moderate rain", "heavy intensity rain", "very heavy rain",
-            "extreme rain", "freezing rain", "light intensity shower rain", "shower rain",
-            "heavy intensity shower rain", "ragged shower rain" -> "light rain"
+            "drizzle", "light rain", "moderate rain", "heavy intensity rain" -> "light rain"
             "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
-            "light snow", "snow", "heavy snow", "sleet", "light shower sleet", "shower sleet",
-            "light rain and snow", "rain and snow", "light shower snow", "shower snow", "heavy shower snow" -> "snow"
-            else -> "clear sky"  // default fallback description
+            "light snow", "snow", "heavy snow", "sleet" -> "snow"
+            else -> "clear sky"
         }
-
-        // 변환된 날씨 설명 로그로 출력
-        Log.d("WeatherCheck", "날씨 설명 변환: $description -> $commonDescription")
-        Log.d("WeatherCheck", "원래 날씨 설명: $description -> 소문자 변환: $lowerCaseDescription")
-
-        return commonDescription
     }
-
-
 
     private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
         withContext(Dispatchers.IO) {
             database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
         }
+    }
+
+    private fun isSameDay(time1: Long, time2: Long): Boolean {
+        val cal1 = Calendar.getInstance().apply { timeInMillis = time1 }
+        val cal2 = Calendar.getInstance().apply { timeInMillis = time2 }
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
     }
 }
