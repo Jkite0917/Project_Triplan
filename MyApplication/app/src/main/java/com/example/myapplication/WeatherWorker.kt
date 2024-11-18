@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -41,7 +42,9 @@ class WeatherWorker(
         }
     }
 
-    // 다음 정각 3분 전에 작업 예약
+    /**
+     * 다음 정각 3분 전에 작업 예약
+     */
     private fun scheduleNextHourlyNotification() {
         val initialDelay = calculateInitialDelay()
 
@@ -57,9 +60,11 @@ class WeatherWorker(
         )
     }
 
-    // 다음 정각 3분 전까지 남은 시간 계산
+    /**
+     * 다음 정각 3분 전까지 남은 시간 계산 (한국 시간 기준)
+     */
     private fun calculateInitialDelay(): Long {
-        val calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
 
         // 다음 정각 설정
         calendar.add(Calendar.HOUR_OF_DAY, 1)
@@ -76,10 +81,12 @@ class WeatherWorker(
         return if (delay > 0) delay else 0L
     }
 
-    // 시간 포맷 함수
+    /**
+     * 시간 포맷 함수 (한국 시간 기준)
+     */
     private fun formatTime(timestamp: Long): String {
-        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
         return sdf.format(Date(timestamp))
     }
-
 }
