@@ -20,7 +20,7 @@ class WeatherWorker(
     private val weatherNotificationManager = WeatherNotificationManager(context, database)
     private val sharedPreferences = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
     private val apiService = ApiClient.weatherApiService
-    private val apiKey = "74c26aef7529a784cee3247a261edd92"  // API 키를 여기에 입력하세요
+    private val apiKey = "74c26aef7529a784cee3247a261edd92"
 
     override suspend fun doWork(): Result {
         return try {
@@ -32,39 +32,50 @@ class WeatherWorker(
                 weatherNotificationManager.checkWeatherConditions(apiService, apiKey, selectedRegion)
             }
 
-            // 다음 정각에 맞춰 작업을 예약합니다.
+            // 다음 정각 3분 전에 작업을 예약합니다.
             scheduleNextHourlyNotification()
 
             Result.success()
         } catch (e: Exception) {
             Log.e("WeatherWorker", "Error in worker: ${e.message}")
-            Result.retry()  // 작업 실패 시 재시도합니다.
+            Result.retry() // 작업 실패 시 재시도합니다.
         }
     }
 
-    // 다음 정각에 맞춰 알림을 예약하는 함수
+    // 다음 정각 3분 전에 알림을 예약하는 함수
     private fun scheduleNextHourlyNotification() {
         val initialDelay = calculateInitialDelay()
 
-        // 1시간 후 정각에 작업을 실행하도록 예약합니다.
+        // 작업 예약
         val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
             .build()
 
         WorkManager.getInstance(applicationContext).enqueue(notificationRequest)
+        Log.d("WeatherWorker", "다음 작업 예약: ${formatTime(System.currentTimeMillis() + initialDelay)}")
     }
 
-    // 다음 1시간 정각까지 남은 시간(밀리초)을 계산하는 함수
+    // 다음 정각 3분 전까지 남은 시간(밀리초)을 계산하는 함수
     private fun calculateInitialDelay(): Long {
         val calendar = Calendar.getInstance()
 
-        // 현재 시각에서 1시간 후의 정각으로 설정합니다.
+        // 현재 시각에서 1시간 후 정각으로 설정
         calendar.add(Calendar.HOUR_OF_DAY, 1)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
 
-        // 다음 정각까지의 남은 시간을 계산합니다.
-        return calendar.timeInMillis - System.currentTimeMillis()
+        // 정각 3분 전으로 설정
+        val nextHour = calendar.timeInMillis
+        val threeMinutesBefore = nextHour - 3 * 60 * 1000
+
+        // 현재 시간과 비교하여 남은 시간을 계산
+        return threeMinutesBefore - System.currentTimeMillis()
+    }
+
+    // 디버깅용 시간 포맷 함수
+    private fun formatTime(timestamp: Long): String {
+        val sdf = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        return sdf.format(Date(timestamp))
     }
 }
