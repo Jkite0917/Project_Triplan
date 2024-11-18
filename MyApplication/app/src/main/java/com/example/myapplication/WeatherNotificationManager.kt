@@ -115,14 +115,18 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     // "당일 오전 6시" 알림 처리
     private fun handleTodayNotification(savedItem: WeatherListItem, forecastList: List<Forecast>) {
+        val currentTime = System.currentTimeMillis()
+
+        // 오전 5시 55분 ~ 6시 05분 사이인지 확인
+        if (!isWithinTimeRange(currentTime, 6)) {
+            Log.d("WeatherCheck", "현재 시간이 당일 알림 시간대가 아님")
+            return
+        }
+
         val today = Calendar.getInstance()
         forecastList.forEach { forecast ->
             val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 .parse(forecast.dt_txt)?.time ?: return@forEach
-
-            // 06:00~23:59 사이 시간만 비교
-            val hour = Calendar.getInstance().apply { timeInMillis = forecastTime }.get(Calendar.HOUR_OF_DAY)
-            if (hour < 6) return@forEach
 
             if (isSameDay(today.timeInMillis, forecastTime)) {
                 val forecastDescription = convertToCommonWeatherDescription(
@@ -139,14 +143,18 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     // "전날 오후 9시" 알림 처리
     private fun handleTomorrowNotification(savedItem: WeatherListItem, forecastList: List<Forecast>) {
+        val currentTime = System.currentTimeMillis()
+
+        // 오후 8시 55분 ~ 9시 05분 사이인지 확인
+        if (!isWithinTimeRange(currentTime, 21)) {
+            Log.d("WeatherCheck", "현재 시간이 전날 알림 시간대가 아님")
+            return
+        }
+
         val tomorrow = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, 1) }
         forecastList.forEach { forecast ->
             val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 .parse(forecast.dt_txt)?.time ?: return@forEach
-
-            // 21:00~23:59 사이 시간만 비교
-            val hour = Calendar.getInstance().apply { timeInMillis = forecastTime }.get(Calendar.HOUR_OF_DAY)
-            if (hour < 21) return@forEach
 
             if (isSameDay(tomorrow.timeInMillis, forecastTime)) {
                 val forecastDescription = convertToCommonWeatherDescription(
@@ -159,6 +167,21 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
                 }
             }
         }
+    }
+
+    // 특정 시간대인지 확인하는 함수
+    private fun isWithinTimeRange(currentTime: Long, targetHour: Int): Boolean {
+        val offsetMinutes = 5
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, targetHour)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val targetTime = calendar.timeInMillis
+        val offsetMillis = offsetMinutes * 60 * 1000
+
+        return currentTime in (targetTime - offsetMillis)..(targetTime + offsetMillis)
     }
 
     // 알림 전송
