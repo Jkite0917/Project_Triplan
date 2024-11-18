@@ -8,20 +8,20 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat // 날짜 포맷팅을 위한 import
-import java.util.* // 날짜 및 시간 계산을 위한 import
+import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 class WeatherNotificationManager(val context: Context, private val database: LocalDatabase) {
 
     private val channelId = "weather_notification_channel"
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         createNotificationChannel()
     }
 
-    // 알림 채널 생성 (Android 8.0 이상 필요)
+    // 알림 채널 생성
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -37,7 +37,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
     }
 
-    // 시간 포맷 함수 추가
+    // 시간 포맷 함수
     private fun formatTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
         return sdf.format(Date(timestamp))
@@ -79,8 +79,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             savedWeatherItems.forEach { savedItem ->
                 when (savedItem.time) {
                     "현재 날씨" -> handleImmediateNotification(savedItem, forecastList)
-                    "당일 오전 6시" -> handleTimeNotification(savedItem, nextHour, 6)
-                    "전날 오후 9시" -> handleTimeNotification(savedItem, nextHour, 21)
+                    "당일 오전 6시" -> handleTimeNotification(savedItem, forecastList, 6)
+                    "전날 오후 9시" -> handleTimeNotification(savedItem, forecastList, 21)
                 }
             }
         } else {
@@ -88,8 +88,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
     }
 
-    // "현재 날씨" 알림 처리
-    private suspend fun handleImmediateNotification(
+    // "현재 날씨" 알림 처리 및 상태 업데이트
+    private fun handleImmediateNotification(
         savedItem: WeatherListItem,
         forecastList: List<Forecast>
     ) {
@@ -98,21 +98,62 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         )
         Log.d("WeatherCheck", "예보된 날씨: $forecastDescription, 저장된 날씨: ${savedItem.weather}")
 
-        if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
+        // 현재 날씨가 저장된 날씨와 다르면 isNotified를 false로 리셋
+        if (savedItem.weather != forecastDescription) {
+            coroutineScope.launch {
+                resetNotificationStatus(savedItem.wNo)
+            }
+            Log.d("WeatherCheck", "날씨 변경 감지: ${savedItem.weather} -> $forecastDescription, 상태 리셋 완료")
+        }
+
+        // 현재 날씨와 조건 일치 시 알림 전송
+        if (savedItem.weather == forecastDescription && !savedItem.isNotified && isWithinTimeOffset(
+                System.currentTimeMillis(),
+                forecastList[0].dt_txt
+            )
+        ) {
             sendNotification(savedItem.contents)
-            updateNotificationStatus(savedItem.wNo, true) // 알림 상태 업데이트
+            coroutineScope.launch {
+                updateNotificationStatus(savedItem.wNo, true)
+            }
+            Log.d("WeatherCheck", "즉시 알림 조건 충족: wNo=${savedItem.wNo}")
         }
     }
 
     // "당일 오전 6시" 및 "전날 오후 9시" 알림 처리
-    private fun handleTimeNotification(savedItem: WeatherListItem, nextHour: Long, targetHour: Int) {
-        if (!isWithinTimeRange(nextHour, targetHour)) {
-            Log.d("WeatherCheck", "현재 시간이 ${targetHour}시 알림 시간대가 아님")
-            return
+    private fun handleTimeNotification(
+        savedItem: WeatherListItem,
+        forecastList: List<Forecast>,
+        targetHour: Int
+    ) {
+        val targetForecasts = forecastList.filter { forecast ->
+            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                .parse(forecast.dt_txt)?.time ?: return@filter false
+
+            val forecastHour = Calendar.getInstance().apply { timeInMillis = forecastTime }.get(Calendar.HOUR_OF_DAY)
+            forecastHour == targetHour
         }
 
-        sendNotification(savedItem.contents)
-        Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+        targetForecasts.forEach { forecast ->
+            val forecastDescription = convertToCommonWeatherDescription(
+                forecast.weather[0].description.lowercase(Locale.getDefault())
+            )
+            if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
+                sendNotification(savedItem.contents)
+                coroutineScope.launch {
+                    updateNotificationStatus(savedItem.wNo, true)
+                }
+                Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+            }
+        }
+    }
+
+    // 특정 시간에 대한 오차 범위 확인 (1분으로 줄임)
+    private fun isWithinTimeOffset(baseTime: Long, targetTimeString: String): Boolean {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+        val targetTime = sdf.parse(targetTimeString)?.time ?: return false
+        val offsetMillis = 1 * 60 * 1000 // 1분 오차
+        return targetTime in (baseTime - offsetMillis)..(baseTime + offsetMillis)
     }
 
     // 다음 정각 계산
@@ -125,21 +166,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             add(Calendar.HOUR_OF_DAY, 1)
         }
         return calendar.timeInMillis
-    }
-
-    // 특정 시간대인지 확인하는 함수
-    private fun isWithinTimeRange(currentTime: Long, targetHour: Int): Boolean {
-        val offsetMinutes = 5
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, targetHour)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-
-        val targetTime = calendar.timeInMillis
-        val offsetMillis = offsetMinutes * 60 * 1000
-
-        return currentTime in (targetTime - offsetMillis)..(targetTime + offsetMillis)
     }
 
     // 알림 전송
@@ -165,6 +191,13 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
         withContext(Dispatchers.IO) {
             database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
+        }
+    }
+
+    // 알림 상태 리셋
+    private suspend fun resetNotificationStatus(wNo: Long) {
+        withContext(Dispatchers.IO) {
+            database.getWeatherTextDao().updateNotificationStatus(wNo, false)
         }
     }
 
