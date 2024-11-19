@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import java.util.Locale
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 data class WeatherListItem(
     val wNo: Long,          // 기본 키
     val contents: String,   // 내용
-    val weather: String,    // 날씨 설명 (String 타입으로 변경됨)
+    val weather: String,    // 날씨 설명 (String 타입으로 저장됨)
     val time: String,       // 알림 시간
     val isNotified: Boolean = false // 알림 여부 (중복 방지용)
 )
@@ -51,27 +50,14 @@ class WeatherListAdapter(
 
         // weather 설명에 따른 아이콘을 가져오는 함수
         private fun getWeatherIconId(weatherDescription: String): Int {
-            return when (convertToCommonWeatherDescription(weatherDescription)) {
+            return when (weatherDescription) {
                 "clear sky" -> R.drawable.weather_sun_icon
-                "partly cloudy" -> R.drawable.weather_suncloud_icon
                 "few clouds" -> R.drawable.weather_cloud_icon
                 "light rain" -> R.drawable.weather_rain_icon
                 "thunderstorm" -> R.drawable.weather_thunder_icon
                 "snow" -> R.drawable.weather_snow_icon
-                else -> R.drawable.weather_sun_icon
-            }
-        }
-
-        // 날씨 설명 변환 (WeatherNotificationManager와 동일한 변환 로직 사용)
-        private fun convertToCommonWeatherDescription(description: String): String {
-            return when (description.trim().lowercase(Locale.ROOT)) {
-                "clear sky" -> "clear sky"
-                "few clouds", "scattered clouds" -> "partly cloudy"
-                "broken clouds", "overcast clouds", "mist" -> "few clouds"
-                "drizzle", "light rain", "moderate rain", "heavy intensity rain" -> "light rain"
-                "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
-                "light snow", "snow", "heavy snow", "sleet" -> "snow"
-                else -> "clear sky"
+                "partly cloudy" -> R.drawable.weather_suncloud_icon
+                else -> R.drawable.weather_sun_icon // 예외적인 경우 맑음 아이콘 반환
             }
         }
     }

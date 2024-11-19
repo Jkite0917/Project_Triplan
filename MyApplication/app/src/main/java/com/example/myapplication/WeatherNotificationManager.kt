@@ -16,7 +16,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     private val channelId = "weather_notification_channel"
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val timeOffsetMillis = 1 * 60 * 1000 // 시간 오차: 1분
 
     init {
         createNotificationChannel()
@@ -45,13 +44,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
      */
     suspend fun checkWeatherConditions(apiService: WeatherApiService, apiKey: String, region: String) {
         val apiCallTime = System.currentTimeMillis()
-        val nextHour = calculateNextHour(apiCallTime) // 다음 정각 계산
-        val apiFetchTime = nextHour - timeOffsetMillis // 정각 1분 전
-
-        if (apiCallTime < apiFetchTime) {
-            Log.d("WeatherCheck", "아직 API 호출 시간이 아님: ${formatTime(apiCallTime)}")
-            return
-        }
 
         // API 호출
         val response = withContext(Dispatchers.IO) {
@@ -76,7 +68,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             savedWeatherItems.forEach { savedItem ->
                 when (savedItem.time) {
                     "현재 날씨" -> handleImmediateNotification(savedItem, forecastList)
-                    "당일 오전 6시", "전날 오후 9시" -> handleScheduledNotification(savedItem, forecastList)
+                    "당일 오전 6시", "전날 오후 9시" -> handleScheduledNotification(savedItem, forecastList, apiCallTime)
                 }
             }
         } else {
@@ -94,13 +86,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         val forecastDescription = convertToCommonWeatherDescription(
             forecastList[0].weather[0].description.lowercase(Locale.KOREA)
         )
-        val currentTime = System.currentTimeMillis()
-        val forecastTimeMillis = parseForecastTime(forecastList[0].dt_txt)
 
-        if (savedItem.weather == forecastDescription &&
-            !savedItem.isNotified &&
-            isWithinTimeOffset(currentTime, forecastTimeMillis)
-        ) {
+        if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
             sendNotification(savedItem.contents, forecastList[0].weather[0].description)
             coroutineScope.launch {
                 updateNotificationStatus(savedItem.wNo, true) // 상태 업데이트
@@ -114,7 +101,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
      */
     private fun handleScheduledNotification(
         savedItem: WeatherListItem,
-        forecastList: List<Forecast>
+        forecastList: List<Forecast>,
+        apiCallTime: Long
     ) {
         val targetHour = when (savedItem.time) {
             "당일 오전 6시" -> 6
@@ -122,49 +110,58 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             else -> return
         }
 
-        val targetForecasts = forecastList.filter { forecast ->
-            val forecastTimeMillis = parseForecastTime(forecast.dt_txt)
-            val forecastHour = Calendar.getInstance().apply { timeInMillis = forecastTimeMillis }
-                .get(Calendar.HOUR_OF_DAY)
-
-            // 6시 또는 21시에 맞는 데이터만 필터링
-            forecastHour == targetHour
+        val isWithinScheduledTime = when (targetHour) {
+            6 -> isWithinTime(apiCallTime, 5, 58, 6, 0)
+            21 -> isWithinTime(apiCallTime, 20, 58, 21, 0)
+            else -> false
         }
 
-        if (targetForecasts.isNotEmpty()) {
-            val combinedDescriptions = targetForecasts.joinToString(", ") { forecast ->
-                convertToCommonWeatherDescription(forecast.weather[0].description)
+        if (isWithinScheduledTime) {
+            val targetForecasts = forecastList.filter { forecast ->
+                val forecastTimeMillis = parseForecastTime(forecast.dt_txt)
+                val forecastHour = Calendar.getInstance().apply { timeInMillis = forecastTimeMillis }
+                    .get(Calendar.HOUR_OF_DAY)
+
+                forecastHour == targetHour
             }
 
-            if (combinedDescriptions.contains(savedItem.weather) && !savedItem.isNotified) {
-                sendNotification(savedItem.contents, savedItem.weather)
-                coroutineScope.launch {
-                    updateNotificationStatus(savedItem.wNo, true)
+            if (targetForecasts.isNotEmpty()) {
+                val combinedDescriptions = targetForecasts.joinToString(", ") { forecast ->
+                    convertToCommonWeatherDescription(forecast.weather[0].description)
                 }
-                Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+
+                if (combinedDescriptions.contains(savedItem.weather) && !savedItem.isNotified) {
+                    sendNotification(savedItem.contents, savedItem.weather)
+                    coroutineScope.launch {
+                        updateNotificationStatus(savedItem.wNo, true)
+                    }
+                    Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+                }
             }
         }
     }
 
     /**
-     * 다음 정각 계산 함수
+     * 특정 시간 범위 확인 함수
      */
-    private fun calculateNextHour(currentTime: Long): Long {
-        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
-            timeInMillis = currentTime
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-            add(Calendar.HOUR_OF_DAY, 1) // 한 시간 추가
-        }
-        return calendar.timeInMillis
-    }
+    private fun isWithinTime(apiCallTime: Long, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int): Boolean {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
 
-    /**
-     * 시간 오차를 고려한 비교 함수
-     */
-    private fun isWithinTimeOffset(currentTime: Long, targetTime: Long): Boolean {
-        return targetTime in (currentTime - timeOffsetMillis)..(currentTime + timeOffsetMillis)
+        // 범위 시작 시간
+        val startTime = calendar.apply {
+            set(Calendar.HOUR_OF_DAY, startHour)
+            set(Calendar.MINUTE, startMinute)
+            set(Calendar.SECOND, 0)
+        }.timeInMillis
+
+        // 범위 종료 시간
+        val endTime = calendar.apply {
+            set(Calendar.HOUR_OF_DAY, endHour)
+            set(Calendar.MINUTE, endMinute)
+            set(Calendar.SECOND, 0)
+        }.timeInMillis
+
+        return apiCallTime in startTime..endTime
     }
 
     /**
@@ -174,15 +171,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
         sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
         return sdf.parse(timeString)?.time ?: 0L
-    }
-
-    /**
-     * 시간 포맷 함수
-     */
-    private fun formatTime(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
-        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
-        return sdf.format(Date(timestamp))
     }
 
     /**
