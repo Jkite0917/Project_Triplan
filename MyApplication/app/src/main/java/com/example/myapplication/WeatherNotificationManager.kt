@@ -16,6 +16,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     private val channelId = "weather_notification_channel"
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val timeOffsetMillis = 1 * 60 * 1000 // 시간 오차: 1분 (59분에 API 호출하기 위한 설정)
 
     init {
         createNotificationChannel()
@@ -23,6 +24,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     /**
      * 알림 채널 생성 (Android 8.0 이상 필요)
+     * 앱이 실행될 때 알림을 전송하기 위한 채널을 생성합니다.
      */
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -40,24 +42,13 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     }
 
     /**
-     * 주어진 시간(timestamp)을 "yyyy-MM-dd HH:mm:ss" 형식의 문자열로 변환
-     */
-    private fun formatTime(timestamp: Long): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
-        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
-        return sdf.format(Date(timestamp))
-    }
-
-    /**
      * 날씨 조건 확인 및 알림 처리
-     * @param apiService API 호출 객체
-     * @param apiKey OpenWeather API 키
-     * @param region 사용자 설정 지역
+     * API에서 날씨 정보를 가져오고, 저장된 데이터와 비교하여 알림을 전송합니다.
      */
     suspend fun checkWeatherConditions(apiService: WeatherApiService, apiKey: String, region: String) {
         val apiCallTime = System.currentTimeMillis()
         val nextHour = calculateNextHour(apiCallTime) // 다음 정각 계산
-        val apiFetchTime = nextHour - 1 * 60 * 1000 // 정각 1분 전
+        val apiFetchTime = nextHour - timeOffsetMillis // 정각 1분 전
 
         if (apiCallTime < apiFetchTime) {
             Log.d("WeatherCheck", "아직 API 호출 시간이 아님: ${formatTime(apiCallTime)}")
@@ -79,16 +70,16 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
                     contents = weather.wText,
                     weather = weather.weather,
                     time = weather.wTime,
-                    isNotified = weather.isNotified
+                    isNotified = weather.isNotified // 저장된 상태 유지
                 )
             }
 
-            // 각 알림 항목에 대해 조건 확인 및 처리
+            // 저장된 알림 데이터를 기준으로 처리
             savedWeatherItems.forEach { savedItem ->
                 when (savedItem.time) {
                     "현재 날씨" -> handleImmediateNotification(savedItem, forecastList)
-                    "당일 오전 6시" -> handleScheduledNotification(savedItem, forecastList, 6)
-                    "전날 오후 9시" -> handleScheduledNotification(savedItem, forecastList, 21)
+                    "당일 오전 6시" -> handleScheduledNotification(savedItem, forecastList, true)
+                    "전날 오후 9시" -> handleScheduledNotification(savedItem, forecastList, false)
                 }
             }
         } else {
@@ -98,8 +89,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     /**
      * "현재 날씨" 알림 처리
-     * @param savedItem 사용자가 저장한 알림 데이터
-     * @param forecastList API로부터 가져온 날씨 데이터
+     * 현재 시간과 가장 가까운 예보를 기준으로 알림을 판단합니다.
      */
     private fun handleImmediateNotification(
         savedItem: WeatherListItem,
@@ -108,66 +98,59 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         val forecastDescription = convertToCommonWeatherDescription(
             forecastList[0].weather[0].description.lowercase(Locale.KOREA)
         )
-        Log.d("WeatherCheck", "예보된 날씨: $forecastDescription, 저장된 날씨: ${savedItem.weather}")
+        val currentTime = System.currentTimeMillis()
+        val forecastTimeMillis = parseForecastTime(forecastList[0].dt_txt)
 
-        // 현재 날씨가 저장된 날씨와 다르면 isNotified를 false로 리셋
-        if (savedItem.weather != forecastDescription) {
-            coroutineScope.launch {
-                resetNotificationStatus(savedItem.wNo)
-            }
-            Log.d("WeatherCheck", "날씨 변경 감지: ${savedItem.weather} -> $forecastDescription, 상태 리셋 완료")
-        }
-
-        if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
+        if (savedItem.weather == forecastDescription &&
+            !savedItem.isNotified &&
+            isWithinTimeOffset(currentTime, forecastTimeMillis)
+        ) {
             sendNotification(savedItem.contents, forecastList[0].weather[0].description)
             coroutineScope.launch {
-                updateNotificationStatus(savedItem.wNo, true)
+                updateNotificationStatus(savedItem.wNo, true) // 상태 업데이트
             }
             Log.d("WeatherCheck", "즉시 알림 조건 충족: wNo=${savedItem.wNo}")
         }
     }
 
     /**
-     * "당일 오전 6시", "전날 오후 9시" 알림 처리
-     * @param savedItem 사용자가 저장한 알림 데이터
-     * @param forecastList API로부터 가져온 날씨 데이터
-     * @param targetHour 알림이 발생해야 하는 기준 시간 (6시, 21시)
+     * "당일 오전 6시" 및 "전날 오후 9시" 알림 처리
+     * 저장된 시간에 따라 오늘 또는 내일 데이터를 비교합니다.
      */
     private fun handleScheduledNotification(
         savedItem: WeatherListItem,
         forecastList: List<Forecast>,
-        targetHour: Int
+        isMorning: Boolean // true = 오전 6시, false = 전날 오후 9시
     ) {
         val targetForecasts = forecastList.filter { forecast ->
-            val forecastTime = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
-                .parse(forecast.dt_txt)?.time ?: return@filter false
+            val forecastTimeMillis = parseForecastTime(forecast.dt_txt)
+            val forecastDay = Calendar.getInstance().apply { timeInMillis = forecastTimeMillis }
+            val currentDay = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
 
-            val forecastHour = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
-                timeInMillis = forecastTime
-            }.get(Calendar.HOUR_OF_DAY)
-
-            forecastHour == targetHour
+            if (isMorning) {
+                forecastDay.get(Calendar.DAY_OF_YEAR) == currentDay.get(Calendar.DAY_OF_YEAR)
+            } else {
+                forecastDay.get(Calendar.DAY_OF_YEAR) == currentDay.get(Calendar.DAY_OF_YEAR) + 1
+            }
         }
 
-        // 하루 중 조건 만족 여부 확인
-        if (targetForecasts.any { forecast ->
-                val forecastDescription = convertToCommonWeatherDescription(
-                    forecast.weather[0].description.lowercase(Locale.KOREA)
-                )
-                savedItem.weather == forecastDescription
-            }) {
-            if (!savedItem.isNotified) {
+        targetForecasts.forEach { forecast ->
+            val forecastDescription = convertToCommonWeatherDescription(
+                forecast.weather[0].description.lowercase(Locale.KOREA)
+            )
+            if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
                 sendNotification(savedItem.contents, savedItem.weather)
                 coroutineScope.launch {
-                    updateNotificationStatus(savedItem.wNo, true)
+                    updateNotificationStatus(savedItem.wNo, true) // 상태 업데이트
                 }
-                Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+                Log.d("WeatherCheck", "${if (isMorning) "오전 6시" else "오후 9시"} 알림 조건 충족: wNo=${savedItem.wNo}")
             }
         }
     }
 
     /**
-     * 한국 시간 기준 다음 정각 계산
+     * 다음 정각 계산 함수
+     * 현재 시간을 기준으로 다음 정각(한국 시간)을 반환합니다.
      */
     private fun calculateNextHour(currentTime: Long): Long {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
@@ -175,15 +158,49 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
             set(Calendar.MILLISECOND, 0)
-            add(Calendar.HOUR_OF_DAY, 1)
+            add(Calendar.HOUR_OF_DAY, 1) // 한 시간 추가
         }
-        return calendar.timeInMillis
+        return calendar.timeInMillis // 다음 정각의 밀리초 반환
+    }
+
+    /**
+     * 시간 오차를 고려한 비교 함수
+     */
+    private fun isWithinTimeOffset(currentTime: Long, targetTime: Long): Boolean {
+        return targetTime in (currentTime - timeOffsetMillis)..(currentTime + timeOffsetMillis)
+    }
+
+    /**
+     * Forecast 시간 문자열을 밀리초로 변환
+     */
+    private fun parseForecastTime(timeString: String): Long {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return sdf.parse(timeString)?.time ?: 0L
+    }
+
+    /**
+     * 시간 포맷 함수
+     * 로그 및 디버그 용도로 사용됩니다.
+     */
+    private fun formatTime(timestamp: Long): String {
+        val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
+        sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        return sdf.format(Date(timestamp))
+    }
+
+    /**
+     * 알림 상태 업데이트
+     */
+    private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
+        withContext(Dispatchers.IO) {
+            database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
+        }
+        Log.d("WeatherNotificationManager", "알림 상태 업데이트 완료: wNo=$wNo, isNotified=$isNotified")
     }
 
     /**
      * 알림 전송
-     * @param content 알림 내용
-     * @param weatherDescription 날씨 설명
      */
     private fun sendNotification(content: String, weatherDescription: String) {
         val notificationManager =
@@ -206,39 +223,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     }
 
     /**
-     * 날씨에 따른 아이콘 반환
-     */
-    private fun getWeatherIcon(description: String): Int {
-        return when (convertToCommonWeatherDescription(description)) {
-            "clear sky" -> R.drawable.weather_sun_icon
-            "partly cloudy" -> R.drawable.weather_suncloud_icon
-            "few clouds" -> R.drawable.weather_cloud_icon
-            "light rain" -> R.drawable.weather_rain_icon
-            "thunderstorm" -> R.drawable.weather_thunder_icon
-            "snow" -> R.drawable.weather_snow_icon
-            else -> R.drawable.weather_sun_icon
-        }
-    }
-
-    /**
-     * 알림 상태 업데이트
-     */
-    private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
-        withContext(Dispatchers.IO) {
-            database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
-        }
-    }
-
-    /**
-     * 알림 상태 초기화
-     */
-    private suspend fun resetNotificationStatus(wNo: Long) {
-        withContext(Dispatchers.IO) {
-            database.getWeatherTextDao().updateNotificationStatus(wNo, false)
-        }
-    }
-
-    /**
      * 날씨 설명 변환
      */
     private fun convertToCommonWeatherDescription(description: String): String {
@@ -250,6 +234,21 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
             "light snow", "snow", "heavy snow", "sleet" -> "snow"
             else -> "clear sky"
+        }
+    }
+
+    /**
+     * 날씨 아이콘 반환
+     */
+    private fun getWeatherIcon(description: String): Int {
+        return when (convertToCommonWeatherDescription(description)) {
+            "clear sky" -> R.drawable.weather_sun_icon
+            "partly cloudy" -> R.drawable.weather_suncloud_icon
+            "few clouds" -> R.drawable.weather_cloud_icon
+            "light rain" -> R.drawable.weather_rain_icon
+            "thunderstorm" -> R.drawable.weather_thunder_icon
+            "snow" -> R.drawable.weather_snow_icon
+            else -> R.drawable.weather_sun_icon
         }
     }
 }

@@ -118,4 +118,3 @@ class WeatherWorker(
         return sdf.format(Date(timestamp))
     }
 }
-

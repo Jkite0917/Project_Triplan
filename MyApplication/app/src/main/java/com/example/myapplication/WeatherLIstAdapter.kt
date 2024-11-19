@@ -15,7 +15,7 @@ data class WeatherListItem(
     val contents: String,   // 내용
     val weather: String,    // 날씨 설명 (String 타입으로 변경됨)
     val time: String,       // 알림 시간
-    val isNotified: Boolean = false// 알림 여부 (중복 방지용)
+    val isNotified: Boolean = false // 알림 여부 (중복 방지용)
 )
 
 // WeatherListAdapter 클래스: 날씨 항목 리스트를 RecyclerView에 표시하기 위한 어댑터
@@ -51,7 +51,7 @@ class WeatherListAdapter(
 
         // weather 설명에 따른 아이콘을 가져오는 함수
         private fun getWeatherIconId(weatherDescription: String): Int {
-            return when (weatherDescription.lowercase(Locale.ROOT)) {
+            return when (convertToCommonWeatherDescription(weatherDescription)) {
                 "clear sky" -> R.drawable.weather_sun_icon
                 "partly cloudy" -> R.drawable.weather_suncloud_icon
                 "few clouds" -> R.drawable.weather_cloud_icon
@@ -59,6 +59,19 @@ class WeatherListAdapter(
                 "thunderstorm" -> R.drawable.weather_thunder_icon
                 "snow" -> R.drawable.weather_snow_icon
                 else -> R.drawable.weather_sun_icon
+            }
+        }
+
+        // 날씨 설명 변환 (WeatherNotificationManager와 동일한 변환 로직 사용)
+        private fun convertToCommonWeatherDescription(description: String): String {
+            return when (description.trim().lowercase(Locale.ROOT)) {
+                "clear sky" -> "clear sky"
+                "few clouds", "scattered clouds" -> "partly cloudy"
+                "broken clouds", "overcast clouds", "mist" -> "few clouds"
+                "drizzle", "light rain", "moderate rain", "heavy intensity rain" -> "light rain"
+                "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
+                "light snow", "snow", "heavy snow", "sleet" -> "snow"
+                else -> "clear sky"
             }
         }
     }
