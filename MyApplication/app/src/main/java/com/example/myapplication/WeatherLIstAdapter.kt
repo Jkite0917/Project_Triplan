@@ -52,13 +52,13 @@ class WeatherListAdapter(
         // weather 설명에 따른 아이콘을 가져오는 함수
         private fun getWeatherIconId(weatherDescription: String): Int {
             return when (weatherDescription.lowercase(Locale.ROOT)) {
-                "clear sky" -> R.drawable.weather_sun_icon  // 맑은 하늘
-                "partly cloudy" -> R.drawable.weather_suncloud_icon  // 구름 많음
-                "few clouds" -> R.drawable.weather_cloud_icon  // 흐림
-                "light rain" -> R.drawable.weather_rain_icon  // 비
-                "thunderstorm" -> R.drawable.weather_thunder_icon  // 뇌우
-                "snow" -> R.drawable.weather_snow_icon  // 눈
-                else -> R.drawable.weather_sun_icon  // 기본값: 맑음
+                "clear sky" -> R.drawable.weather_sun_icon
+                "partly cloudy" -> R.drawable.weather_suncloud_icon
+                "few clouds" -> R.drawable.weather_cloud_icon
+                "light rain" -> R.drawable.weather_rain_icon
+                "thunderstorm" -> R.drawable.weather_thunder_icon
+                "snow" -> R.drawable.weather_snow_icon
+                else -> R.drawable.weather_sun_icon
             }
         }
     }
