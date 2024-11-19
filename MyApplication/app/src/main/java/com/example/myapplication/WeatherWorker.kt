@@ -27,14 +27,21 @@ class WeatherWorker(
         return try {
             val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
 
-            // 날씨 조건 확인 및 알림
+            // 자정에 알림 상태 초기화
+            val currentTime = System.currentTimeMillis()
+            if (isMidnight(currentTime)) {
+                resetNotifiedStatus()
+            }
+
+            // 1분 전에 API 호출 및 데이터 처리
             withContext(Dispatchers.IO) {
                 weatherNotificationManager.checkWeatherConditions(apiService, apiKey, selectedRegion)
             }
 
-            // 다음 정각 3분 전에 작업 예약
+            // 다음 작업 예약
             scheduleNextHourlyNotification()
 
+            Log.d("WeatherWorker", "작업 성공적으로 완료")
             Result.success()
         } catch (e: Exception) {
             Log.e("WeatherWorker", "Error in worker: ${e.message}")
@@ -43,7 +50,7 @@ class WeatherWorker(
     }
 
     /**
-     * 다음 정각 3분 전에 작업 예약
+     * 다음 정각 1분 전에 작업 예약
      */
     private fun scheduleNextHourlyNotification() {
         val initialDelay = calculateInitialDelay()
@@ -54,6 +61,7 @@ class WeatherWorker(
             .build()
 
         WorkManager.getInstance(applicationContext).enqueue(notificationRequest)
+
         Log.d(
             "WeatherWorker",
             "다음 작업 예약: ${formatTime(System.currentTimeMillis() + initialDelay)} (현재 시간: ${formatTime(System.currentTimeMillis())})"
@@ -61,7 +69,7 @@ class WeatherWorker(
     }
 
     /**
-     * 다음 정각 3분 전까지 남은 시간 계산 (한국 시간 기준)
+     * 다음 정각 1분 전까지 남은 시간 계산 (한국 시간 기준)
      */
     private fun calculateInitialDelay(): Long {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
@@ -72,13 +80,33 @@ class WeatherWorker(
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
 
-        // 정각 3분 전 계산
+        // 정각 1분 전 계산
         val nextHour = calendar.timeInMillis
-        val threeMinutesBefore = nextHour - 3 * 60 * 1000
+        val oneMinuteBefore = nextHour - 1 * 60 * 1000
 
         // 현재 시간과 비교하여 남은 시간 반환 (음수 방지)
-        val delay = threeMinutesBefore - System.currentTimeMillis()
+        val delay = oneMinuteBefore - System.currentTimeMillis()
         return if (delay > 0) delay else 0L
+    }
+
+    /**
+     * 자정 여부 확인 함수 (한국 시간 기준)
+     */
+    private fun isMidnight(currentTime: Long): Boolean {
+        val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
+            timeInMillis = currentTime
+        }
+        return calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) < 5
+    }
+
+    /**
+     * 모든 알림 상태 초기화 (자정에 호출)
+     */
+    private suspend fun resetNotifiedStatus() {
+        withContext(Dispatchers.IO) {
+            database.getWeatherTextDao().resetAllNotificationStatus()
+        }
+        Log.d("WeatherWorker", "모든 알림 상태가 초기화되었습니다.")
     }
 
     /**
@@ -90,3 +118,4 @@ class WeatherWorker(
         return sdf.format(Date(timestamp))
     }
 }
+

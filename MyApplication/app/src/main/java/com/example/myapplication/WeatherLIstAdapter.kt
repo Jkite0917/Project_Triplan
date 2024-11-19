@@ -15,7 +15,7 @@ data class WeatherListItem(
     val contents: String,   // 내용
     val weather: String,    // 날씨 설명 (String 타입으로 변경됨)
     val time: String,       // 알림 시간
-    val isNotified: Boolean // 알림 여부 (중복 방지용)
+    val isNotified: Boolean = false// 알림 여부 (중복 방지용)
 )
 
 // WeatherListAdapter 클래스: 날씨 항목 리스트를 RecyclerView에 표시하기 위한 어댑터

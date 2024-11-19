@@ -50,10 +50,15 @@ interface WeatherListDao {
     @Query("DELETE FROM WeatherList")
     suspend fun deleteAllWeatherLists()
 
-    // isNotified 필드 업데이트를 위한 쿼리 추가
+    // isNotified 필드 업데이트를 위한 쿼리
     @Query("UPDATE WeatherList SET isNotified = :isNotified WHERE wNo = :wNo")
     suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean)
+
+    // 모든 isNotified 값을 false로 초기화
+    @Query("UPDATE WeatherList SET isNotified = 0")
+    suspend fun resetAllNotificationStatus()
 }
+
 
 @Dao
 interface ChecklistDao {
