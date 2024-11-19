@@ -3,9 +3,11 @@ package com.example.myapplication
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import androidx.work.WorkInfo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -24,6 +26,11 @@ class WeatherWorker(
     private val apiService = ApiClient.weatherApiService // OpenWeather API 서비스
     private val apiKey = "74c26aef7529a784cee3247a261edd92" // OpenWeather API 키
 
+    companion object {
+        @Volatile
+        private var isRunning = false // 실행 중 여부 플래그
+    }
+
     /**
      * 작업 수행 함수
      * - API 호출을 통해 날씨 데이터를 가져오고, 조건에 맞는 알림을 전송합니다.
@@ -31,7 +38,13 @@ class WeatherWorker(
      * - 다음 작업을 예약합니다.
      */
     override suspend fun doWork(): Result {
-        return try {
+        if (isRunning) {
+            Log.d("WeatherWorker", "이미 실행 중인 작업입니다.")
+            return Result.success() // 이미 실행 중이면 새 작업 실행 안 함
+        }
+
+        isRunning = true
+        try {
             // 사용자 설정에서 지역 정보 가져오기 (기본값: "Seoul")
             val selectedRegion = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
 
@@ -50,10 +63,12 @@ class WeatherWorker(
             scheduleNextHourlyNotification()
 
             Log.d("WeatherWorker", "작업 성공적으로 완료")
-            Result.success()
+            return Result.success()
         } catch (e: Exception) {
             Log.e("WeatherWorker", "Error in worker: ${e.message}")
-            Result.retry() // 작업 실패 시 재시도
+            return Result.retry() // 작업 실패 시 재시도
+        } finally {
+            isRunning = false // 작업 종료 후 플래그 해제
         }
     }
 
@@ -64,18 +79,31 @@ class WeatherWorker(
     private fun scheduleNextHourlyNotification() {
         val initialDelay = calculateInitialDelay() // 다음 정각까지 남은 시간 계산
 
-        // OneTimeWorkRequest를 생성하여 예약 작업을 설정
-        val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
-            .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
-            .build()
+        // 예약된 작업 확인
+        val workInfos = WorkManager.getInstance(applicationContext)
+            .getWorkInfosForUniqueWork("HourlyWeatherNotification")
+            .get()
 
-        // WorkManager에 작업 예약
-        WorkManager.getInstance(applicationContext).enqueue(notificationRequest)
+        val isRunning = workInfos.any { it.state == WorkInfo.State.RUNNING }
 
-        Log.d(
-            "WeatherWorker",
-            "다음 작업 예약: ${formatTime(System.currentTimeMillis() + initialDelay)} (현재 시간: ${formatTime(System.currentTimeMillis())})"
-        )
+        if (!isRunning) {
+            val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
+                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                .build()
+
+            WorkManager.getInstance(applicationContext).enqueueUniqueWork(
+                "HourlyWeatherNotification",
+                ExistingWorkPolicy.KEEP, // 기존 작업 유지
+                notificationRequest
+            )
+
+            Log.d(
+                "WeatherWorker",
+                "새 작업이 예약되었습니다: ${formatTime(System.currentTimeMillis() + initialDelay)}"
+            )
+        } else {
+            Log.d("WeatherWorker", "이미 실행 중인 작업이 있습니다. 새 작업을 예약하지 않습니다.")
+        }
     }
 
     /**
