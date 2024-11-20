@@ -18,7 +18,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.work.*
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -41,13 +43,13 @@ class MainActivity : AppCompatActivity() {
 
     // 지역 정보 저장 공유 변수
     private lateinit var sharedPreferences: SharedPreferences
-    private lateinit var weatherNotificationManager: WeatherNotificationManager // 알림 매니저 인스턴스
+    private lateinit var weatherNotificationManager: WeatherNotificationManager // 알림 매니저 인스 턴스
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Android 13 이상에서 알림 권한 요청
+        // Android 13 이상 에서 알림 권한 요청
         requestNotificationPermissionIfNeeded()
 
         // 버튼 리스너 설정
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         // 초기값 설정
         initializeDefaultSharedPreferences()
 
-        // 캘린더 컨트롤 설정 및 업데이트
+        // 캘린더 컨트롤 설정 및 업 데이트
         setupCalendarControls()
         updateCalendar()
 
@@ -83,23 +85,23 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // SharedPreferences에 기본 지역 설정 저장
+    // SharedPreferences 에 기본 지역 설정 저장
     private fun initializeDefaultSharedPreferences() {
         if (!sharedPreferences.contains("selectedRegion")) {
             with(sharedPreferences.edit()) {
                 putString("selectedRegion", "Seoul")
-                apply() // 비동기적으로 저장
+                apply() // 비동기 적으로 저장
             }
         }
     }
 
-    // 테스트용으로 앱 시작 시 즉시 WeatherWorker 실행
+    // 테스트 용으로 앱 시작 시 즉시 WeatherWorker 실행
     private fun triggerImmediateWeatherCheck() {
         val immediateWorkRequest = OneTimeWorkRequestBuilder<WeatherWorker>().build()
         WorkManager.getInstance(this).enqueue(immediateWorkRequest)
     }
 
-    // 알림 권한을 요청하는 함수 (Android 13 이상)
+    // 알림 권한을 요청 하는 함수 (Android 13 이상)
     private fun requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -114,16 +116,16 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 100) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Log.d("MainActivity", "알림 권한이 허용되었습니다.")
+                Log.d("MainActivity", "알림 권한이 허용 ")
             } else {
-                Log.d("MainActivity", "알림 권한이 거부되었습니다. 알림 기능이 제한됩니다.")
+                Log.d("MainActivity", "알림 권한이 거부 , 알림 기능이 제한 됩니다.")
             }
         }
     }
 
-    // 매 정각에 알림을 예약하는 함수
+    // 매 정각에 알림을 예약 하는 함수
     private fun scheduleWeatherNotifications() {
-        // 다음 1시간 정각까지 남은 시간 계산
+        // 다음 1시간 정각 까지 남은 시간 계산
         val initialDelay = calculateInitialDelay()
         val notificationRequest = OneTimeWorkRequestBuilder<WeatherWorker>()
             .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS) // 정각에 맞춰 첫 알림 실행
@@ -136,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    // 다음 1시간 정각까지 남은 초기 지연 시간 계산
+    // 다음 1시간 정각 까지 남은 초기 지연 시간 계산
     private fun calculateInitialDelay(): Long {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.HOUR_OF_DAY, 1)
@@ -153,13 +155,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.imageButton_calender_monthRight).setOnClickListener { navigateMonth(1) }
     }
 
-    // 달력 업데이트 함수
+    // 달력 업 데이트 함수
     private fun updateCalendar() {
         updateMonthDisplay()
         displayDaysInGrid()
     }
 
-    // 달력의 날짜를 화면에 표시하는 함수
+    // 달력의 날짜를 화면에 표시 하는 함수
     private fun displayDaysInGrid() {
         gridCalendar.removeAllViews()
         val firstDayOfMonth = calendar.apply { set(Calendar.DAY_OF_MONTH, 1) }.get(Calendar.DAY_OF_WEEK)
@@ -182,7 +184,28 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             if (isToday(calendar, today, dayTextView.text.toString())) {
-                dayTextView.setTextColor(ContextCompat.getColor(this, R.color.Today))  // 오늘 날짜 하이라이트
+                dayTextView.setTextColor(ContextCompat.getColor(this, R.color.Today))  // 오늘 날짜 하이 라이트
+            }
+
+            // DAO를 가져오기
+            val dailyScheduleDao = LocalDatabase.getDatabase(this@MainActivity).getDailyScheduleDao()
+            // 날짜 포맷 설정 (yyyy-MM-dd)
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+            // 데이터베이스에서 해당 날짜에 일정이 있는지 확인
+            if (dayTextView.text.isNotEmpty()) {
+                val day = dayTextView.text.toString().toInt()
+                val currentCalendar = Calendar.getInstance().apply {
+                    set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), day)
+                }
+                val currentDate = dateFormat.format(currentCalendar.time) // yyyy-MM-dd 형식의 String 값 생성
+
+                lifecycleScope.launch {
+                    val dailySchedule = dailyScheduleDao.getDailyScheduleInfo(currentDate)
+                    if (dailySchedule != null) {
+                        dayTextView.setBackgroundResource(R.drawable.calender_underline)
+                    }
+                }
             }
 
             // 날짜 클릭 시 처리
@@ -205,32 +228,32 @@ class MainActivity : AppCompatActivity() {
             text = if (dayIndex > prevMonthDays) (dayIndex - prevMonthDays).toString() else ""
 
             // 위아래 간격 조정
-            setPadding(0, 8, 0, 8) // top과 bottom에 각각 20dp 간격 추가
+            setPadding(0, 8, 0, 8) // top 과 bottom 에 각각 20dp 간격 추가
         }
     }
 
-    // 오늘 날짜인지 확인하는 함수
+    // 오늘 날짜 인지 확인 하는 함수
     private fun isToday(calendar: Calendar, today: Calendar, dayText: String): Boolean {
         return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
                 dayText == today.get(Calendar.DAY_OF_MONTH).toString()
     }
 
-    // 선택한 날짜 표시 업데이트 함수
+    // 선택한 날짜 표시 업 데이트 함수
     private fun updateSelectedDateText(selectedDate: Calendar) {
-        // SharedPreferences에서 저장된 영어 값을 한국어로 변환
+        // SharedPreferences 에서 저장된 영어 값을 한국어 로 변환
         val regionInKorean = getRegionInKorean(sharedPreferences)
-        val regionText = "$regionInKorean 날씨 정보입니다."
+        val regionText = "$regionInKorean 날씨 정보 입니다."
         val selectedDateFormat = SimpleDateFormat("  MM월 dd일 $regionText", Locale.getDefault())
         selectedDateTextView.text = selectedDateFormat.format(selectedDate.time)
 
-        // 스크롤뷰에도 업데이트 반영
+        // 스크롤 뷰에도 업 데이트 반영
         updateWeatherScrollView(sharedPreferences, selectedDate)
     }
 
-    // SharedPreferences를 통해 저장된 지역 값을 한국어로 변환하는 함수
-    fun getRegionInKorean(sharedPreferences: SharedPreferences): String {
-        // 영어와 한국어를 매핑한 리스트
+    // SharedPreferences 를 통해 저장된 지역 값을 한국어 로 변환 하는 함수
+    private fun getRegionInKorean(sharedPreferences: SharedPreferences): String {
+        // 영어와 한국어 를 매핑한 리스트
         val regionMap = mapOf(
             "서울" to "Seoul",
             "부산" to "Busan",
@@ -251,16 +274,16 @@ class MainActivity : AppCompatActivity() {
             "제주도" to "Jeju-do"
         )
 
-        // 영어 값을 SharedPreferences에서 가져옴
+        // 영어 값을 SharedPreferences 에서 가져옴
         val savedRegionInEnglish = sharedPreferences.getString("selectedRegion", "Seoul") ?: "Seoul"
 
-        // 영어 값을 한국어로 변환
+        // 영어 값을 한국어 로 변환
         return regionMap.keys.find { regionMap[it] == savedRegionInEnglish } ?: "서울"
     }
 
-    // 현재 달 표시 업데이트 함수
+    // 현재 달 표시 업 데이트 함수
     private fun updateMonthDisplay() {
-        val dateFormat = SimpleDateFormat("yyyy년 MM월", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy 년 MM월", Locale.getDefault())
         tvCurrentMonth.text = dateFormat.format(calendar.time)
     }
 
@@ -270,28 +293,28 @@ class MainActivity : AppCompatActivity() {
         updateCalendar()
     }
 
-    // 날짜 선택 시 호출되는 함수
+    // 날짜 선택 시 호출 되는 함수
     private fun onDaySelected(dayTextView: TextView) {
         val selectedDay = dayTextView.text.toString().toIntOrNull() ?: return
         val selectedDate = Calendar.getInstance().apply {
             set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), selectedDay)
         }
 
-        // 같은 날짜를 두 번 클릭했는지 확인
+        // 같은 날짜를 두 번 클릭 했는지 확인
         if (lastSelectedDay == selectedDay) {
             // 같은 날짜를 두 번 클릭한 경우 로그 출력
             Log.d("Double", "($selectedDay)")
 
-            // 바텀 시트를 여기에서 보여주기 위한 메소드 호출
+            // 바텀 시트를 여기 에서 보여 주기 위한 메소드 호출
             showBottomSheet(selectedDate)
         } else {
-            // 선택한 날짜가 다른 경우, 선택한 날짜 업데이트
+            // 선택한 날짜가 다른 경우, 선택한 날짜 업 데이트
             lastSelectedDay = selectedDay
-            updateSelectedDateText(selectedDate) // 선택한 날짜 표시 업데이트
+            updateSelectedDateText(selectedDate) // 선택한 날짜 표시 업 데이트
         }
     }
 
-    // 바텀 시트를 보여주는 메소드
+    // 바텀 시트를 보여 주는 메소드
     private fun showBottomSheet(selectedDate: Calendar) {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(selectedDate.time)
@@ -300,20 +323,20 @@ class MainActivity : AppCompatActivity() {
         bottomSheet.show(supportFragmentManager, "DateInfoBottomSheet")
     }
 
-    // api 파일에 값 넣어서 실행하도록 보내기
+    // api 파일에 값 넣어서 실행 하도록 보내기
     private fun updateWeatherScrollView(sharedPreferences: SharedPreferences, selectedDate: Calendar) {
-        // 레이아웃 참조
+        // 레이 아웃 참조
         val weatherScrollLayout: LinearLayout = findViewById(R.id.linearLayout_main_in_scrollview)
 
-        // "selectedRegion"이라는 키로 저장된 값을 가져와서 변수에 할당
+        // "selectedRegion"이라는 키로 저장된 값을 가져 와서 변수에 할당
         val city = sharedPreferences.getString("selectedRegion", "defaultCity") ?: "defaultCity"
         Log.e("API_LOG_Checking_Region", "selected Region is : $city")
 
-        // selectedDate를 문자열로 변환 (yyyy-MM-dd 형식)
+        // selectedDate 를 문자열 로 변환 (yyyy-MM-dd 형식)
         val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val formattedDate: String = dateFormat.format(selectedDate.time)
 
-        // 현재 날짜와 5일 후 날짜에서 시간 제거
+        // 현재 날짜와 5일 후 날짜 에서 시간 제거
         val currentDate = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -331,12 +354,12 @@ class MainActivity : AppCompatActivity() {
 
         val parentScrollView: HorizontalScrollView = findViewById(R.id.scrollview_main_in_cardview)
 
-        // selectedDate가 currentDate와 같거나 이후이면서, fiveDaysLater 이전인 경우에만 날씨 정보 요청
+        // selectedDate 가 currentDate 와 같거나 이후 이면서, fiveDaysLater 이전인 경우 에만 날씨 정보 요청
         if (selectedDate.before(currentDate) || selectedDate.after(fiveDaysLater)) {
-            // 날짜가 유효하지 않으면 레이아웃 숨기기
+            // 날짜가 유효 하지 않으면 레이 아웃 숨기기
             parentScrollView.visibility = View.GONE
         } else {
-            // 유효한 날짜라면 레이아웃 보이기 및 날씨 정보 요청
+            // 유효한 날짜 라면 레이 아웃 보이기 및 날씨 정보 요청
             parentScrollView.visibility = View.VISIBLE
             val mainScrollView = MainScrollView(this, city, formattedDate, weatherScrollLayout)
             mainScrollView.getWeatherForecast()
@@ -345,14 +368,14 @@ class MainActivity : AppCompatActivity() {
 
     // 하단 메뉴바 화면 이동 기능
     private fun setupButtonListeners() {
-        buttonLeft1 = findViewById<ImageButton>(R.id.button_all_cardview_left1)
-        buttonLeft2 = findViewById<ImageButton>(R.id.button_all_cardview_left2)
-        buttonRight1 = findViewById<ImageButton>(R.id.button_all_cardview_right1)
-        buttonRight2 = findViewById<ImageButton>(R.id.button_all_cardview_right2)
+        buttonLeft1 = findViewById(R.id.button_all_cardview_left1)
+        buttonLeft2 = findViewById(R.id.button_all_cardview_left2)
+        buttonRight1 = findViewById(R.id.button_all_cardview_right1)
+        buttonRight2 = findViewById(R.id.button_all_cardview_right2)
         buttonCenter = findViewById(R.id.button_all_cardview_center)
 
         buttonLeft1.setOnClickListener {
-            // 현재 액티비티가 MainActivity일 때 아무 동작도 하지 않음
+            // 현재 액티 비티 가 MainActivity 일 때 아무 동작도 하지 않음
         }
 
         buttonLeft2.setOnClickListener {

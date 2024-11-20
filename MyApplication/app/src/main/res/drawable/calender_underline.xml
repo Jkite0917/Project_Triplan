@@ -1,4 +1,18 @@
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <size android:width="20dp" android:height="2dp" />
-    <solid android:color="#FF6200EE" /> <!-- 점 색상 (빨간색) -->
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 투명한 배경 -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+    <!-- 밑줄 -->
+    <item
+        android:top="30dp"
+        android:left="10dp"
+        android:right="10dp"> <!-- 텍스트 아래에만 밑줄 추가 -->
+        <shape android:shape="rectangle">
+            <size android:height="0.5dp"/>
+            <solid android:color="@color/purple_200" />
+        </shape>
+    </item>
+</layer-list>
