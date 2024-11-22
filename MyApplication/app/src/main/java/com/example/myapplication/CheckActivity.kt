@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -54,6 +55,7 @@ class CheckActivity : AppCompatActivity() {
     }
 
     // 데이터베이스에서 체크리스트 항목을 불러와 리스트에 추가
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadChecklistItems() {
         lifecycleScope.launch {
             val savedItems = withContext(Dispatchers.IO) {
@@ -73,7 +75,6 @@ class CheckActivity : AppCompatActivity() {
             checklistAdapter.notifyDataSetChanged() // 전체 데이터 갱신
         }
     }
-
 
     // 체크리스트 항목의 상태가 변경되었을 때 해당 항목만 업데이트
     private fun updateChecklistItem(item: ChecklistItem) {
@@ -113,7 +114,6 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-
     // 새로운 체크리스트 항목을 데이터베이스에 추가하고 RecyclerView 갱신
     private fun addItemToChecklist(newItem: ChecklistItem) {
         lifecycleScope.launch {
@@ -135,7 +135,7 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-
+    // 필요 시 체크리스트 항목 초기화
     private fun resetChecklistItemsIfNeeded() {
         lifecycleScope.launch {
             val resetItems = withContext(Dispatchers.IO) {
@@ -154,8 +154,6 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-
-
     // 특정 체크리스트 항목의 주기 확인 함수
     private fun shouldResetItem(item: Checklist): Boolean {
         val lastCheckedDate = Calendar.getInstance().apply {
@@ -165,17 +163,19 @@ class CheckActivity : AppCompatActivity() {
 
         return when (item.period) {
             "daily" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
-            "weekly" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.WEEK_OF_YEAR)
-            "monthly" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.MONTH)
+            "weekly" -> currentDate.get(Calendar.DAY_OF_WEEK).toString() == item.weekDay &&
+                    isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
+            "monthly" -> currentDate.get(Calendar.DAY_OF_MONTH).toString() == item.monthDay &&
+                    isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
             else -> false
         }
     }
 
     // 두 날짜가 특정 단위(일, 주, 월)에서 다른지 확인하는 함수
+    @Suppress("SameParameterValue")
     private fun isDateDifferent(lastCheckedDate: Calendar, currentDate: Calendar, unit: Int): Boolean {
         return lastCheckedDate.get(unit) != currentDate.get(unit)
     }
-
 
     // 버튼 초기화 및 클릭 리스너 설정
     private fun setupButtonListeners() {
