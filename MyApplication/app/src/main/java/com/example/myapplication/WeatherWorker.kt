@@ -31,12 +31,6 @@ class WeatherWorker(
         private var isRunning = false // 실행 중 여부 플래그
     }
 
-    /**
-     * 작업 수행 함수
-     * - API 호출을 통해 날씨 데이터를 가져오고, 조건에 맞는 알림을 전송합니다.
-     * - 자정에는 알림 상태를 초기화합니다.
-     * - 다음 작업을 예약합니다.
-     */
     override suspend fun doWork(): Result {
         if (isRunning) {
             Log.d("WeatherWorker", "이미 실행 중인 작업입니다.")
@@ -72,10 +66,7 @@ class WeatherWorker(
         }
     }
 
-    /**
-     * 다음 정각 1분 전에 작업 예약
-     * - 매 1시간마다 알림을 예약하여 정각에 맞는 날씨 알림을 실행합니다.
-     */
+    // 다음 정각 1분 전에 작업 예약
     private fun scheduleNextHourlyNotification() {
         val initialDelay = calculateInitialDelay() // 다음 정각까지 남은 시간 계산
 
@@ -106,18 +97,15 @@ class WeatherWorker(
         }
     }
 
-    /**
-     * 다음 정각 1분 전까지 남은 시간 계산 (한국 시간 기준)
-     * @return 초기 지연 시간 (밀리초)
-     */
+    // 다음 정각 1분 전까지 남은 시간 계산
     private fun calculateInitialDelay(): Long {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
 
         // 다음 정각 설정
-        calendar.add(Calendar.HOUR_OF_DAY, 1) // 현재 시간에 한 시간 추가
-        calendar.set(Calendar.MINUTE, 0) // 분을 0으로 초기화
-        calendar.set(Calendar.SECOND, 0) // 초를 0으로 초기화
-        calendar.set(Calendar.MILLISECOND, 0) // 밀리초를 0으로 초기화
+        calendar.add(Calendar.HOUR_OF_DAY, 1)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
 
         // 정각 1분 전 시간 계산
         val nextHour = calendar.timeInMillis
@@ -128,12 +116,8 @@ class WeatherWorker(
         return if (delay > 0) delay else 0L
     }
 
-    /**
-     * 자정 여부 확인 함수 (한국 시간 기준)
-     * - 자정(0시)에 알림 상태를 초기화하기 위해 호출됩니다.
-     * @param currentTime 현재 시간 (밀리초)
-     * @return 자정 여부
-     */
+
+     // 자정(0시)에 알림 상태를 초기화
     private fun isMidnight(currentTime: Long): Boolean {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
             timeInMillis = currentTime
@@ -142,10 +126,8 @@ class WeatherWorker(
         return calendar.get(Calendar.HOUR_OF_DAY) == 0 && calendar.get(Calendar.MINUTE) < 5
     }
 
-    /**
-     * 모든 알림 상태 초기화 (자정에 호출)
-     * - 하루가 지나면 알림 상태를 초기화하여 동일 조건에 대해 다시 알림을 보낼 수 있도록 설정합니다.
-     */
+
+     // 하루가 지나면 알림 상태를 초기화하여 동일 조건에 대해 다시 알림을 보낼 수 있도록 설정
     private suspend fun resetNotifiedStatus() {
         withContext(Dispatchers.IO) {
             database.getWeatherTextDao().resetAllNotificationStatus() // 알림 상태 초기화
@@ -153,11 +135,7 @@ class WeatherWorker(
         Log.d("WeatherWorker", "모든 알림 상태가 초기화되었습니다.")
     }
 
-    /**
-     * 시간 포맷 함수 (한국 시간 기준)
-     * @param timestamp 밀리초 단위의 시간 값
-     * @return 형식화된 시간 문자열
-     */
+    // 시간 포맷 함수 (한국 시간 기준)
     private fun formatTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
         sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")

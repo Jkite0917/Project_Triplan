@@ -12,18 +12,30 @@ import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+// 시간 범위를 나타내는 데이터 클래스
+data class TimeRange(
+    val startHour: Int,
+    val startMinute: Int,
+    val endHour: Int,
+    val endMinute: Int
+)
+
 class WeatherNotificationManager(val context: Context, private val database: LocalDatabase) {
 
     private val channelId = "weather_notification_channel"
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+    // 시간 범위 상수 정의
+    companion object {
+        val MORNING_TIME = TimeRange(5, 58, 6, 0)  // 당일 오전 6시
+        val EVENING_TIME = TimeRange(20, 58, 21, 0) // 전날 오후 9시
+    }
+
     init {
         createNotificationChannel()
     }
 
-    /**
-     * 알림 채널 생성 (Android 8.0 이상 필요)
-     */
+    // 알림 채널 생성 (Android 8.0 이상 필요)
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -39,153 +51,212 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
     }
 
-    /**
-     * 날씨 조건 확인 및 알림 처리
-     */
+    // 날씨 조건 확인 및 알림 처리
     suspend fun checkWeatherConditions(apiService: WeatherApiService, apiKey: String, region: String) {
         val apiCallTime = System.currentTimeMillis()
 
-        // API 호출
+        // 저장된 날씨 알림 리스트 가져오기
+        val savedWeatherItems = database.getWeatherTextDao().getAllWeatherList().map { weather ->
+            WeatherListItem(
+                wNo = weather.wNo,
+                contents = weather.wText,
+                weather = weather.weather,
+                time = weather.wTime,
+                isNotified = weather.isNotified
+            )
+        }
+
+        // 시간 종류별로 리스트 필터링
+        val currentWeatherItems = savedWeatherItems.filter { it.time == "현재 날씨" }
+        val morningWeatherItems = savedWeatherItems.filter { it.time == "당일 오전 6시" }
+        val eveningWeatherItems = savedWeatherItems.filter { it.time == "전날 오후 9시" }
+
+        // "현재 날씨" 알림 처리
+        if (currentWeatherItems.isNotEmpty()) {
+            handleCurrentWeather(currentWeatherItems, apiService, apiKey, region)
+        }
+
+        // "당일 오전 6시" 알림 처리
+        if (morningWeatherItems.isNotEmpty() && isWithinTime(apiCallTime, MORNING_TIME)) {
+            handleMorningWeather(morningWeatherItems, apiService, apiKey, region)
+        }
+
+        // "전날 오후 9시" 알림 처리
+        if (eveningWeatherItems.isNotEmpty() && isWithinTime(apiCallTime, EVENING_TIME)) {
+            handleEveningWeather(eveningWeatherItems, apiService, apiKey, region)
+        }
+    }
+
+    // 현재 날씨" 알림 처리
+    private suspend fun handleCurrentWeather(
+        weatherItems: List<WeatherListItem>,
+        apiService: WeatherApiService,
+        apiKey: String,
+        region: String
+    ) {
+        // API 호출하여 현재 날씨 정보 가져오기
         val response = withContext(Dispatchers.IO) {
             apiService.getWeatherForecast(region, apiKey).execute()
         }
 
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
-            Log.d("WeatherCheck", "API 응답에서 가져온 날씨 항목: ${forecastList.size}")
+            val nearestForecast = forecastList[0] // 가장 가까운 시간대의 예보
+            val forecastDescription = convertToCommonWeatherDescription(
+                nearestForecast.weather[0].description.lowercase(Locale.KOREA)
+            )
 
-            val savedWeatherItems = database.getWeatherTextDao().getAllWeatherList().map { weather ->
-                WeatherListItem(
-                    wNo = weather.wNo,
-                    contents = weather.wText,
-                    weather = weather.weather,
-                    time = weather.wTime,
-                    isNotified = weather.isNotified // 저장된 상태 유지
-                )
-            }
-
-            // 저장된 알림 데이터를 기준으로 처리
-            savedWeatherItems.forEach { savedItem ->
-                when (savedItem.time) {
-                    "현재 날씨" -> handleImmediateNotification(savedItem, forecastList)
-                    "당일 오전 6시", "전날 오후 9시" -> handleScheduledNotification(savedItem, forecastList, apiCallTime)
+            // 각 저장된 아이템과 비교하여 알림 조건 확인
+            for (savedItem in weatherItems) {
+                if (savedItem.weather == forecastDescription) {
+                    if (!savedItem.isNotified) {
+                        sendNotification(savedItem.contents, nearestForecast.weather[0].description)
+                        coroutineScope.launch {
+                            updateNotificationStatus(savedItem.wNo, true) // 알림 상태 업데이트
+                        }
+                        Log.d("WeatherCheck", "현재 날씨 알림 전송: wNo=${savedItem.wNo}")
+                    }
+                } else {
+                    // 날씨가 다르면 isNotified를 false로 설정
+                    if (savedItem.isNotified) {
+                        coroutineScope.launch {
+                            updateNotificationStatus(savedItem.wNo, false)
+                        }
+                    }
                 }
             }
         } else {
-            Log.d("WeatherCheck", "API 호출 실패: 코드=${response.code()}")
+            Log.d("WeatherCheck", "현재 날씨 API 호출 실패: 코드=${response.code()}")
         }
     }
 
-    /**
-     * "현재 날씨" 알림 처리
-     */
-    private fun handleImmediateNotification(
-        savedItem: WeatherListItem,
-        forecastList: List<Forecast>
+    // 당일 오전 6시" 알림 처리
+    private suspend fun handleMorningWeather(
+        weatherItems: List<WeatherListItem>,
+        apiService: WeatherApiService,
+        apiKey: String,
+        region: String
     ) {
-        val forecastDescription = convertToCommonWeatherDescription(
-            forecastList[0].weather[0].description.lowercase(Locale.KOREA)
-        )
-
-        if (savedItem.weather == forecastDescription && !savedItem.isNotified) {
-            sendNotification(savedItem.contents, forecastList[0].weather[0].description)
-            coroutineScope.launch {
-                updateNotificationStatus(savedItem.wNo, true) // 상태 업데이트
-            }
-            Log.d("WeatherCheck", "즉시 알림 조건 충족: wNo=${savedItem.wNo}")
-        }
-    }
-
-    /**
-     * "당일 오전 6시" 및 "전날 오후 9시" 알림 처리
-     */
-    private fun handleScheduledNotification(
-        savedItem: WeatherListItem,
-        forecastList: List<Forecast>,
-        apiCallTime: Long
-    ) {
-        val targetHour = when (savedItem.time) {
-            "당일 오전 6시" -> 6
-            "전날 오후 9시" -> 21
-            else -> return
+        // API 호출하여 오늘의 날씨 예보 가져오기
+        val response = withContext(Dispatchers.IO) {
+            apiService.getWeatherForecast(region, apiKey).execute()
         }
 
-        val isWithinScheduledTime = when (targetHour) {
-            6 -> isWithinTime(apiCallTime, 5, 58, 6, 0)
-            21 -> isWithinTime(apiCallTime, 20, 58, 21, 0)
-            else -> false
-        }
+        if (response.isSuccessful) {
+            val forecastList = response.body()?.list ?: return
 
-        if (isWithinScheduledTime) {
-            val targetForecasts = forecastList.filter { forecast ->
-                val forecastTimeMillis = parseForecastTime(forecast.dt_txt)
-                val forecastHour = Calendar.getInstance().apply { timeInMillis = forecastTimeMillis }
-                    .get(Calendar.HOUR_OF_DAY)
-
-                forecastHour == targetHour
+            // 오늘 날짜의 예보만 필터링
+            val todayForecasts = forecastList.filter { forecast ->
+                isToday(parseForecastTime(forecast.dt_txt))
             }
 
-            if (targetForecasts.isNotEmpty()) {
-                val combinedDescriptions = targetForecasts.joinToString(", ") { forecast ->
-                    convertToCommonWeatherDescription(forecast.weather[0].description)
-                }
+            // 오늘의 날씨 예보 중 날씨 설명들을 가져와서 병합
+            val combinedDescriptions = todayForecasts.joinToString(", ") { forecast ->
+                convertToCommonWeatherDescription(forecast.weather[0].description)
+            }
 
-                if (combinedDescriptions.contains(savedItem.weather) && !savedItem.isNotified) {
+            // 각 저장된 아이템과 비교하여 알림 조건 확인
+            for (savedItem in weatherItems) {
+                if (combinedDescriptions.contains(savedItem.weather)) {
                     sendNotification(savedItem.contents, savedItem.weather)
-                    coroutineScope.launch {
-                        updateNotificationStatus(savedItem.wNo, true)
-                    }
-                    Log.d("WeatherCheck", "${targetHour}시 알림 조건 충족: wNo=${savedItem.wNo}")
+                    Log.d("WeatherCheck", "당일 오전 6시 알림 전송: wNo=${savedItem.wNo}")
                 }
             }
+        } else {
+            Log.d("WeatherCheck", "당일 오전 6시 API 호출 실패: 코드=${response.code()}")
         }
     }
 
-    /**
-     * 특정 시간 범위 확인 함수
-     */
-    private fun isWithinTime(apiCallTime: Long, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int): Boolean {
+    // 전날 오후 9시" 알림 처리
+    private suspend fun handleEveningWeather(
+        weatherItems: List<WeatherListItem>,
+        apiService: WeatherApiService,
+        apiKey: String,
+        region: String
+    ) {
+        // API 호출하여 내일의 날씨 예보 가져오기
+        val response = withContext(Dispatchers.IO) {
+            apiService.getWeatherForecast(region, apiKey).execute()
+        }
+
+        if (response.isSuccessful) {
+            val forecastList = response.body()?.list ?: return
+
+            // 내일 날짜의 예보만 필터링
+            val tomorrowForecasts = forecastList.filter { forecast ->
+                isTomorrow(parseForecastTime(forecast.dt_txt))
+            }
+
+            // 내일의 날씨 예보 중 날씨 설명들을 가져와서 병합
+            val combinedDescriptions = tomorrowForecasts.joinToString(", ") { forecast ->
+                convertToCommonWeatherDescription(forecast.weather[0].description)
+            }
+
+            // 각 저장된 아이템과 비교하여 알림 조건 확인
+            for (savedItem in weatherItems) {
+                if (combinedDescriptions.contains(savedItem.weather)) {
+                    sendNotification(savedItem.contents, savedItem.weather)
+                    Log.d("WeatherCheck", "전날 오후 9시 알림 전송: wNo=${savedItem.wNo}")
+                }
+            }
+        } else {
+            Log.d("WeatherCheck", "전날 오후 9시 API 호출 실패: 코드=${response.code()}")
+        }
+    }
+
+    // 특정 시간 범위 확인 함수
+    private fun isWithinTime(apiCallTime: Long, timeRange: TimeRange): Boolean {
         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
 
-        // 범위 시작 시간
-        val startTime = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, startHour)
-            set(Calendar.MINUTE, startMinute)
-            set(Calendar.SECOND, 0)
-        }.timeInMillis
+        // 범위 시작 시간 설정
+        val startTime = calendar.clone() as Calendar
+        startTime.set(Calendar.HOUR_OF_DAY, timeRange.startHour)
+        startTime.set(Calendar.MINUTE, timeRange.startMinute)
+        startTime.set(Calendar.SECOND, 0)
+        startTime.set(Calendar.MILLISECOND, 0)
 
-        // 범위 종료 시간
-        val endTime = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, endHour)
-            set(Calendar.MINUTE, endMinute)
-            set(Calendar.SECOND, 0)
-        }.timeInMillis
+        // 범위 종료 시간 설정
+        val endTime = calendar.clone() as Calendar
+        endTime.set(Calendar.HOUR_OF_DAY, timeRange.endHour)
+        endTime.set(Calendar.MINUTE, timeRange.endMinute)
+        endTime.set(Calendar.SECOND, 0)
+        endTime.set(Calendar.MILLISECOND, 0)
 
-        return apiCallTime in startTime..endTime
+        return apiCallTime in startTime.timeInMillis..endTime.timeInMillis
     }
 
-    /**
-     * Forecast 시간 문자열을 밀리초로 변환
-     */
+    // 시간 문자열에서 밀리초로 변환
     private fun parseForecastTime(timeString: String): Long {
         val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.KOREA)
         sdf.timeZone = TimeZone.getTimeZone("Asia/Seoul")
         return sdf.parse(timeString)?.time ?: 0L
     }
 
-    /**
-     * 알림 상태 업데이트
-     */
-    private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
-        withContext(Dispatchers.IO) {
-            database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
+    // 주어진 시간이 오늘인지 확인
+    private fun isToday(timeMillis: Long): Boolean {
+        val today = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
+        val targetDay = Calendar.getInstance().apply {
+            timeInMillis = timeMillis
+            timeZone = TimeZone.getTimeZone("Asia/Seoul")
         }
-        Log.d("WeatherNotificationManager", "알림 상태 업데이트 완료: wNo=$wNo, isNotified=$isNotified")
+        return today.get(Calendar.YEAR) == targetDay.get(Calendar.YEAR) &&
+                today.get(Calendar.DAY_OF_YEAR) == targetDay.get(Calendar.DAY_OF_YEAR)
     }
 
-    /**
-     * 알림 전송
-     */
+    // 주어진 시간이 내일인지 확인
+    private fun isTomorrow(timeMillis: Long): Boolean {
+        val tomorrow = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul")).apply {
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val targetDay = Calendar.getInstance().apply {
+            timeInMillis = timeMillis
+            timeZone = TimeZone.getTimeZone("Asia/Seoul")
+        }
+        return tomorrow.get(Calendar.YEAR) == targetDay.get(Calendar.YEAR) &&
+                tomorrow.get(Calendar.DAY_OF_YEAR) == targetDay.get(Calendar.DAY_OF_YEAR)
+    }
+
+    // 알림 전송
     private fun sendNotification(content: String, weatherDescription: String) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -206,9 +277,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
 
-    /**
-     * 날씨 설명 변환
-     */
+    // 날씨 설명을 공통된 날씨 분류로 변환
     private fun convertToCommonWeatherDescription(description: String): String {
         return when (description.trim().lowercase(Locale.KOREA)) {
             "clear sky" -> "clear sky"
@@ -221,9 +290,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
     }
 
-    /**
-     * 날씨 아이콘 반환
-     */
+    // 날씨 설명에 따른 아이콘 반환
     private fun getWeatherIcon(description: String): Int {
         return when (convertToCommonWeatherDescription(description)) {
             "clear sky" -> R.drawable.weather_sun_icon
@@ -234,5 +301,13 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             "snow" -> R.drawable.weather_snow_icon
             else -> R.drawable.weather_sun_icon
         }
+    }
+
+    //알림 상태 업데이트
+    private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
+        withContext(Dispatchers.IO) {
+            database.getWeatherTextDao().updateNotificationStatus(wNo, isNotified)
+        }
+        Log.d("WeatherNotificationManager", "알림 상태 업데이트: wNo=$wNo, isNotified=$isNotified")
     }
 }
