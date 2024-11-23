@@ -3,8 +3,6 @@ package com.example.myapplication
 import android.content.Context
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
-import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -94,20 +92,30 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
                 forecastList[0].weather[0].description.lowercase(Locale.KOREA)
             )
 
+            // API 데이터와 변환된 값 로그
+            Log.d("APIWeatherCheck", "$timeDescription - API 원본: ${forecastList[0].weather[0].description}, 변환된 값: $forecastDescription")
+
             for (savedItem in weatherItems) {
-                val savedDescription = convertToCommonWeatherDescription(savedItem.weather)
-                if (savedDescription == forecastDescription && !savedItem.isNotified) {
-                    sendNotification(savedItem.contents, forecastDescription)
+                Log.d(
+                    "DBWeatherCheck",
+                    "$timeDescription - DB에서 읽은 값 - ID: ${savedItem.wNo}, 날씨: ${savedItem.weather}, 내용: ${savedItem.contents}"
+                )
+
+                val savedDescription = savedItem.weather
+
+                if (savedDescription == forecastDescription) {
+                    Log.d("WeatherMatch", "$timeDescription - DB와 API 값 매칭 - 알림 준비: ${savedItem.weather}")
+                    sendNotification(savedItem.contents, savedItem.weather)
                     coroutineScope.launch { updateNotificationStatus(savedItem.wNo, true) }
-                    Log.d("WeatherCheck", "$timeDescription 알림 전송: wNo=${savedItem.wNo}")
-                } else if (savedItem.isNotified && savedDescription != forecastDescription) {
-                    coroutineScope.launch { updateNotificationStatus(savedItem.wNo, false) }
+                } else {
+                    Log.d("WeatherMatch", "$timeDescription - DB와 API 값 불일치 - DB=${savedDescription}, API=$forecastDescription")
                 }
             }
         } else {
-            Log.d("WeatherCheck", "$timeDescription API 호출 실패: 코드=${response.code()}")
+            Log.e("WeatherAPIError", "$timeDescription - API 호출 실패: 코드=${response.code()}, 메시지=${response.message()}")
         }
     }
+
 
     // 날씨 설명을 공통된 날씨 분류로 변환
     private fun convertToCommonWeatherDescription(description: String): String {
@@ -126,24 +134,21 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     private fun sendNotification(content: String, savedWeather: String) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val intent = Intent(context, WeatherActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(
-            context, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 
+        // DB에서 가져온 값과 매핑된 아이콘 확인
         val smallIcon = getWeatherIcon(savedWeather)
+        Log.d("NotificationDebug", "알림 생성 - 내용: $content, 날씨: $savedWeather, 매핑된 아이콘 ID: $smallIcon")
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(smallIcon)
-            .setContentTitle("날씨 알림!")
+            .setContentTitle("날씨 알림")
             .setContentText(content)
-            .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
 
         notificationManager.notify(savedWeather.hashCode(), notification)
     }
+
 
 
     // 알림 상태 업데이트
@@ -155,15 +160,17 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     }
 
     // 날씨 설명에 따른 아이콘 반환
-    private fun getWeatherIcon(description: String): Int {
-        return when (description.lowercase(Locale.KOREA)) {
+    private fun getWeatherIcon(weatherDescription: String): Int {
+        val iconId = when (weatherDescription) {
             "clear sky" -> R.drawable.weather_sun_icon
-            "partly cloudy" -> R.drawable.weather_suncloud_icon
             "clouds" -> R.drawable.weather_cloud_icon
             "rain" -> R.drawable.weather_rain_icon
             "thunderstorm" -> R.drawable.weather_thunder_icon
             "snow" -> R.drawable.weather_snow_icon
+            "partly cloudy" -> R.drawable.weather_suncloud_icon
             else -> R.drawable.weather_sun_icon
         }
+        Log.d("IconMapping", "날씨 설명: $weatherDescription → 매핑된 아이콘 ID: $iconId")
+        return iconId
     }
 }
