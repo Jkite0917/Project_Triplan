@@ -114,8 +114,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         return when (description.trim().lowercase(Locale.KOREA)) {
             "clear sky" -> "clear sky"
             "few clouds", "scattered clouds" -> "partly cloudy"
-            "broken clouds", "overcast clouds", "mist" -> "few clouds"
-            "drizzle", "light rain", "moderate rain", "heavy intensity rain" -> "light rain"
+            "broken clouds", "overcast clouds", "mist" -> "clouds"
+            "drizzle", "light rain", "moderate rain", "heavy intensity rain" -> "rain"
             "light thunderstorm", "thunderstorm", "heavy thunderstorm" -> "thunderstorm"
             "light snow", "snow", "heavy snow", "sleet" -> "snow"
             else -> "clear sky"
@@ -123,7 +123,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     }
 
     // 알림 전송
-    private fun sendNotification(content: String, weatherDescription: String) {
+    private fun sendNotification(content: String, savedWeather: String) {
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(context, WeatherActivity::class.java)
@@ -131,7 +131,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             context, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val smallIcon = getWeatherIcon(weatherDescription)
+
+        val smallIcon = getWeatherIcon(savedWeather)
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(smallIcon)
@@ -141,8 +142,9 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(weatherDescription.hashCode(), notification)
+        notificationManager.notify(savedWeather.hashCode(), notification)
     }
+
 
     // 알림 상태 업데이트
     private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
@@ -157,8 +159,8 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         return when (description.lowercase(Locale.KOREA)) {
             "clear sky" -> R.drawable.weather_sun_icon
             "partly cloudy" -> R.drawable.weather_suncloud_icon
-            "few clouds" -> R.drawable.weather_cloud_icon
-            "light rain" -> R.drawable.weather_rain_icon
+            "clouds" -> R.drawable.weather_cloud_icon
+            "rain" -> R.drawable.weather_rain_icon
             "thunderstorm" -> R.drawable.weather_thunder_icon
             "snow" -> R.drawable.weather_snow_icon
             else -> R.drawable.weather_sun_icon

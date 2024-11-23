@@ -52,8 +52,8 @@ class WeatherListAdapter(
         private fun getWeatherIconId(weatherDescription: String): Int {
             return when (weatherDescription) {
                 "clear sky" -> R.drawable.weather_sun_icon
-                "few clouds" -> R.drawable.weather_cloud_icon
-                "light rain" -> R.drawable.weather_rain_icon
+                "clouds" -> R.drawable.weather_cloud_icon
+                "rain" -> R.drawable.weather_rain_icon
                 "thunderstorm" -> R.drawable.weather_thunder_icon
                 "snow" -> R.drawable.weather_snow_icon
                 "partly cloudy" -> R.drawable.weather_suncloud_icon

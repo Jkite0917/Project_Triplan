@@ -23,8 +23,8 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
     // 날씨 버튼 ID와 설명 매핑
     private val weatherIconMap = mapOf(
         R.id.imageButton_weatherAdd_Icon_Sun to "clear sky",
-        R.id.imageButton_weatherAdd_Icon_Cloud to "few clouds",
-        R.id.imageButton_weatherAdd_Icon_Rain to "light rain",
+        R.id.imageButton_weatherAdd_Icon_Cloud to "clouds",
+        R.id.imageButton_weatherAdd_Icon_Rain to "rain",
         R.id.imageButton_weatherAdd_Icon_Thunder to "thunderstorm",
         R.id.imageButton_weatherAdd_Icon_Show to "snow",
         R.id.imageButton_weatherAdd_Icon_SunCloud to "partly cloudy"
