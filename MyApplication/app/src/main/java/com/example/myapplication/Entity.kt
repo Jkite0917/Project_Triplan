@@ -6,8 +6,8 @@ import androidx.room.ColumnInfo
 
 @Entity(tableName = "DailySchedule")
 data class DailySchedule (
-    @PrimaryKey val Date: String, // 메모 날짜, pk
-    @ColumnInfo(name = "Info") val Info: String // 내용
+    @PrimaryKey val date: String, // 메모 날짜, pk
+    @ColumnInfo(name = "Info") val info: String // 내용
 )
 
 @Entity(tableName = "WeatherList")

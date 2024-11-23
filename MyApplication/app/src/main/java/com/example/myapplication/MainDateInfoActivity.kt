@@ -19,7 +19,7 @@ import kotlinx.coroutines.withContext
 class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialogFragment() {
 
     private lateinit var editText: TextView
-    private lateinit var TextView : TextView
+    private lateinit var textView : TextView
     private lateinit var deleteButton: Button
     private lateinit var db: LocalDatabase
 
@@ -29,7 +29,7 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
     ): View? {
         val view = inflater.inflate(R.layout.bottomsheet_main_checkanddelete, container, false)
         editText = view.findViewById(R.id.textview_mainCheck_input)
-        TextView = view.findViewById(R.id.textview_mainCheck_selectedDate)
+        textView = view.findViewById(R.id.textview_mainCheck_selectedDate)
         deleteButton = view.findViewById(R.id.button_mainAdd_deleteData)
 
         // Room 데이터베이스 초기화
@@ -59,7 +59,7 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
     }
 
     private fun loadData() {
-        TextView.text = selectedDate
+        textView.text = selectedDate
 
         CoroutineScope(Dispatchers.IO).launch {
             val schedule = db.getDailyScheduleDao().getDailyScheduleInfo(selectedDate)
@@ -67,7 +67,7 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
                 if (schedule != null) {
                     editText.text = Editable.Factory.getInstance().newEditable(schedule)
                 } else {
-                    editText.setText("")
+                    editText.text = ""
                     Toast.makeText(context, "해당 날짜에 저장된 일정이 없습니다.", Toast.LENGTH_SHORT).show()
                 }
             }

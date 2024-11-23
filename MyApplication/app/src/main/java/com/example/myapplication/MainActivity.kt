@@ -75,9 +75,6 @@ class MainActivity : AppCompatActivity() {
         // 알림 매니저 초기화
         weatherNotificationManager = WeatherNotificationManager(this, LocalDatabase.getDatabase(this))
 
-        // 앱 실행 시 즉시 날씨 조건 확인 (테스트 용)
-        // triggerImmediateWeatherCheck()
-
         // 앱 첫 실행 시에만 날씨 알림 예약 설정
         if (!sharedPreferences.getBoolean("isNotificationScheduled", false)) {
             scheduleWeatherNotifications()
@@ -93,12 +90,6 @@ class MainActivity : AppCompatActivity() {
                 apply() // 비동기 적으로 저장
             }
         }
-    }
-
-    // 테스트 용으로 앱 시작 시 즉시 WeatherWorker 실행
-    private fun triggerImmediateWeatherCheck() {
-        val immediateWorkRequest = OneTimeWorkRequestBuilder<WeatherWorker>().build()
-        WorkManager.getInstance(this).enqueue(immediateWorkRequest)
     }
 
     // 알림 권한을 요청 하는 함수 (Android 13 이상)

@@ -4,26 +4,16 @@ import androidx.room.*
 
 @Dao
 interface DailyScheduleDao {
-    @Query("SELECT * FROM DailySchedule")
-    fun getAllDailyScheduleInfo(): List<DailySchedule>
 
-    @Query("SELECT Date FROM DailySchedule")
-    fun getAllInfoDate(): List<String>
-
-    @Query("SELECT Info FROM DailySchedule WHERE Date = :date LIMIT 1")  // 하나만 가져오기
+    @Query("SELECT Info FROM DailySchedule WHERE date = :date LIMIT 1")  // 하나만 가져오기
     suspend fun getDailyScheduleInfo(date: String): String?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDailyScheduleInfo(date: DailySchedule)
 
-    @Update
-    suspend fun updateDailyScheduleInfo(date: DailySchedule)
-
-    @Query("DELETE FROM DailySchedule WHERE Date = :date")
+    @Query("DELETE FROM DailySchedule WHERE date = :date")
     suspend fun deleteDailyScheduleInfo(date: String)
 
-    @Query("DELETE FROM DailySchedule")
-    suspend fun deleteAllDailyScheduleInfo()
 }
 
 @Dao
@@ -32,31 +22,16 @@ interface WeatherListDao {
     @Query("SELECT * FROM WeatherList")
     fun getAllWeatherList(): List<WeatherList>
 
-    @Query("SELECT * FROM WeatherList WHERE wNo = :wNo")
-    suspend fun getWeatherList(wNo: Long): WeatherList?
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertWeatherList(weatherList: WeatherList): Long
 
-    @Update
-    suspend fun updateWeatherList(weatherList: WeatherList)
-
     @Delete
     suspend fun deleteWeatherList(weatherList: WeatherList)
-
-    @Query("DELETE FROM WeatherList WHERE wNo = :wNo")
-    suspend fun deleteWeatherListById(wNo: Long)
-
-    @Query("DELETE FROM WeatherList")
-    suspend fun deleteAllWeatherLists()
 
     // isNotified 필드 업데이트를 위한 쿼리
     @Query("UPDATE WeatherList SET isNotified = :isNotified WHERE wNo = :wNo")
     suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean)
 
-    // 모든 isNotified 값을 false로 초기화
-    @Query("UPDATE WeatherList SET isNotified = 0")
-    suspend fun resetAllNotificationStatus()
 }
 
 

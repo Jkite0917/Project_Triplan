@@ -90,8 +90,8 @@ class MainAddActivity : BottomSheetDialogFragment() {
     private fun saveToDatabase(selectedDate: String, info: String) {
         // Room DB에 데이터를 저장하는 함수
         val scheduleInfo = DailySchedule(
-            Date = selectedDate,
-            Info = info
+            date = selectedDate,
+            info = info
         )
 
         // IO 스레드에서 비동기로 데이터베이스 작업을 수행하기 위해 별도의 CoroutineScope 사용

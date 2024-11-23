@@ -61,8 +61,8 @@ class WeatherAddActivity(private val onSave: (WeatherListItem) -> Unit) : Bottom
         // 시간 선택 버튼들
         val timeButtons = listOf(
             view.findViewById<Button>(R.id.button_weatherAdd_dayBefore),
-            view.findViewById<Button>(R.id.button_weatherAdd_timeNow),
-            view.findViewById<Button>(R.id.button_weatherAdd_allDay)
+            view.findViewById(R.id.button_weatherAdd_timeNow),
+            view.findViewById(R.id.button_weatherAdd_allDay)
         )
 
         timeButtons.forEach { button ->
