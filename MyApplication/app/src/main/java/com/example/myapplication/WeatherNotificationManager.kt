@@ -58,7 +58,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
 
         // "당일 오전 6시" 알림 처리
-        if (currentHour == 6 && currentMinute < 5) {
+        if (currentHour == 6 && currentMinute < 25) {
             val morningItems = savedWeatherItems.filter { it.time == "당일 오전 6시" }
             if (morningItems.isNotEmpty()) {
                 handleWeather(morningItems, apiService, apiKey, region, "당일 오전 6시")
@@ -66,7 +66,7 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         }
 
         // "전날 오후 9시" 알림 처리
-        if (currentHour == 21 && currentMinute < 5) {
+        if (currentHour == 21 && currentMinute < 25) {
             val eveningItems = savedWeatherItems.filter { it.time == "전날 오후 9시" }
             if (eveningItems.isNotEmpty()) {
                 handleWeather(eveningItems, apiService, apiKey, region, "전날 오후 9시")
@@ -76,12 +76,13 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
     // 특정 시간에 따른 알림 처리
     private suspend fun handleWeather(
-        weatherItems: List<WeatherListItem>,
-        apiService: WeatherApiService,
-        apiKey: String,
-        region: String,
-        timeDescription: String
+        weatherItems: List<WeatherListItem>, // DB에서 읽어온 날씨 항목 리스트
+        apiService: WeatherApiService, // OpenWeather API 서비스
+        apiKey: String, // OpenWeather API 키
+        region: String, // 사용자가 선택한 지역
+        timeDescription: String // 현재 처리 중인 시간대 설명 (예: "현재 날씨", "당일 오전 6시")
     ) {
+        // OpenWeather API 호출 및 응답 처리
         val response = withContext(Dispatchers.IO) {
             apiService.getWeatherForecast(region, apiKey).execute()
         }
@@ -89,32 +90,42 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
             val forecastDescription = convertToCommonWeatherDescription(
-                forecastList[0].weather[0].description.lowercase(Locale.KOREA)
+                forecastList[0].weather[0].description.lowercase(Locale.KOREA) // API에서 반환된 날씨 설명 변환
             )
 
-            // API 데이터와 변환된 값 로그
             Log.d("APIWeatherCheck", "$timeDescription - API 원본: ${forecastList[0].weather[0].description}, 변환된 값: $forecastDescription")
 
+            // DB 항목과 API 값을 비교
             for (savedItem in weatherItems) {
                 Log.d(
                     "DBWeatherCheck",
-                    "$timeDescription - DB에서 읽은 값 - ID: ${savedItem.wNo}, 날씨: ${savedItem.weather}, 내용: ${savedItem.contents}"
+                    "$timeDescription - DB에서 읽은 값 - ID: ${savedItem.wNo}, 날씨: ${savedItem.weather}, 내용: ${savedItem.contents}, 알림 상태: ${savedItem.isNotified}"
                 )
 
                 val savedDescription = savedItem.weather
 
+                // 1. API와 DB 값이 매칭되었고, 아직 알림이 전송되지 않은 경우
                 if (savedDescription == forecastDescription) {
-                    Log.d("WeatherMatch", "$timeDescription - DB와 API 값 매칭 - 알림 준비: ${savedItem.weather}")
-                    sendNotification(savedItem.contents, savedItem.weather)
-                    coroutineScope.launch { updateNotificationStatus(savedItem.wNo, true) }
-                } else {
-                    Log.d("WeatherMatch", "$timeDescription - DB와 API 값 불일치 - DB=${savedDescription}, API=$forecastDescription")
+                    if (!savedItem.isNotified) {
+                        Log.d("WeatherNotification", "$timeDescription - 알림 전송: ${savedItem.weather}")
+                        sendNotification(savedItem.contents, savedItem.weather) // 알림 전송
+                        coroutineScope.launch { updateNotificationStatus(savedItem.wNo, true) } // 상태 업데이트
+                    } else {
+                        Log.d("WeatherNotification", "$timeDescription - 동일 날씨 조건: 알림 전송 안 함 (이미 전송됨)")
+                    }
+                }
+                // 2. API와 DB 값이 다른 경우 상태 초기화
+                else {
+                    Log.d("WeatherNotification", "$timeDescription - 날씨 변경으로 상태 초기화: ${savedItem.weather}")
+                    coroutineScope.launch { updateNotificationStatus(savedItem.wNo, false) } // 상태 초기화
                 }
             }
+
         } else {
             Log.e("WeatherAPIError", "$timeDescription - API 호출 실패: 코드=${response.code()}, 메시지=${response.message()}")
         }
     }
+
 
 
     // 날씨 설명을 공통된 날씨 분류로 변환
