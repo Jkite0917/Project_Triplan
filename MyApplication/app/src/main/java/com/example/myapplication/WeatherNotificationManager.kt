@@ -7,6 +7,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
 import java.util.*
 
 class WeatherNotificationManager(val context: Context, private val database: LocalDatabase) {
@@ -54,57 +55,47 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         // "현재 날씨" 알림 처리
         val currentWeatherItems = savedWeatherItems.filter { it.time == "현재 날씨" }
         if (currentWeatherItems.isNotEmpty()) {
-            handleWeather(currentWeatherItems, apiService, apiKey, region, "현재 날씨")
+            handleCurrentWeather(currentWeatherItems, apiService, apiKey, region, "현재 날씨")
         }
 
         // "당일 오전 6시" 알림 처리
         if (currentHour == 6 && currentMinute < 25) {
-            val morningItems = savedWeatherItems.filter { it.time == "당일 오전 6시" }
-            if (morningItems.isNotEmpty()) {
-                handleWeather(morningItems, apiService, apiKey, region, "당일 오전 6시")
-            }
+            handleDailyWeather(apiService, apiKey, region, savedWeatherItems, false, "당일 오전 6시")
         }
 
         // "전날 오후 9시" 알림 처리
         if (currentHour == 21 && currentMinute < 25) {
-            val eveningItems = savedWeatherItems.filter { it.time == "전날 오후 9시" }
-            if (eveningItems.isNotEmpty()) {
-                handleWeather(eveningItems, apiService, apiKey, region, "전날 오후 9시")
-            }
+            handleDailyWeather(apiService, apiKey, region, savedWeatherItems, true, "전날 오후 9시")
         }
     }
 
-    // 특정 시간에 따른 알림 처리
-    private suspend fun handleWeather(
-        weatherItems: List<WeatherListItem>, // DB에서 읽어온 날씨 항목 리스트
-        apiService: WeatherApiService, // OpenWeather API 서비스
-        apiKey: String, // OpenWeather API 키
-        region: String, // 사용자가 선택한 지역
-        timeDescription: String // 현재 처리 중인 시간대 설명 (예: "현재 날씨", "당일 오전 6시")
+    // 현재 날씨 처리 로직
+    private suspend fun handleCurrentWeather(
+        weatherItems: List<WeatherListItem>,
+        apiService: WeatherApiService,
+        apiKey: String,
+        region: String,
+        timeDescription: String
     ) {
-        // OpenWeather API 호출 및 응답 처리
+        // OpenWeather API 호출
         val response = withContext(Dispatchers.IO) {
             apiService.getWeatherForecast(region, apiKey).execute()
         }
 
         if (response.isSuccessful) {
             val forecastList = response.body()?.list ?: return
+
+            // API의 가장 최근 데이터로 현재 날씨 확인
             val forecastDescription = convertToCommonWeatherDescription(
-                forecastList[0].weather[0].description.lowercase(Locale.KOREA) // API에서 반환된 날씨 설명 변환
+                forecastList[0].weather[0].description.lowercase(Locale.KOREA)
             )
 
             Log.d("APIWeatherCheck", "$timeDescription - API 원본: ${forecastList[0].weather[0].description}, 변환된 값: $forecastDescription")
 
             // DB 항목과 API 값을 비교
             for (savedItem in weatherItems) {
-                Log.d(
-                    "DBWeatherCheck",
-                    "$timeDescription - DB에서 읽은 값 - ID: ${savedItem.wNo}, 날씨: ${savedItem.weather}, 내용: ${savedItem.contents}, 알림 상태: ${savedItem.isNotified}"
-                )
-
                 val savedDescription = savedItem.weather
 
-                // 1. API와 DB 값이 매칭되었고, 아직 알림이 전송되지 않은 경우
                 if (savedDescription == forecastDescription) {
                     if (!savedItem.isNotified) {
                         Log.d("WeatherNotification", "$timeDescription - 알림 전송: ${savedItem.weather}")
@@ -113,20 +104,84 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
                     } else {
                         Log.d("WeatherNotification", "$timeDescription - 동일 날씨 조건: 알림 전송 안 함 (이미 전송됨)")
                     }
-                }
-                // 2. API와 DB 값이 다른 경우 상태 초기화
-                else {
+                } else {
                     Log.d("WeatherNotification", "$timeDescription - 날씨 변경으로 상태 초기화: ${savedItem.weather}")
                     coroutineScope.launch { updateNotificationStatus(savedItem.wNo, false) } // 상태 초기화
                 }
             }
-
         } else {
             Log.e("WeatherAPIError", "$timeDescription - API 호출 실패: 코드=${response.code()}, 메시지=${response.message()}")
         }
     }
 
+    // 하루치 데이터 비교 및 알림 처리
+    private suspend fun handleDailyWeather(
+        apiService: WeatherApiService,
+        apiKey: String,
+        region: String,
+        savedWeatherItems: List<WeatherListItem>,
+        isForTomorrow: Boolean, // true면 내일 데이터, false면 오늘 데이터
+        timeDescription: String
+    ) {
+        // OpenWeather API 호출
+        val response = withContext(Dispatchers.IO) {
+            apiService.getWeatherForecast(region, apiKey).execute()
+        }
 
+        if (response.isSuccessful) {
+            val forecastList = response.body()?.list ?: return
+
+            // 오늘 또는 내일의 날짜 계산
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
+            if (isForTomorrow) calendar.add(Calendar.DAY_OF_YEAR, 1) // 내일로 이동
+            val targetDate = SimpleDateFormat("yyyy-MM-dd", Locale.KOREA).format(calendar.time)
+
+            // 하루치 데이터 필터링
+            val dailyForecasts = forecastList.filter { forecast ->
+                forecast.dt_txt.startsWith(targetDate)
+            }
+
+            if (dailyForecasts.isNotEmpty()) {
+                Log.d("DailyWeatherCheck", "$timeDescription - 대상 날짜: $targetDate, 데이터 개수: ${dailyForecasts.size}")
+
+                // 중복 알림 방지를 위한 Set
+                val alreadyNotifiedConditions = mutableSetOf<String>()
+
+                // 하루치 데이터 순회하며 DB 조건과 비교
+                for (forecast in dailyForecasts) {
+                    val forecastDescription = convertToCommonWeatherDescription(
+                        forecast.weather[0].description.lowercase(Locale.KOREA)
+                    )
+
+                    Log.d("APIWeatherCheck", "$timeDescription - 시간: ${forecast.dt_txt}, 날씨: $forecastDescription")
+
+                    for (savedItem in savedWeatherItems) {
+                        val savedDescription = savedItem.weather
+
+                        // 1. 이미 알림이 발생한 조건은 스킵
+                        if (alreadyNotifiedConditions.contains(savedDescription)) {
+                            Log.d("WeatherNotification", "$timeDescription - 이미 알림이 발생한 조건: $savedDescription (시간: ${forecast.dt_txt})")
+                            continue
+                        }
+
+                        // 2. 조건이 일치하고 아직 알림이 전송되지 않은 경우
+                        if (savedDescription == forecastDescription && !savedItem.isNotified) {
+                            Log.d("WeatherNotification", "$timeDescription - 알림 전송: ${savedItem.weather}")
+                            sendNotification(savedItem.contents, savedItem.weather) // 알림 전송
+                            coroutineScope.launch { updateNotificationStatus(savedItem.wNo, true) }
+                            alreadyNotifiedConditions.add(savedDescription) // 알림 발생 조건 추가
+                        } else if (savedDescription != forecastDescription) {
+                            coroutineScope.launch { updateNotificationStatus(savedItem.wNo, false) } // 상태 초기화
+                        }
+                    }
+                }
+            } else {
+                Log.d("DailyWeatherCheck", "$timeDescription - 대상 날짜에 해당하는 데이터가 없습니다.")
+            }
+        } else {
+            Log.e("WeatherAPIError", "$timeDescription - API 호출 실패: 코드=${response.code()}, 메시지=${response.message()}")
+        }
+    }
 
     // 날씨 설명을 공통된 날씨 분류로 변환
     private fun convertToCommonWeatherDescription(description: String): String {
@@ -146,7 +201,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // DB에서 가져온 값과 매핑된 아이콘 확인
         val smallIcon = getWeatherIcon(savedWeather)
         Log.d("NotificationDebug", "알림 생성 - 내용: $content, 날씨: $savedWeather, 매핑된 아이콘 ID: $smallIcon")
 
@@ -159,8 +213,6 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
         notificationManager.notify(savedWeather.hashCode(), notification)
     }
-
-
 
     // 알림 상태 업데이트
     private suspend fun updateNotificationStatus(wNo: Long, isNotified: Boolean) {
