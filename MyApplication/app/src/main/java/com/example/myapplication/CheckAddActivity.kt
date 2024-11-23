@@ -78,6 +78,7 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
                     }
                 }
             }
+
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
     }
@@ -103,8 +104,16 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
         saveButton.setOnClickListener {
             val title = titleEditText.text.toString().trim() // 제목 입력값
             val period = periodSpinner.selectedItem.toString().trim() // 선택된 주기
-            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) weekDaySpinner.selectedItem.toString().trim() else null
-            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) monthDaySpinner.selectedItem.toString().trim() else null
+            val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) {
+                (weekDaySpinner.selectedItemPosition + 1).toString() // 1(일요일)부터 7(토요일)로 변환
+            } else {
+                null
+            }
+            val monthDay = if (monthDaySpinner.visibility == View.VISIBLE) {
+                monthDaySpinner.selectedItem.toString().trim()
+            } else {
+                null
+            }
 
             // 입력값 유효성 검사
             if (title.isEmpty() || period == "선택하세요") {

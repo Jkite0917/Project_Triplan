@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -68,11 +69,16 @@ class CheckActivity : AppCompatActivity() {
                     cTitle = checklist.cTitle,
                     isChecked = checklist.isChecked,
                     period = checklist.period,
-                    weekDay = checklist.weekDay,
+                    weekDay = checklist.weekDay, // DB에서 불러온 weekDay 값
                     monthDay = checklist.monthDay
                 )
             })
-            checklistAdapter.notifyDataSetChanged() // 전체 데이터 갱신
+            checklistAdapter.notifyDataSetChanged()
+
+            // weekDay 디버깅 로그 추가
+            checklistItems.forEach {
+                Log.d("DEBUG", "Loaded ChecklistItem - Title: ${it.cTitle}, WeekDay: ${it.weekDay}")
+            }
         }
     }
 
@@ -141,6 +147,7 @@ class CheckActivity : AppCompatActivity() {
             val resetItems = withContext(Dispatchers.IO) {
                 val currentItems = database.getChecklistDao().getAllChecklistItems()
                 currentItems.filter { shouldResetItem(it) }.onEach { item ->
+                    // 체크 상태를 해제하고, 마지막 체크 날짜를 현재로 업데이트
                     database.getChecklistDao().updateChecklistItemById(
                         item.cNo,
                         isChecked = false,
@@ -154,6 +161,20 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
+    // 요일 문자열을 숫자로 매핑하는 함수
+    private fun mapWeekDayStringToNumber(weekDay: String): Int {
+        return when (weekDay) {
+            "일" -> 1
+            "월" -> 2
+            "화" -> 3
+            "수" -> 4
+            "목" -> 5
+            "금" -> 6
+            "토" -> 7
+            else -> -1 // 잘못된 입력 처리
+        }
+    }
+
     // 특정 체크리스트 항목의 주기 확인 함수
     private fun shouldResetItem(item: Checklist): Boolean {
         val lastCheckedDate = Calendar.getInstance().apply {
@@ -161,15 +182,38 @@ class CheckActivity : AppCompatActivity() {
         }
         val currentDate = Calendar.getInstance()
 
+        // Logcat에 디버깅 메시지 출력
+        Log.d("DEBUG", "Last Checked Date: ${lastCheckedDate.time}")
+        Log.d("DEBUG", "Current Date: ${currentDate.time}")
+        Log.d("DEBUG", "Last Week of Year: ${lastCheckedDate.get(Calendar.WEEK_OF_YEAR)}")
+        Log.d("DEBUG", "Current Week of Year: ${currentDate.get(Calendar.WEEK_OF_YEAR)}")
+        Log.d("DEBUG", "Saved WeekDay: ${item.weekDay}")
+        Log.d("DEBUG", "Current WeekDay: ${currentDate.get(Calendar.DAY_OF_WEEK)}")
+
         return when (item.period) {
-            "daily" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
-            "weekly" -> currentDate.get(Calendar.DAY_OF_WEEK).toString() == item.weekDay &&
-                    isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
-            "monthly" -> currentDate.get(Calendar.DAY_OF_MONTH).toString() == item.monthDay &&
-                    isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR)
+            "매일" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR) // 하루 단위 초기화
+            "매주" -> {
+                val savedWeekDayNumber = item.weekDay?.let { mapWeekDayStringToNumber(it) } ?: -1
+                val currentWeekDay = currentDate.get(Calendar.DAY_OF_WEEK)
+                val isTargetWeekDay = savedWeekDayNumber == currentWeekDay // 요일 비교
+                val isDifferentWeek = lastCheckedDate.get(Calendar.WEEK_OF_YEAR) != currentDate.get(Calendar.WEEK_OF_YEAR) ||
+                        lastCheckedDate.get(Calendar.YEAR) != currentDate.get(Calendar.YEAR) // 차주 확인
+
+                Log.d("DEBUG", "Saved WeekDay (Number): $savedWeekDayNumber")
+                Log.d("DEBUG", "Is Target WeekDay: $isTargetWeekDay")
+                Log.d("DEBUG", "Is Different Week: $isDifferentWeek")
+
+                // 요일이 맞으면 초기화
+                isTargetWeekDay && (isDifferentWeek || lastCheckedDate.get(Calendar.WEEK_OF_YEAR) == currentDate.get(Calendar.WEEK_OF_YEAR))
+            }
+            "매월" -> {
+                val currentMonthDay = currentDate.get(Calendar.DAY_OF_MONTH).toString() // 현재 날짜
+                currentMonthDay == item.monthDay // 설정된 날짜와 현재 날짜 비교
+            }
             else -> false
         }
     }
+
 
     // 두 날짜가 특정 단위(일, 주, 월)에서 다른지 확인하는 함수
     @Suppress("SameParameterValue")
