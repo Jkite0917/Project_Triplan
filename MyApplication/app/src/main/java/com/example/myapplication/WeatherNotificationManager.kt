@@ -60,14 +60,17 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
 
         // "당일 오전 6시" 알림 처리
         if (currentHour == 6 && currentMinute < 25) {
-            handleDailyWeather(apiService, apiKey, region, savedWeatherItems, false, "당일 오전 6시")
+            val morningWeatherItems = savedWeatherItems.filter { it.time == "당일 오전 6시" }
+            handleDailyWeather(apiService, apiKey, region, morningWeatherItems, false, "당일 오전 6시")
         }
 
         // "전날 오후 9시" 알림 처리
         if (currentHour == 21 && currentMinute < 25) {
-            handleDailyWeather(apiService, apiKey, region, savedWeatherItems, true, "전날 오후 9시")
+            val eveningWeatherItems = savedWeatherItems.filter { it.time == "전날 오후 9시" }
+            handleDailyWeather(apiService, apiKey, region, eveningWeatherItems, true, "전날 오후 9시")
         }
     }
+
 
     // 현재 날씨 처리 로직
     private suspend fun handleCurrentWeather(
