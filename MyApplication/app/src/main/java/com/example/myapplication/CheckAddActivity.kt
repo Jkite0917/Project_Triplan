@@ -85,7 +85,7 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
 
     // 요일 선택 스피너 설정 함수
     private fun setupWeekDaySpinner() {
-        val weekDays = arrayOf("일", "월", "화", "수", "목", "금", "토")
+        val weekDays = arrayOf("일", "월", "화", "수", "목", "금", "토") // 요일 이름 배열
         val weekDayAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, weekDays)
         weekDayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         weekDaySpinner.adapter = weekDayAdapter
@@ -105,7 +105,7 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
             val title = titleEditText.text.toString().trim() // 제목 입력값
             val period = periodSpinner.selectedItem.toString().trim() // 선택된 주기
             val weekDay = if (weekDaySpinner.visibility == View.VISIBLE) {
-                (weekDaySpinner.selectedItemPosition + 1).toString() // 1(일요일)부터 7(토요일)로 변환
+                weekDaySpinner.selectedItem.toString() // 선택된 요일 이름으로 저장 (예: "월", "화")
             } else {
                 null
             }
@@ -126,7 +126,7 @@ class CheckAddActivity(private val onSave: (ChecklistItem) -> Unit) : BottomShee
                 val newItem = ChecklistItem(
                     cTitle = title,
                     period = period,
-                    weekDay = weekDay,
+                    weekDay = weekDay, // 요일 이름 저장
                     monthDay = monthDay
                 )
                 onSave(newItem) // 저장 콜백 호출

@@ -1,9 +1,7 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -55,30 +53,34 @@ class CheckActivity : AppCompatActivity() {
         loadChecklistItems() // 데이터베이스에서 체크리스트 항목 불러오기
     }
 
-    // 데이터베이스에서 체크리스트 항목을 불러와 리스트에 추가
-    @SuppressLint("NotifyDataSetChanged")
+    // 데이터베이스에서 체크리스트 항목을 불러와 RecyclerView 업데이트
     private fun loadChecklistItems() {
         lifecycleScope.launch {
             val savedItems = withContext(Dispatchers.IO) {
                 database.getChecklistDao().getAllChecklistItems()
             }
-            checklistItems.clear()
-            checklistItems.addAll(savedItems.map { checklist ->
+
+            // Checklist -> ChecklistItem으로 변환
+            val checklistItemList = savedItems.map { checklist ->
                 ChecklistItem(
                     cNo = checklist.cNo,
                     cTitle = checklist.cTitle,
                     isChecked = checklist.isChecked,
                     period = checklist.period,
-                    weekDay = checklist.weekDay, // DB에서 불러온 weekDay 값
+                    weekDay = checklist.weekDay, // 이미 문자열로 저장됨
                     monthDay = checklist.monthDay
                 )
-            })
-            checklistAdapter.notifyDataSetChanged()
-
-            // weekDay 디버깅 로그 추가
-            checklistItems.forEach {
-                Log.d("DEBUG", "Loaded ChecklistItem - Title: ${it.cTitle}, WeekDay: ${it.weekDay}")
             }
+
+            // 기존 항목과 새로 불러온 항목 비교
+            val diffCallback = ChecklistDiffCallback(checklistItems, checklistItemList)
+            val diffResult = androidx.recyclerview.widget.DiffUtil.calculateDiff(diffCallback)
+
+            checklistItems.clear()
+            checklistItems.addAll(checklistItemList)
+
+            // RecyclerView 업데이트 (변경된 부분만 적용)
+            diffResult.dispatchUpdatesTo(checklistAdapter)
         }
     }
 
@@ -95,11 +97,10 @@ class CheckActivity : AppCompatActivity() {
             )
             database.getChecklistDao().updateChecklistItem(checklist)
             withContext(Dispatchers.Main) {
-                // 항목 위치를 찾아 해당 위치만 업데이트
                 val position = checklistItems.indexOfFirst { it.cNo == item.cNo }
                 if (position != -1) {
                     checklistItems[position] = item
-                    checklistAdapter.notifyItemChanged(position) // 변경된 위치만 업데이트
+                    checklistAdapter.notifyItemChanged(position)
                 }
             }
         }
@@ -114,7 +115,6 @@ class CheckActivity : AppCompatActivity() {
                 if (position != -1) {
                     checklistItems.removeAt(position)
                     checklistAdapter.notifyItemRemoved(position)
-                    checklistAdapter.notifyItemRangeChanged(position, checklistItems.size)
                 }
             }
         }
@@ -147,7 +147,6 @@ class CheckActivity : AppCompatActivity() {
             val resetItems = withContext(Dispatchers.IO) {
                 val currentItems = database.getChecklistDao().getAllChecklistItems()
                 currentItems.filter { shouldResetItem(it) }.onEach { item ->
-                    // 체크 상태를 해제하고, 마지막 체크 날짜를 현재로 업데이트
                     database.getChecklistDao().updateChecklistItemById(
                         item.cNo,
                         isChecked = false,
@@ -161,8 +160,8 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-    // 요일 문자열을 숫자로 매핑하는 함수
-    private fun mapWeekDayStringToNumber(weekDay: String): Int {
+    // 문자열로 저장된 요일을 숫자로 변환하는 함수
+    private fun mapWeekDayStringToNumber(weekDay: String?): Int {
         return when (weekDay) {
             "일" -> 1
             "월" -> 2
@@ -171,7 +170,7 @@ class CheckActivity : AppCompatActivity() {
             "목" -> 5
             "금" -> 6
             "토" -> 7
-            else -> -1 // 잘못된 입력 처리
+            else -> -1
         }
     }
 
@@ -182,43 +181,33 @@ class CheckActivity : AppCompatActivity() {
         }
         val currentDate = Calendar.getInstance()
 
-        // Logcat에 디버깅 메시지 출력
-        Log.d("DEBUG", "Last Checked Date: ${lastCheckedDate.time}")
-        Log.d("DEBUG", "Current Date: ${currentDate.time}")
-        Log.d("DEBUG", "Last Week of Year: ${lastCheckedDate.get(Calendar.WEEK_OF_YEAR)}")
-        Log.d("DEBUG", "Current Week of Year: ${currentDate.get(Calendar.WEEK_OF_YEAR)}")
-        Log.d("DEBUG", "Saved WeekDay: ${item.weekDay}")
-        Log.d("DEBUG", "Current WeekDay: ${currentDate.get(Calendar.DAY_OF_WEEK)}")
-
         return when (item.period) {
-            "매일" -> isDateDifferent(lastCheckedDate, currentDate, Calendar.DAY_OF_YEAR) // 하루 단위 초기화
+            "매일" -> isDateDifferent(lastCheckedDate, currentDate)
             "매주" -> {
-                val savedWeekDayNumber = item.weekDay?.let { mapWeekDayStringToNumber(it) } ?: -1
+                // 문자열로 저장된 요일 데이터를 숫자로 변환하여 비교
+                val savedWeekDayNumber = mapWeekDayStringToNumber(item.weekDay)
                 val currentWeekDay = currentDate.get(Calendar.DAY_OF_WEEK)
-                val isTargetWeekDay = savedWeekDayNumber == currentWeekDay // 요일 비교
-                val isDifferentWeek = lastCheckedDate.get(Calendar.WEEK_OF_YEAR) != currentDate.get(Calendar.WEEK_OF_YEAR) ||
-                        lastCheckedDate.get(Calendar.YEAR) != currentDate.get(Calendar.YEAR) // 차주 확인
 
-                Log.d("DEBUG", "Saved WeekDay (Number): $savedWeekDayNumber")
-                Log.d("DEBUG", "Is Target WeekDay: $isTargetWeekDay")
-                Log.d("DEBUG", "Is Different Week: $isDifferentWeek")
+                // 조건: 현재 요일이 저장된 요일과 같으면 체크 해제
+                val isTargetWeekDay = savedWeekDayNumber == currentWeekDay
 
-                // 요일이 맞으면 초기화
-                isTargetWeekDay && (isDifferentWeek || lastCheckedDate.get(Calendar.WEEK_OF_YEAR) == currentDate.get(Calendar.WEEK_OF_YEAR))
+                // 조건: 주가 다르면 체크 해제
+                val isDifferentWeek = lastCheckedDate.get(Calendar.WEEK_OF_YEAR) != currentDate.get(Calendar.WEEK_OF_YEAR)
+
+                // 주가 다르거나, 같은 주더라도 해당 요일에 도달하면 체크 해제
+                isTargetWeekDay || isDifferentWeek
             }
             "매월" -> {
-                val currentMonthDay = currentDate.get(Calendar.DAY_OF_MONTH).toString() // 현재 날짜
-                currentMonthDay == item.monthDay // 설정된 날짜와 현재 날짜 비교
+                val currentMonthDay = currentDate.get(Calendar.DAY_OF_MONTH).toString()
+                currentMonthDay == item.monthDay
             }
             else -> false
         }
     }
 
-
     // 두 날짜가 특정 단위(일, 주, 월)에서 다른지 확인하는 함수
-    @Suppress("SameParameterValue")
-    private fun isDateDifferent(lastCheckedDate: Calendar, currentDate: Calendar, unit: Int): Boolean {
-        return lastCheckedDate.get(unit) != currentDate.get(unit)
+    private fun isDateDifferent(lastCheckedDate: Calendar, currentDate: Calendar): Boolean {
+        return lastCheckedDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR)
     }
 
     // 버튼 초기화 및 클릭 리스너 설정
@@ -229,7 +218,6 @@ class CheckActivity : AppCompatActivity() {
         buttonRight2 = findViewById(R.id.button_all_cardview_right2)
         buttonCenter = findViewById(R.id.button_all_cardview_center)
 
-        // 각 버튼 클릭 시 해당 액티비티로 이동
         buttonLeft1.setOnClickListener {
             startActivity(Intent(this, MainActivity::class.java))
         }
@@ -250,5 +238,26 @@ class CheckActivity : AppCompatActivity() {
             }
             bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
+    }
+}
+
+// DiffUtil Callback 클래스
+class ChecklistDiffCallback(
+    private val oldList: List<ChecklistItem>,
+    private val newList: List<ChecklistItem>
+) : androidx.recyclerview.widget.DiffUtil.Callback() {
+
+    override fun getOldListSize(): Int = oldList.size
+
+    override fun getNewListSize(): Int = newList.size
+
+    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        // 각 항목의 고유 ID를 비교하여 동일한 항목인지 확인
+        return oldList[oldItemPosition].cNo == newList[newItemPosition].cNo
+    }
+
+    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+        // 항목의 내용이 동일한지 비교
+        return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

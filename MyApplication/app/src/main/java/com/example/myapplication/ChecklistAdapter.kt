@@ -34,9 +34,9 @@ class ChecklistAdapter(
         // 기간, 요일, 날짜 텍스트 구성
         fun buildPeriodText(item: ChecklistItem): String {
             val period = item.period
-            val weekDay = item.weekDay?.let { " $it" + "요일" } ?: ""
-            val monthDay = item.monthDay?.let { " $it" + "일" } ?: ""
-            return "$period$weekDay$monthDay".trim()
+            val weekDay = item.weekDay?.let { " $it" + "요일"  } ?: "" // 숫자 -> 요일 변환
+            val monthDay = item.monthDay?.let { " $it" + "일"  } ?: ""
+            return "$period $weekDay $monthDay".trim()
         }
     }
 
