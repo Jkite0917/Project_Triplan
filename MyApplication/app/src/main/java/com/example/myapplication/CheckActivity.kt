@@ -20,7 +20,7 @@ class CheckActivity : AppCompatActivity() {
     private lateinit var buttonRight2: ImageButton
     private lateinit var buttonCenter: ImageButton
 
-    // 어댑터 및 체크리스트 아이템 리스트 초기화
+    // 어댑터 및 체크 리스트 아이템 리스트 초기화
     private lateinit var checklistAdapter: ChecklistAdapter
     private val checklistItems = mutableListOf<ChecklistItem>()
     private lateinit var checklistRecyclerView: RecyclerView
@@ -32,10 +32,10 @@ class CheckActivity : AppCompatActivity() {
 
         setupButtonListeners()
 
-        // 데이터베이스 초기화
+        // 데이터 베이스 초기화
         database = LocalDatabase.getDatabase(this)
 
-        // 주기적으로 체크리스트 항목 초기화
+        // 주기 적으로 체크 리스트 항목 초기화
         resetChecklistItemsIfNeeded()
 
         // 어댑터 설정
@@ -43,31 +43,31 @@ class CheckActivity : AppCompatActivity() {
         checklistAdapter = ChecklistAdapter(checklistItems, onDeleteClick = { cNo ->
             deleteChecklistItem(cNo) // 항목 삭제 처리
         }, onCheckedChange = { updatedItem ->
-            updateChecklistItem(updatedItem) // 체크박스 상태 변경 처리
+            updateChecklistItem(updatedItem) // 체크 박스 상태 변경 처리
         })
 
-        // RecyclerView에 어댑터와 레이아웃 매니저 연결
+        // RecyclerView 에 어댑터 와 레이 아웃 매니저 연결
         checklistRecyclerView.adapter = checklistAdapter
         checklistRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        loadChecklistItems() // 데이터베이스에서 체크리스트 항목 불러오기
+        loadChecklistItems() // 데이터 베이스 에서 체크 리스트 항목 불러 오기
     }
 
-    // 데이터베이스에서 체크리스트 항목을 불러와 RecyclerView 업데이트
+    // 데이터 베이스 에서 체크 리스트 항목을 불러와 RecyclerView 업데 이트
     private fun loadChecklistItems() {
         lifecycleScope.launch {
             val savedItems = withContext(Dispatchers.IO) {
                 database.getChecklistDao().getAllChecklistItems()
             }
 
-            // Checklist -> ChecklistItem으로 변환
+            // Checklist -> ChecklistItem 으로 변환
             val checklistItemList = savedItems.map { checklist ->
                 ChecklistItem(
                     cNo = checklist.cNo,
                     cTitle = checklist.cTitle,
                     isChecked = checklist.isChecked,
                     period = checklist.period,
-                    weekDay = checklist.weekDay, // 이미 문자열로 저장됨
+                    weekDay = checklist.weekDay, // 이미 문자열 로 저장됨
                     monthDay = checklist.monthDay
                 )
             }
@@ -79,12 +79,12 @@ class CheckActivity : AppCompatActivity() {
             checklistItems.clear()
             checklistItems.addAll(checklistItemList)
 
-            // RecyclerView 업데이트 (변경된 부분만 적용)
+            // RecyclerView 업데 이트 (변경된 부분만 적용)
             diffResult.dispatchUpdatesTo(checklistAdapter)
         }
     }
 
-    // 체크리스트 항목의 상태가 변경되었을 때 해당 항목만 업데이트
+    // 체크 리스트 항목의 상태가 변경 되었을 때 해당 항목만 업 데이트
     private fun updateChecklistItem(item: ChecklistItem) {
         lifecycleScope.launch(Dispatchers.IO) {
             val checklist = Checklist(
@@ -106,7 +106,7 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-    // 체크리스트 항목 삭제 처리
+    // 체크 리스트 항목 삭제 처리
     private fun deleteChecklistItem(cNo: Long) {
         lifecycleScope.launch(Dispatchers.IO) {
             database.getChecklistDao().deleteChecklistItemByCNo(cNo)
@@ -120,7 +120,7 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-    // 새로운 체크리스트 항목을 데이터베이스에 추가하고 RecyclerView 갱신
+    // 새로운 체크 리스트 항목을 데이터 베이스 에 추가 하고 RecyclerView 갱신
     private fun addItemToChecklist(newItem: ChecklistItem) {
         lifecycleScope.launch {
             val checklist = Checklist(
@@ -141,26 +141,30 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-    // 필요 시 체크리스트 항목 초기화
+    // 필요 시 체크 리스트 항목 초기화
     private fun resetChecklistItemsIfNeeded() {
         lifecycleScope.launch {
             val resetItems = withContext(Dispatchers.IO) {
                 val currentItems = database.getChecklistDao().getAllChecklistItems()
+                val currentDateMillis = System.currentTimeMillis()
+
                 currentItems.filter { shouldResetItem(it) }.onEach { item ->
                     database.getChecklistDao().updateChecklistItemById(
                         item.cNo,
                         isChecked = false,
-                        lastCheckedDate = System.currentTimeMillis()
+                        lastCheckedDate = System.currentTimeMillis(),
+                        lastResetDate = currentDateMillis // 초기화 날짜 업 데이트
                     )
                 }
             }
+
             if (resetItems.isNotEmpty()) {
                 loadChecklistItems()
             }
         }
     }
 
-    // 문자열로 저장된 요일을 숫자로 변환하는 함수
+    // 문자 열로 저장된 요일을 숫자로 변환 하는 함수
     private fun mapWeekDayStringToNumber(weekDay: String?): Int {
         return when (weekDay) {
             "일" -> 1
@@ -174,38 +178,34 @@ class CheckActivity : AppCompatActivity() {
         }
     }
 
-    // 특정 체크리스트 항목의 주기 확인 함수
+    // 특정 체크 리스트 항목의 주기 확인 함수
     private fun shouldResetItem(item: Checklist): Boolean {
-        val lastCheckedDate = Calendar.getInstance().apply {
-            timeInMillis = item.lastCheckedDate
-        }
+        val lastCheckedDate = Calendar.getInstance().apply { timeInMillis = item.lastCheckedDate }
+        val lastResetDate = Calendar.getInstance().apply { timeInMillis = item.lastResetDate }
         val currentDate = Calendar.getInstance()
 
+        // 날짜가 다른 경우 에만 초기화
+        val isDifferentDate = lastResetDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR) ||
+                lastResetDate.get(Calendar.YEAR) != currentDate.get(Calendar.YEAR)
+
         return when (item.period) {
-            "매일" -> isDateDifferent(lastCheckedDate, currentDate)
+            "매일" -> isDifferentDate && isDateDifferent(lastCheckedDate, currentDate)
             "매주" -> {
-                // 문자열로 저장된 요일 데이터를 숫자로 변환하여 비교
                 val savedWeekDayNumber = mapWeekDayStringToNumber(item.weekDay)
                 val currentWeekDay = currentDate.get(Calendar.DAY_OF_WEEK)
-
-                // 조건: 현재 요일이 저장된 요일과 같으면 체크 해제
                 val isTargetWeekDay = savedWeekDayNumber == currentWeekDay
-
-                // 조건: 주가 다르면 체크 해제
                 val isDifferentWeek = lastCheckedDate.get(Calendar.WEEK_OF_YEAR) != currentDate.get(Calendar.WEEK_OF_YEAR)
-
-                // 주가 다르거나, 같은 주더라도 해당 요일에 도달하면 체크 해제
-                isTargetWeekDay || isDifferentWeek
+                isDifferentDate && (isTargetWeekDay || isDifferentWeek)
             }
             "매월" -> {
                 val currentMonthDay = currentDate.get(Calendar.DAY_OF_MONTH).toString()
-                currentMonthDay == item.monthDay
+                isDifferentDate && currentMonthDay == item.monthDay
             }
             else -> false
         }
     }
 
-    // 두 날짜가 특정 단위(일, 주, 월)에서 다른지 확인하는 함수
+    // 두 날짜가 특정 단위(일, 주, 월)에서 다른지 확인 하는 함수
     private fun isDateDifferent(lastCheckedDate: Calendar, currentDate: Calendar): Boolean {
         return lastCheckedDate.get(Calendar.DAY_OF_YEAR) != currentDate.get(Calendar.DAY_OF_YEAR)
     }
@@ -225,13 +225,13 @@ class CheckActivity : AppCompatActivity() {
             startActivity(Intent(this, WeatherActivity::class.java))
         }
         buttonRight1.setOnClickListener {
-            // 현재 액티비티가 CheckActivity일 때 아무 동작도 하지 않음
+            // 현재 액티 비티가 CheckActivity 일 때 아무 동작도 하지 않음
         }
         buttonRight2.setOnClickListener {
             startActivity(Intent(this, SettingActivity::class.java))
         }
 
-        // 중앙 버튼 클릭 시 새로운 체크리스트 항목 추가
+        // 중앙 버튼 클릭 시 새로운 체크 리스트 항목 추가
         buttonCenter.setOnClickListener {
             val bottomSheet = CheckAddActivity { newItem ->
                 addItemToChecklist(newItem)
@@ -252,12 +252,12 @@ class ChecklistDiffCallback(
     override fun getNewListSize(): Int = newList.size
 
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        // 각 항목의 고유 ID를 비교하여 동일한 항목인지 확인
+        // 각 항목의 고유 ID를 비교 하여 동일한 항목 인지 확인
         return oldList[oldItemPosition].cNo == newList[newItemPosition].cNo
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        // 항목의 내용이 동일한지 비교
+        // 항목의 내용이 동일 한지 비교
         return oldList[oldItemPosition] == newList[newItemPosition]
     }
 }

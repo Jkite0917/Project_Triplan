@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.imageButton_calender_monthRight).setOnClickListener { navigateMonth(1) }
     }
 
-    // 달력 현재날로 초기화 onResume, moveTOCurrentMonth
+    // 달력 현재 날로 초기화 onResume, moveTOCurrentMonth
     override fun onResume() {
         super.onResume()
         moveToCurrentMonth()
@@ -189,12 +189,12 @@ class MainActivity : AppCompatActivity() {
                 dayTextView.setTextColor(ContextCompat.getColor(this, R.color.Today))  // 오늘 날짜 하이 라이트
             }
 
-            // DAO를 가져오기
+            // DAO 를 가져 오기
             val dailyScheduleDao = LocalDatabase.getDatabase(this@MainActivity).getDailyScheduleDao()
             // 날짜 포맷 설정 (yyyy-MM-dd)
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-            // 데이터베이스에서 해당 날짜에 일정이 있는지 확인
+            // 데이터 베이스 에서 해당 날짜에 일정이 있는지 확인
             if (dayTextView.text.isNotEmpty()) {
                 val day = dayTextView.text.toString().toInt()
                 val currentCalendar = Calendar.getInstance().apply {

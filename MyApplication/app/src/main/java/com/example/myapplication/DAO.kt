@@ -54,12 +54,9 @@ interface ChecklistDao {
     suspend fun updateChecklistItem(checklist: Checklist)
 
     // lastCheckedDate와 isChecked만 업데이트하는 쿼리
-    @Query("""
-        UPDATE Checklist
-        SET isChecked = :isChecked, lastCheckedDate = :lastCheckedDate
-        WHERE cNo = :cNo
-    """)
-    suspend fun updateChecklistItemById(cNo: Long, isChecked: Boolean, lastCheckedDate: Long)
+    @Query("UPDATE Checklist SET isChecked = :isChecked, lastCheckedDate = :lastCheckedDate, lastResetDate = :lastResetDate WHERE cNo = :cNo")
+    suspend fun updateChecklistItemById(cNo: Long, isChecked: Boolean, lastCheckedDate: Long, lastResetDate: Long)
+
 
     @Query("DELETE FROM Checklist")
     suspend fun deleteAllChecklistItems()
