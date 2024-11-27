@@ -80,11 +80,21 @@ class MainAddActivity : BottomSheetDialogFragment() {
 
         if (info.isNotEmpty() && selectedDate != "선택된 날짜 없음") {
             saveToDatabase(selectedDate, info)
+
+            // 결과 반환
+            parentFragmentManager.setFragmentResult(
+                "memoAdded",
+                Bundle().apply {
+                    putString("addedDate", selectedDate)
+                }
+            )
+
             dismiss() // 다이얼로그 닫기
         } else {
             Toast.makeText(requireContext(), "내용과 날짜를 모두 입력해주세요.", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     // saveData 함수에서 실제 DB에 저장되는 로직
     private fun saveToDatabase(selectedDate: String, info: String) {

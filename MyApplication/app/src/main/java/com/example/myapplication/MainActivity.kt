@@ -58,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         // 버튼 리스너 설정
         setupButtonListeners()
 
+        // 메모 캘린더 업데이트 리스터
+        setupResultListener()
+
         gridCalendar = findViewById(R.id.gridLayout_calender_date)
         selectedDateTextView = findViewById(R.id.textview_main_dateWeather)
         tvCurrentMonth = findViewById(R.id.textview_calender_yearMonth)
@@ -237,6 +240,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 메모 캘린더 업데이트 함수
+    private fun setupResultListener() {
+        supportFragmentManager.setFragmentResultListener("memoAdded", this) { _, bundle ->
+            val addedDate = bundle.getString("addedDate")
+            if (!addedDate.isNullOrEmpty()) {
+                Log.d("MainActivity", "메모 추가됨: $addedDate")
+                updateCalendar() // 캘린더 갱신
+            }
+        }
+    }
+
     // 오늘 날짜 인지 확인 하는 함수
     private fun isToday(calendar: Calendar, today: Calendar, dayText: String): Boolean {
         return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
@@ -347,9 +361,6 @@ class MainActivity : AppCompatActivity() {
             updateSelectedDateText(selectedDate) // 선택한 날짜 표시 업데이트
         }
     }
-
-
-
 
     // 바텀 시트를 보여 주는 메소드
     private fun showBottomSheet(selectedDate: Calendar) {
