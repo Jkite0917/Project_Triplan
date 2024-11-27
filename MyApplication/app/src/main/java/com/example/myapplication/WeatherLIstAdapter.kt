@@ -52,11 +52,11 @@ class WeatherListAdapter(
         private fun getWeatherIconId(weatherDescription: String): Int {
             return when (weatherDescription) {
                 "clear sky" -> R.drawable.weather_sun_icon
-                "clouds" -> R.drawable.weather_cloud_icon
+                "partly cloudy" -> R.drawable.weather_cloud_icon
                 "rain" -> R.drawable.weather_rain_icon
                 "thunderstorm" -> R.drawable.weather_thunder_icon
                 "snow" -> R.drawable.weather_snow_icon
-                "partly cloudy" -> R.drawable.weather_suncloud_icon
+                "clouds" -> R.drawable.weather_suncloud_icon
                 else -> R.drawable.weather_sun_icon // 예외적인 경우 맑음 아이콘 반환
             }
         }

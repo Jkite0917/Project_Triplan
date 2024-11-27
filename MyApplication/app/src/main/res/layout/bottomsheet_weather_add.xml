@@ -53,7 +53,7 @@
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:src="@drawable/weather_cloud_icon"
+            android:src="@drawable/weather_suncloud_icon"
             android:scaleType="fitCenter"
             android:padding="8dp" />
 
@@ -101,7 +101,7 @@
             android:layout_columnWeight="1"
             android:layout_margin="4dp"
             android:background="@drawable/bottomsheet_button_background"
-            android:src="@drawable/weather_suncloud_icon"
+            android:src="@drawable/weather_cloud_icon"
             android:scaleType="fitCenter"
             android:padding="8dp" />
     </GridLayout>
