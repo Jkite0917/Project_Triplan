@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                 dayTextView.setTextColor(
                     when (correctedDayOfWeek) {
                         1 -> ContextCompat.getColor(this, R.color.Sunday) // 일요일
-                        7 -> ContextCompat.getColor(this, R.color.teal_700) // 토요일
+                        7 -> ContextCompat.getColor(this, R.color.Saturday) // 토요일
                         else -> ContextCompat.getColor(this, R.color.black) // 평일
                     }
                 )

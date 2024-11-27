@@ -9,10 +9,10 @@
     <item
         android:top="30dp"
         android:left="10dp"
-        android:right="10dp"> <!-- 텍스트 아래에만 밑줄 추가 -->
+        android:right="10dp"> <!-- 텍스트 아래 에만 밑줄 추가 -->
         <shape android:shape="rectangle">
-            <size android:height="0.5dp"/>
-            <solid android:color="@color/purple_200" />
+            <size android:height="0.2dp"/>
+            <solid android:color="@color/UnderLine"/>
         </shape>
     </item>
 </layer-list>

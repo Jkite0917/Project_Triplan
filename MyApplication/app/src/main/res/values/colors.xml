@@ -9,11 +9,12 @@
     <color name="white">#FFFFFFFF</color>
     <color name="buttonC">#B0D3E0</color>
     <color name="Red">#9B111E</color>
-    <color name="Saturday">#50bcdf</color>
+    <color name="Saturday">#0067A3</color>
     <color name="Sunday">#BE2E22</color>
-    <color name="Today">#257968</color>
+    <color name="Today">#964b00</color>
+    <color name="UnderLine">#B67E36</color>
     <color name="gray">#808080</color>
     <color name="test">#E0E0E0</color>
 </resources>
 
-<!-- e8e8e8 DBE3E3  EFEFEF F0F0F0 EDE7E0 F2EEE7 EDEAE3 -->
+<!-- e8e8e8 DBE3E3  EF EF EF F0F0F0 EDE7E0 F2EEE7 ED EAE3 -->
