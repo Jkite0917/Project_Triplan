@@ -229,11 +229,11 @@ class WeatherNotificationManager(val context: Context, private val database: Loc
     private fun getWeatherIcon(weatherDescription: String): Int {
         val iconId = when (weatherDescription) {
             "clear sky" -> R.drawable.weather_sun_icon
-            "clouds" -> R.drawable.weather_cloud_icon
+            "partly cloudy" -> R.drawable.weather_cloud_icon
             "rain" -> R.drawable.weather_rain_icon
             "thunderstorm" -> R.drawable.weather_thunder_icon
             "snow" -> R.drawable.weather_snow_icon
-            "partly cloudy" -> R.drawable.weather_suncloud_icon
+            "clouds" -> R.drawable.weather_suncloud_icon
             else -> R.drawable.weather_sun_icon
         }
         Log.d("IconMapping", "날씨 설명: $weatherDescription → 매핑된 아이콘 ID: $iconId")
