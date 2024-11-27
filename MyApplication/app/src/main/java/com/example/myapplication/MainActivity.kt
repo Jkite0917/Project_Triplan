@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            // 날짜 클릭 시  처리
+            // 날짜 클 릭 시  처리
             dayTextView.setOnClickListener { onDaySelected(dayTextView) }
             gridCalendar.addView(dayTextView)
         }
