@@ -146,6 +146,17 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.imageButton_calender_monthRight).setOnClickListener { navigateMonth(1) }
     }
 
+    // 달력 현재날로 초기화 onResume, moveTOCurrentMonth
+    override fun onResume() {
+        super.onResume()
+        moveToCurrentMonth()
+    }
+
+    private fun moveToCurrentMonth() {
+        calendar.time = Calendar.getInstance().time
+        updateCalendar()
+    }
+
     // 달력 업 데이트 함수
     private fun updateCalendar() {
         updateMonthDisplay()
