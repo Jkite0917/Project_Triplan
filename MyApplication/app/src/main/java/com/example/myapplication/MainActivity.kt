@@ -41,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     // 선택한 날짜를 저장할 변수
     private var lastSelectedDay: Int? = null
 
+    // 마지막으로 선택된 날짜의 TextView
+    private var lastSelectedTextView: TextView? = null
+
     // 지역 정보 저장 공유 변수
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var weatherNotificationManager: WeatherNotificationManager // 알림 매니저 인스 턴스
@@ -295,26 +298,58 @@ class MainActivity : AppCompatActivity() {
         updateCalendar()
     }
 
-    // 날짜 선택 시 호출 되는 함수
+    // 날짜 선택 시 호출되는 함수
     private fun onDaySelected(dayTextView: TextView) {
         val selectedDay = dayTextView.text.toString().toIntOrNull() ?: return
         val selectedDate = Calendar.getInstance().apply {
             set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), selectedDay)
         }
 
-        // 같은 날짜를 두 번 클릭 했는지 확인
+        // 오늘 날짜 가져오기
+        val today = Calendar.getInstance()
+
+        // 이전에 선택된 날짜 초기화
+        lastSelectedTextView?.let {
+            val previousDay = it.text.toString().toIntOrNull() ?: return@let
+            val previousDate = Calendar.getInstance().apply {
+                set(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), previousDay)
+            }
+
+            // 오늘 날짜인지 확인
+            val isToday = previousDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                    previousDate.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                    previousDate.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH)
+
+            // 색상 복구
+            val resetColor = when {
+                isToday -> ContextCompat.getColor(this, R.color.Today) // 오늘 날짜 색상 복구
+                previousDate.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY -> ContextCompat.getColor(this, R.color.Sunday) // 일요일
+                previousDate.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY -> ContextCompat.getColor(this, R.color.Saturday) // 토요일
+                else -> ContextCompat.getColor(this, R.color.black) // 평일
+            }
+            it.setTextColor(resetColor)
+        }
+
+        // 새로 선택된 날짜 강조
+        dayTextView.setTextColor(ContextCompat.getColor(this, R.color.Selected)) // 선택된 날짜 강조 색상
+        lastSelectedTextView = dayTextView // 현재 선택된 날짜 저장
+
+        // 같은 날짜를 두 번 클릭했는지 확인
         if (lastSelectedDay == selectedDay) {
             // 같은 날짜를 두 번 클릭한 경우 로그 출력
             Log.d("Double", "($selectedDay)")
 
-            // 바텀 시트를 여기 에서 보여 주기 위한 메소드 호출
+            // 바텀 시트를 여기에서 보여주기 위한 메소드 호출
             showBottomSheet(selectedDate)
         } else {
-            // 선택한 날짜가 다른 경우, 선택한 날짜 업 데이트
+            // 선택한 날짜가 다른 경우, 선택한 날짜 업데이트
             lastSelectedDay = selectedDay
-            updateSelectedDateText(selectedDate) // 선택한 날짜 표시 업 데이트
+            updateSelectedDateText(selectedDate) // 선택한 날짜 표시 업데이트
         }
     }
+
+
+
 
     // 바텀 시트를 보여 주는 메소드
     private fun showBottomSheet(selectedDate: Calendar) {
