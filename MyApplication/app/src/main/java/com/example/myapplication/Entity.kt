@@ -28,5 +28,5 @@ data class Checklist(
     @ColumnInfo val weekDay: String? = null, // 요일 (선택 사항)
     @ColumnInfo val monthDay: String? = null, // 날짜 (선택 사항)
     val lastCheckedDate: Long = System.currentTimeMillis(), // 체크된 날짜를 현재 시간으로 초기화
-    val lastResetDate: Long = 0L // 마지막 초기화 날짜
+    val lastResetDate: Long = System.currentTimeMillis() // 마지막 초기화 날짜
 )
