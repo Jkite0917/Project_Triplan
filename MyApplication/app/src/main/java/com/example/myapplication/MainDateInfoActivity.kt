@@ -47,13 +47,23 @@ class MainDateInfoActivity(private val selectedDate: String) : BottomSheetDialog
             CoroutineScope(Dispatchers.IO).launch {
                 db.getDailyScheduleDao().deleteDailyScheduleInfo(selectedDate)
 
-                // UI 업데이트는 메인 스레드에서 수행
                 withContext(Dispatchers.Main) {
+                    // 삭제 이벤트 전달
+                    parentFragmentManager.setFragmentResult(
+                        "memoDeleted",
+                        Bundle().apply {
+                            putString("deletedDate", selectedDate)
+                        }
+                    )
+
                     editText.text = null // EditText 비우기
-                    Toast.makeText(requireContext(), "일정이 삭제되었습니다 새로 추가해주세요!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "일정이 삭제되었습니다.", Toast.LENGTH_SHORT).show()
+
+                    dismiss() // 다이얼로그 닫기
                 }
             }
         }
+
 
         return view
     }
