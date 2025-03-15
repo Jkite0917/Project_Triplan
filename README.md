@@ -1,5 +1,4 @@
-# Project_-
-2024 2학기 SW프로젝트 
-정상화팀 (Jkite0917 / b / c) 
-안드로이드 어플리케이션 프로젝트 깃허브
+인하공전 2024 2학기 sw프로젝트 강의
+Android Studio & Kotlin
 
+Jkite0917 & DRation1 & mainu0221
