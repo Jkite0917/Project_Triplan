@@ -24,7 +24,7 @@ class WeatherWorker(
 
     // OpenWeather API 서비스 및 API 키
     private val apiService = ApiClient.weatherApiService
-    private val apiKey = "~~~~~~~~~~~~~~~~~~~~~"
+    private val apiKey = "74c26aef7529a784cee3247a261edd92"
 
     // Worker 실행 시 호출되는 메서드
     override suspend fun doWork(): Result {
