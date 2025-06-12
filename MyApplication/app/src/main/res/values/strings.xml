@@ -68,4 +68,9 @@
     <string name="scroll_weather_temperature">온도</string>
     <string name="scroll_weather_raindrop">강수량</string>
 
+    <string name="bottom_navigation_title_main">캘린더</string>
+    <string name="bottom_navigation_title_weather">날씨 알림</string>
+    <string name="bottom_navigation_title_plus">추가</string>
+    <string name="bottom_navigation_title_check">체크 리스트</string>
+    <string name="bottom_navigation_title_setting">지역 설정</string>
 </resources>

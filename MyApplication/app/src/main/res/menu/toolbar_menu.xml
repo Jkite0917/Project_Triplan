@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_main"
+        android:enabled="true"
+        android:icon="@drawable/menu_calendar_asset"
+        android:title="@string/bottom_navigation_title_main" />
+    <item
+        android:id="@+id/nav_weather"
+        android:enabled="true"
+        android:icon="@drawable/menu_weather_asset"
+        android:title="@string/bottom_navigation_title_weather" />
+    <item
+        android:id="@+id/nav_plus"
+        android:enabled="true"
+        android:icon="@drawable/menu_plus_asset"
+        android:title="@string/bottom_navigation_title_plus" />
+    <item
+        android:id="@+id/nav_check"
+        android:enabled="true"
+        android:icon="@drawable/menu_check_asset"
+        android:title="@string/bottom_navigation_title_check" />
+    <item
+        android:id="@+id/nav_setting"
+        android:enabled="true"
+        android:icon="@drawable/menu_setting_asset"
+        android:title="@string/bottom_navigation_title_setting" />
+
+</menu>

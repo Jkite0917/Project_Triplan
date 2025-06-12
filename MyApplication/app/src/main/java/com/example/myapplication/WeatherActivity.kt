@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import android.widget.ImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -29,7 +30,7 @@ class WeatherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_weather)
-        setupButtonListeners()
+        setupBottomNavigation()
 
         // 데이터베이스 초기화
         database = LocalDatabase.getDatabase(this)
@@ -82,35 +83,37 @@ class WeatherActivity : AppCompatActivity() {
         }
     }
 
-    // 버튼 리스너 설정 함수
-    private fun setupButtonListeners() {
-        buttonLeft1 = findViewById(R.id.button_all_cardview_left1)
-        buttonLeft2 = findViewById(R.id.button_all_cardview_left2)
-        buttonRight1 = findViewById(R.id.button_all_cardview_right1)
-        buttonRight2 = findViewById(R.id.button_all_cardview_right2)
-        buttonCenter = findViewById(R.id.button_all_cardview_center)
+    // 하단 메뉴바 화면 이동 기능
+    private fun setupBottomNavigation() {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        buttonLeft1.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-        }
-
-        buttonLeft2.setOnClickListener {
-            // 현재 액티비티가 WeatherActivity일 때는 동작하지 않음
-        }
-
-        buttonRight1.setOnClickListener {
-            startActivity(Intent(this, CheckActivity::class.java))
-        }
-
-        buttonRight2.setOnClickListener {
-            startActivity(Intent(this, SettingActivity::class.java))
-        }
-
-        buttonCenter.setOnClickListener {
-            val bottomSheet = WeatherAddActivity { newItem ->
-                addItemToWeatherList(newItem)
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_main -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.nav_weather -> {
+                    //startActivity(Intent(this, WeatherActivity::class.java))
+                    true
+                }
+                R.id.nav_plus -> {
+                    val bottomSheet = WeatherAddActivity { newItem ->
+                        addItemToWeatherList(newItem)
+                    }
+                    bottomSheet.show(supportFragmentManager, bottomSheet.tag)
+                    true
+                }
+                R.id.nav_check -> {
+                    startActivity(Intent(this, CheckActivity::class.java))
+                    true
+                }
+                R.id.nav_setting -> {
+                    startActivity(Intent(this, SettingActivity::class.java))
+                    true
+                }
+                else -> false
             }
-            bottomSheet.show(supportFragmentManager, bottomSheet.tag)
         }
     }
 

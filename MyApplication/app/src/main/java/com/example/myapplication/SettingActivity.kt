@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageButton
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SettingActivity : AppCompatActivity() {
     private lateinit var buttonLeft1: ImageButton
@@ -21,7 +22,7 @@ class SettingActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
-        setupButtonListeners()
+        setupBottomNavigation()
 
         sharedPreferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
 
@@ -82,26 +83,35 @@ class SettingActivity : AppCompatActivity() {
 
     }
 
-    private fun setupButtonListeners() {
-        buttonLeft1 = findViewById(R.id.button_all_cardview_left1)
-        buttonLeft2 = findViewById(R.id.button_all_cardview_left2)
-        buttonRight1 = findViewById(R.id.button_all_cardview_right1)
-        buttonRight2 = findViewById(R.id.button_all_cardview_right2)
+    // 하단 메뉴바 화면 이동 기능
+    private fun setupBottomNavigation() {
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
-        buttonLeft1.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
-        }
-
-        buttonLeft2.setOnClickListener {
-            startActivity(Intent(this, WeatherActivity::class.java))
-        }
-
-        buttonRight1.setOnClickListener {
-            startActivity(Intent(this, CheckActivity::class.java))
-        }
-
-        buttonRight2.setOnClickListener {
-            // 현재 액티비티가 SettingActivity일 때 아무 동작도 하지 않음
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_main -> {
+                    // 현재 MainActivity라면 아무 작업 안함
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.nav_weather -> {
+                    startActivity(Intent(this, WeatherActivity::class.java))
+                    true
+                }
+                R.id.nav_plus -> {
+                    val bottomSheet = MainAddActivity()
+                    bottomSheet.show(supportFragmentManager, bottomSheet.tag)
+                    true
+                }
+                R.id.nav_check -> {
+                    startActivity(Intent(this, CheckActivity::class.java))
+                    true
+                }
+                R.id.nav_setting -> {
+                    true
+                }
+                else -> false
+            }
         }
     }
 }
