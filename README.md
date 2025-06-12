@@ -1,4 +1,4 @@
-# Project_-
-2024 2학기 SW프로젝트 정상화팀 안드로이드 어플리케이션 프로젝트 깃허브
+인하공전 2024 2학기 sw프로젝트 강의
+Android Studio & Kotlin
 
-제하하하하 에이스 대체 이공격은 뭐냐!
+Jkite0917 & DRation1 & mainu0221
